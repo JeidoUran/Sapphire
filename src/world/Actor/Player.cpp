@@ -74,6 +74,7 @@ Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
   m_markedForRemoval( false ),
   m_mount( 0 ),
   m_emoteMode( 0 ),
+  m_modelChara( 0 ),
   m_directorInitialized( false ),
   m_onEnterEventDone( false )
 {
@@ -147,6 +148,11 @@ uint8_t Sapphire::Entity::Player::getGmRank() const
 void Sapphire::Entity::Player::setGmRank( uint8_t rank )
 {
   m_gmRank = rank;
+}
+
+uint16_t Sapphire::Entity::Player::getModelChara() const
+{
+  return m_modelChara;
 }
 
 bool Sapphire::Entity::Player::getGmInvis() const

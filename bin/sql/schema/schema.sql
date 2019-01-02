@@ -51,6 +51,7 @@ CREATE TABLE `charainfo` (
   `Mount` smallint(6) DEFAULT '0',
   `InvincibleGM` smallint(6) DEFAULT '0',
   `Voice` smallint(6) DEFAULT '0',
+  `ModelChara` smallint(12) DEFAULT '0',
   `Customize` binary(26) DEFAULT NULL,
   `ModelMainWeapon` decimal(20,0) DEFAULT '0',
   `ModelSubWeapon` decimal(20,0) DEFAULT '0',

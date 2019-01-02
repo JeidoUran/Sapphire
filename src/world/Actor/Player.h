@@ -813,6 +813,10 @@ namespace Sapphire::Entity
     void setAutoattack( bool mode );
 
     bool isAutoattackOn() const;
+	
+	uint16_t getModelChara() const;
+	
+	void setModelChara( uint8_t modelChara );
 
     // Content Finder handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1020,6 +1024,8 @@ namespace Sapphire::Entity
     uint16_t zoneId;
     bool m_gmInvis = false;
 
+	uint16_t m_modelChara;
+	
     uint8_t m_equipDisplayFlags;
 
     bool m_bInCombat;

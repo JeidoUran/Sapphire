@@ -41,6 +41,8 @@ namespace Sapphire::Network::Packets::Server
       m_data.level = player.getLevel();
       m_data.gmRank = player.getGmRank();
       m_data.pose = player.getPose();
+	  
+	  m_data.modelChara = player.getModelChara();
 
       memcpy( m_data.look, player.getLookArray(), sizeof( m_data.look ) );
 

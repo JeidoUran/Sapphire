@@ -32,7 +32,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                                "Aetheryte, HowTo, Minions, Mounts, Orchestrion, EquippedMannequin, ConfigFlags, "
                                "QuestCompleteFlags, OpeningSequence, QuestTracking, GrandCompany, "
                                "GrandCompanyRank, Discovery, GMRank, EquipDisplayFlags, Unlocks, CFPenaltyUntil, "
-                               "Pose "
+                               "Pose, modelChara "
                                "FROM charainfo WHERE CharacterId = ?;", CONNECTION_SYNC );
 
 
