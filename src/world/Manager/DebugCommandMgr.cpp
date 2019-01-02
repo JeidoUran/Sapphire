@@ -271,7 +271,13 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     sscanf( params.c_str(), "%u", &modelId );
 
     player.setModelChara( modelId );
-    player.sendNotice( "Player's model set to " + std::to_string( modelId ) + ". Respawn required." );
+    player.sendNotice( "Player's model set to " + std::to_string( modelId ) + "." );
+	auto inRange = player.getInRangeActors( true );
+	for( auto actor : inRange )
+	{
+	player.despawn( actor->getAsPlayer() );
+	player.spawn( actor->getAsPlayer() );
+	}
   }
   else if( subCommand == "mount" )
   {
