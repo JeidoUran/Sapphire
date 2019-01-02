@@ -155,6 +155,11 @@ uint16_t Sapphire::Entity::Player::getModelChara() const
   return m_modelChara;
 }
 
+void Sapphire::Entity::Player::setModelChara( uint16_t model )
+{
+  m_modelChara = model;
+}
+
 bool Sapphire::Entity::Player::getGmInvis() const
 {
   return m_gmInvis;

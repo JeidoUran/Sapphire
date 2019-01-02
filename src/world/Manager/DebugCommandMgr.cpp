@@ -265,6 +265,14 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     player.setEorzeaTimeOffset( timestamp );
     player.sendNotice( "Eorzea time offset: " + std::to_string( timestamp ) );
   }
+  else if( subCommand == "model" )
+  {
+    uint32_t modelId;
+    sscanf( params.c_str(), "%u", &modelId );
+
+    player.setModelChara( modelId );
+    player.sendNotice( "Player's model set to " + std::to_string( modelId ) + ". Respawn required." );
+  }
   else if( subCommand == "mount" )
   {
     int32_t id;

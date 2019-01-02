@@ -816,7 +816,7 @@ namespace Sapphire::Entity
 	
 	uint16_t getModelChara() const;
 	
-	void setModelChara( uint8_t modelChara );
+	void setModelChara( uint16_t modelChara );
 
     // Content Finder handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
