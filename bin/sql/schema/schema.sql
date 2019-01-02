@@ -21,6 +21,7 @@ CREATE TABLE `bnpctemplate` (
   `pose` int(3) DEFAULT NULL,
   `modelChara` int(5) DEFAULT NULL,
   `displayFlags` int(10) DEFAULT NULL,
+  `currentMount` int(10) DEFAULT '0',
   `Look` binary(26) DEFAULT NULL,
   `Models` binary(40) DEFAULT NULL,
    PRIMARY KEY (`Id`),

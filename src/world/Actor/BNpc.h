@@ -23,7 +23,7 @@ namespace Sapphire::Entity
 
   public:
     BNpc( FrameworkPtr pFw );
-    BNpc( BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, uint8_t level, FrameworkPtr pFw );
+    BNpc( BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, float rot, uint8_t level, FrameworkPtr pFw );
 
     virtual ~BNpc() override;
 
@@ -36,7 +36,8 @@ namespace Sapphire::Entity
     uint32_t getBNpcNameId() const;
 
     uint8_t getEnemyType() const;
-
+    uint8_t getCurrentMount() const;
+	
     uint64_t getWeaponMain() const;
     uint64_t getWeaponSub() const;
 
@@ -54,6 +55,7 @@ namespace Sapphire::Entity
     uint16_t m_modelChara;
     uint32_t m_displayFlags;
     uint8_t m_level;
+	uint8_t m_currentMount;
 
   };
 

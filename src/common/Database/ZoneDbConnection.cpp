@@ -178,7 +178,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
   /// BNPC TEMPLATES
   prepareStatement( ZONE_SEL_BNPCTEMPLATES,
                     "SELECT Id, Name, bNPCBaseId, bNPCNameId, mainWeaponModel, "
-                           "secWeaponModel, aggressionMode, enemyType, pose, "
+                           "secWeaponModel, aggressionMode, enemyType, currentMount, pose, "
                            "modelChara, displayFlags, Look, Models "
                     "FROM bnpctemplate WHERE 1;",
                     CONNECTION_BOTH );

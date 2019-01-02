@@ -62,7 +62,7 @@ namespace Sapphire::Network::Packets::Server
 
       m_data.classJob = 0;
       //m_data.voice = bnpc.getVoiceId();
-      //m_data.currentMount = bnpc.getCurrentMount();
+      m_data.currentMount = bnpc.getCurrentMount();
 
       //m_data.onlineStatus = static_cast< uint8_t >( bnpc.getOnlineStatus() );
 
@@ -95,7 +95,7 @@ namespace Sapphire::Network::Packets::Server
         m_data.displayFlags |= static_cast< uint16_t >( Common::DisplayFlags::Invisible );
       }*/
 
-      //m_data.currentMount = bnpc.getCurrentMount();
+      m_data.currentMount = bnpc.getCurrentMount();
       //m_data.persistentEmote = bnpc.getPersistentEmote();
 
       m_data.targetId = static_cast< uint64_t >( bnpc.getTargetId() );
