@@ -17,6 +17,7 @@ namespace Sapphire::Entity
     uint64_t m_weaponSub;
     uint8_t m_aggressionMode;
     uint8_t m_enemyType;
+	uint8_t m_currentMount;
     uint8_t m_onlineStatus;
     uint8_t m_pose;
     uint16_t m_modelChara;
@@ -28,7 +29,7 @@ namespace Sapphire::Entity
     BNpcTemplate() {};
 
     BNpcTemplate( uint32_t id, uint32_t baseId, uint32_t nameId, uint64_t weaponMain, uint64_t weaponSub, uint8_t aggressionMode,
-                  uint8_t enemyType, uint8_t onlineStatus, uint8_t pose, uint16_t modelChara,
+                  uint8_t enemyType, uint8_t currentMount, uint8_t onlineStatus, uint8_t pose, uint16_t modelChara,
                   uint32_t displayFlags = 0,
                   uint32_t* modelEquip = nullptr, uint8_t* customize = nullptr );
 
@@ -61,6 +62,10 @@ namespace Sapphire::Entity
     uint8_t getEnemyType() const;
 
     void setEnemyType( uint8_t enemyType );
+	
+	uint8_t getCurrentMount() const;
+
+    void setCurrentMount( uint8_t currentMount );
 
     uint8_t getOnlineStatus() const;
 
@@ -81,6 +86,7 @@ namespace Sapphire::Entity
     const uint32_t* getModelEquip() const;
 
     const uint8_t* getCustomize() const;
+	
   };
 
 

@@ -40,7 +40,7 @@ Sapphire::Entity::BNpc::BNpc( FrameworkPtr pFw ) :
 {
 }
 
-Sapphire::Entity::BNpc::BNpc( BNpcTemplatePtr pTemplate, float posX, float posY, float posZ,
+Sapphire::Entity::BNpc::BNpc( BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, float rot,
                               uint8_t level, FrameworkPtr pFw ) :
   Npc( ObjKind::BattleNpc, pFw )
 {
@@ -53,9 +53,11 @@ Sapphire::Entity::BNpc::BNpc( BNpcTemplatePtr pTemplate, float posX, float posY,
   m_bNpcNameId = pTemplate->getBNpcNameId();
   m_bNpcBaseId = pTemplate->getBNpcBaseId();
   m_enemyType = pTemplate->getEnemyType();
+  m_currentMount = pTemplate->getCurrentMount();
   m_pos.x = posX;
   m_pos.y = posY;
   m_pos.z = posZ;
+  m_rot = rot;
   m_level = level;
 
   m_maxHp = 200;
@@ -113,6 +115,11 @@ uint32_t Sapphire::Entity::BNpc::getBNpcBaseId() const
 uint32_t Sapphire::Entity::BNpc::getBNpcNameId() const
 {
   return m_bNpcNameId;
+}
+
+uint8_t Sapphire::Entity::BNpc::getCurrentMount() const
+{
+  return m_currentMount;
 }
 
 void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )

@@ -435,6 +435,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
                                                    player.getPos().x,
                                                    player.getPos().y,
                                                    player.getPos().z,
+												   player.getRot(),
                                                    1, framework() );
 
     auto playerZone = player.getCurrentZone();
