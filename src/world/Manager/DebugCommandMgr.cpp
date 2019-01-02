@@ -576,9 +576,14 @@ Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Pla
                                                          std::shared_ptr< DebugCommand > command )
 {
   auto pServerZone = framework()->get< World::ServerMgr >();
-  auto pSession = pServerZone->getSession( player.getId() );
-  if( pSession )
-    pSession->getZoneConnection()->injectPacket( data + 7, player );
+  auto inRange = player.getInRangeActors( true );
+	for( auto actor : inRange )
+	{
+      auto pSession = pServerZone->getSession( actor->getId() );
+      if( pSession )
+      pSession->getZoneConnection()->injectPacket( data + 7, player );
+	}
+
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::injectChatPacket( char* data, Entity::Player& player,
