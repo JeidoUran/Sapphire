@@ -624,7 +624,10 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
     }
     case GmCommand::Jump:
     {
-      if( targetPlayer->getZoneId() != player.getZoneId() )
+      if ( targetPlayer->getCurrentInstance() )
+		player.setInstance( targetPlayer->getCurrentInstance() );
+	  
+	  else if ( targetPlayer->getZoneId() != player.getZoneId() )
       {
         player.setZone( targetPlayer->getZoneId() );
       }
@@ -638,9 +641,10 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       if( player.getCurrentInstance() )
         targetPlayer->setInstance( player.getCurrentInstance() );
 
-	  else ( targetPlayer->getZoneId() != player.getZoneId() )
+	  else if ( targetPlayer->getZoneId() != player.getZoneId() )
+	  {
         targetPlayer->setZone( player.getZoneId() );
-
+	  }
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       player.sendNotice( "Calling " + targetPlayer->getName() );
       break;
