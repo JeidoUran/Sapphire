@@ -10,8 +10,6 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Database/DatabaseDef.h>
 #include <cmath>
-#include <cstdlib>
-#include <time.h>
 
 #include "DebugCommand/DebugCommand.h"
 #include "DebugCommandMgr.h"
@@ -273,12 +271,15 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     sscanf( params.c_str(), "%u", &modelId );
 
     player.setModelChara( modelId );
-    player.sendNotice( "Player's model set to " + std::to_string( modelId ) + "." );
+    player.sendNotice( "Player model set to " + std::to_string( modelId ) + "." );
 	auto inRange = player.getInRangeActors( true );
 	for( auto actor : inRange )
 	{
-	player.despawn( actor->getAsPlayer() );
-	player.spawn( actor->getAsPlayer() );
+		if( actor->isPlayer() )
+		{
+	      player.despawn( actor->getAsPlayer() );
+	      player.spawn( actor->getAsPlayer() );
+		}
 	}
   }
   else if( subCommand == "mount" )
@@ -569,9 +570,9 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
   }
   else if ( subCommand == "random" || subCommand == "rand" )
   {
+	srand (time(NULL));
     uint32_t maxnumber;
 	uint32_t randomnumber;
-	srand (time(NULL));
     sscanf( params.c_str(), "%u", &maxnumber );
 
     randomnumber = rand() % ( maxnumber ) + 1;
@@ -598,9 +599,12 @@ void Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity
   auto inRange = player.getInRangeActors( true );
 	for( auto actor : inRange )
 	{
+		if( actor->isPlayer() )
+		{
       auto pSession = pServerZone->getSession( actor->getId() );
       if( pSession )
       pSession->getZoneConnection()->injectPacket( data + 7, player );
+		}
 	}
 
 }
@@ -863,7 +867,7 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     else
       player.sendDebug( "Unknown instance with id: " + std::to_string( instanceId ) );
   }
-  else if( subCommand == "bindall" )
+  else if( subCommand == "bindall" || subCommand == "binda" )
   {
     uint32_t instanceId;
     sscanf( params.c_str(), "%d", &instanceId );
@@ -875,7 +879,11 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
 	  auto inRange = player.getInRangeActors( true );
 	  for( auto actor : inRange )
 	  {
-        pInstanceContent->bindPlayer( actor->getId() );
+		if( actor->isPlayer() )
+		{
+          pInstanceContent->bindPlayer( actor->getId() );
+		  player.sendDebug( "Player bound." );
+		}
       }
 	  player.sendDebug(
       "All players in range are now bound to instance with id: " + std::to_string( pInstanceContent->getGuId() ) +

@@ -143,8 +143,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
-        targetPlayer->despawn( actor->getAsPlayer() );
-        targetPlayer->spawn( actor->getAsPlayer() );
+		 if( actor->isPlayer() )
+		 {
+           targetPlayer->despawn( actor->getAsPlayer() );
+           targetPlayer->spawn( actor->getAsPlayer() );
+		 }
       }
       break;
     }
@@ -156,8 +159,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
-        targetPlayer->despawn( actor->getAsPlayer() );
-        targetPlayer->spawn( actor->getAsPlayer() );
+		 if( actor->isPlayer() )
+		 {
+           targetPlayer->despawn( actor->getAsPlayer() );
+           targetPlayer->spawn( actor->getAsPlayer() );
+		 }
       }
       break;
     }
@@ -169,8 +175,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       auto inRange = targetActor->getInRangeActors();
       for( auto actor : inRange )
       {
-        targetPlayer->despawn( actor->getAsPlayer() );
-        targetPlayer->spawn( actor->getAsPlayer() );
+		 if( actor->isPlayer() )
+		 {
+           targetPlayer->despawn( actor->getAsPlayer() );
+           targetPlayer->spawn( actor->getAsPlayer() );
+		 }
       }
       break;
     }
@@ -223,8 +232,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
 
       for( auto actor : player.getInRangeActors() )
       {
-        player.despawn( actor->getAsPlayer() );
-        player.spawn( actor->getAsPlayer() );
+		 if( actor->isPlayer() )
+		 {
+           player.despawn( actor->getAsPlayer() );
+           player.spawn( actor->getAsPlayer() );
+		 }
       }
       break;
     }
@@ -623,14 +635,11 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
     }
     case GmCommand::Call:
     {
-      // We shouldn't be able to call a player into an instance, only call them out of one
       if( player.getCurrentInstance() )
-      {
-        player.sendUrgent( "You are unable to call a player while bound to a battle instance." );
-        return;
-      }
+        targetPlayer->setInstance( player.getCurrentInstance() );
 
-      targetPlayer->setInstance( player.getCurrentZone() );
+	  else ( targetPlayer->getZoneId() != player.getZoneId() )
+        targetPlayer->setZone( player.getZoneId() );
 
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       player.sendNotice( "Calling " + targetPlayer->getName() );
