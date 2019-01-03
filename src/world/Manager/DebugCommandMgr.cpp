@@ -10,6 +10,8 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Database/DatabaseDef.h>
 #include <cmath>
+#include <cstdlib>
+#include <time.h>
 
 #include "DebugCommand/DebugCommand.h"
 #include "DebugCommandMgr.h"
@@ -552,7 +554,7 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
                  "subCommand " + subCommand + " params: " + params );
 
 
-  if( ( subCommand == "pos" ) )
+  if ( subCommand == "pos" )
   {
 
     int16_t map_id = pExdData->get< Sapphire::Data::TerritoryType >( player.getCurrentZone()->getTerritoryTypeId() )->map;
@@ -565,6 +567,23 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
                        std::to_string( map_id ) + "\nZoneID: " +
                        std::to_string( player.getCurrentZone()->getTerritoryTypeId() ) + "\n" );
   }
+  else if ( subCommand == "random" || subCommand == "rand" )
+  {
+    uint32_t maxnumber;
+	uint32_t randomnumber;
+	srand (time(NULL));
+    sscanf( params.c_str(), "%u", &maxnumber );
+
+    randomnumber = rand() % ( maxnumber ) + 1;
+	//TODO: less ghetto way of doing it + make it a main command instead of a sub
+	//auto inRange = player.getInRangeActors( true );
+	//for( auto actor : inRange )
+	//{
+	auto randomResult = ( std::make_shared< ServerNoticePacket >( player.getId(), player.getName() + " rolls a " + std::to_string( randomnumber ) + "." ) );
+	player.getCurrentZone()->queuePacketForRange( player, 50, randomResult);
+    player.queuePacket ( randomResult );
+	//}
+  }
   else
   {
     player.sendUrgent( subCommand + " is not a valid GET command." );
@@ -572,8 +591,7 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
 
 }
 
-void
-Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Player& player,
+void Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Player& player,
                                                          std::shared_ptr< DebugCommand > command )
 {
   auto pServerZone = framework()->get< World::ServerMgr >();
