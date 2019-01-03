@@ -10,6 +10,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Database/DatabaseDef.h>
 #include <cmath>
+#include <random>
 
 #include "DebugCommand/DebugCommand.h"
 #include "DebugCommandMgr.h"
@@ -59,6 +60,8 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "script", &DebugCommandMgr::script, "Server script utilities.", 1 );
   registerCommand( "instance", &DebugCommandMgr::instance, "Instance utilities", 1 );
   registerCommand( "housing", &DebugCommandMgr::housing, "Housing utilities", 1 );
+  registerCommand( "random", &DebugCommandMgr::random, "Fkn", 1 );
+  registerCommand( "ely", &DebugCommandMgr::ely, "Fkn", 1 );
 }
 
 // clear all loaded commands
@@ -567,23 +570,6 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
                        std::to_string( player.getRot() ) + "\nMapId: " +
                        std::to_string( map_id ) + "\nZoneID: " +
                        std::to_string( player.getCurrentZone()->getTerritoryTypeId() ) + "\n" );
-  }
-  else if ( subCommand == "random" || subCommand == "rand" )
-  {
-	srand (time(NULL));
-    uint32_t maxnumber;
-	uint32_t randomnumber;
-    sscanf( params.c_str(), "%u", &maxnumber );
-
-    randomnumber = rand() % ( maxnumber ) + 1;
-	//TODO: less ghetto way of doing it + make it a main command instead of a sub
-	//auto inRange = player.getInRangeActors( true );
-	//for( auto actor : inRange )
-	//{
-	auto randomResult = ( std::make_shared< ServerNoticePacket >( player.getId(), player.getName() + " rolls a " + std::to_string( randomnumber ) + "." ) );
-	player.getCurrentZone()->queuePacketForRange( player, 50, randomResult);
-    player.queuePacket ( randomResult );
-	//}
   }
   else
   {
@@ -1111,5 +1097,81 @@ void Sapphire::World::Manager::DebugCommandMgr::housing( char* data, Entity::Pla
   else
   {
     player.sendDebug( "Unknown sub command." );
+  }
+}
+
+void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+  {
+    std::string subCommand;
+
+    // check if the command has parameters
+    std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+    std::size_t spos = tmpCommand.find_first_of( " " );
+	Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
+               "Command random params: " + tmpCommand );
+    uint32_t maxnumber;
+	//uint32_t randomnumber;
+    sscanf( tmpCommand.c_str(), "%u", &maxnumber );
+	std::random_device rd;     // only used once to initialise (seed) engine
+    std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+    std::uniform_int_distribution<int> uni(0, ( maxnumber )); // guaranteed unbiased
+	auto randomnumber = uni(rng);
+
+	Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
+               "Result: " + std::to_string( randomnumber ));
+	//TODO: less ghetto way of displaying the result
+	//auto inRange = player.getInRangeActors( true );
+	//for( auto actor : inRange )
+	//{
+	auto randomResult = ( std::make_shared< ServerNoticePacket >( player.getId(), player.getName() + " rolls a " + std::to_string( randomnumber ) + "." ) );
+	player.getCurrentZone()->queuePacketForRange( player, 50, randomResult);
+    player.queuePacket ( randomResult );
+	//}
+  }
+  
+void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+{
+  uint32_t elyexcuse;
+
+  elyexcuse = rand() %  7;
+  if( elyexcuse == 0)
+  {
+	  player.sendDebug( "Oui c'est parceque j'ai pas pu utiliser Restreinte parceque j'avais pas la portée vu que l'angle de la caméra relatif à l'inclinaison de la Lune était pas bon." );
+  }
+  else if( elyexcuse == 1)
+  {
+	  player.sendDebug( "Oui c'est parceque j'étais en plein opener du coup je regardais mes boutons s'allumer et du coup bah lol." );
+  }
+  else if( elyexcuse == 2)
+  {
+	  player.sendDebug( "Oui c'est parceque j'ai pas vu Midgardosrmr sur le bord de l'arène en même temps il est pas super grand hein faut comprendre." );
+  }
+  else if( elyexcuse == 3)
+  {
+	  player.sendDebug( "Oui c'est parceque l'Exaflare était superposé sur le sol et du coup baaaaaah je me suis douché dedans :3" );
+  }
+  else if( elyexcuse == 4)
+  {
+	  player.sendDebug( "On peut faire une pause de 50 minutes ? J'ai un event Nouvel An à faire." );
+  }
+  else if( elyexcuse == 5)
+  {
+	  player.setModelChara( 2335 );
+	  auto inRange = player.getInRangeActors( true );
+	  for( auto actor : inRange )
+	  {
+		if( actor->isPlayer() )
+		{
+	      player.despawn( actor->getAsPlayer() );
+	      player.spawn( actor->getAsPlayer() );
+		}
+	  }
+  }
+  else if( elyexcuse == 6)
+  {
+	  player.takeDamage( 9999999 );
   }
 }

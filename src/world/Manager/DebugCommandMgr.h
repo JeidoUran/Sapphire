@@ -57,6 +57,11 @@ namespace Sapphire::World::Manager
     void housing( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command) ;
 
     void script( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+	
+	void random( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+	
+	void ely( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
 
   };
 
