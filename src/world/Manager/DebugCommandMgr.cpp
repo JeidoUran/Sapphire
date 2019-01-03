@@ -863,6 +863,27 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     else
       player.sendDebug( "Unknown instance with id: " + std::to_string( instanceId ) );
   }
+  else if( subCommand == "bindall" )
+  {
+    uint32_t instanceId;
+    sscanf( params.c_str(), "%d", &instanceId );
+
+    auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
+    if( instance )
+    {
+      auto pInstanceContent = instance->getAsInstanceContent();
+	  auto inRange = player.getInRangeActors( true );
+	  for( auto actor : inRange )
+	  {
+        pInstanceContent->bindPlayer( actor->getId() );
+      }
+	  player.sendDebug(
+      "All players in range are now bound to instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
+      " -> " + pInstanceContent->getName() );
+	}
+    else
+      player.sendDebug( "Unknown instance with id: " + std::to_string( instanceId ) );
+  }
   else if( subCommand == "unbind" )
   {
     uint32_t instanceId;
