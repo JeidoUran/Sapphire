@@ -1107,28 +1107,27 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
 
     // check if the command has parameters
     std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-
     std::size_t spos = tmpCommand.find_first_of( " " );
+	
 	Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
                "Command random params: " + tmpCommand );
+			   
     uint32_t maxnumber;
-	//uint32_t randomnumber;
+	
     sscanf( tmpCommand.c_str(), "%u", &maxnumber );
 	std::random_device rd;     // only used once to initialise (seed) engine
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni(0, ( maxnumber )); // guaranteed unbiased
+	
 	auto randomnumber = uni(rng);
-
+	
 	Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
                "Result: " + std::to_string( randomnumber ));
+			   
 	//TODO: less ghetto way of displaying the result
-	//auto inRange = player.getInRangeActors( true );
-	//for( auto actor : inRange )
-	//{
 	auto randomResult = ( std::make_shared< ServerNoticePacket >( player.getId(), player.getName() + " rolls a " + std::to_string( randomnumber ) + "." ) );
 	player.getCurrentZone()->queuePacketForRange( player, 50, randomResult);
     player.queuePacket ( randomResult );
-	//}
   }
   
 void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player& player,
