@@ -638,9 +638,13 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
     }
     case GmCommand::Call:
     {
+	  auto instance = player.getCurrentInstance();
+	  auto pInstanceContent = instance->getAsInstanceContent();
       if( player.getCurrentInstance() )
+      {
+        pInstanceContent->bindPlayer( targetPlayer->getId() );
         targetPlayer->setInstance( player.getCurrentInstance() );
-
+      }
 	  else if ( targetPlayer->getZoneId() != player.getZoneId() )
 	  {
         targetPlayer->setZone( player.getZoneId() );
