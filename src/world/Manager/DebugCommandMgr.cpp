@@ -449,7 +449,10 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     auto bNpcTemplate = serverZone->getBNpcTemplate( params );
 
     if( !bNpcTemplate )
+	{
       player.sendNotice( "Template " + params + " not found in cache!" );
+	  return;
+	}
 
     auto pBNpc = std::make_shared< Entity::BNpc >( bNpcTemplate,
                                                    player.getPos().x,
@@ -1117,7 +1120,7 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
 	
 	if( maxnumber > 1000000 )
 	{
-		player.sendUrgent( "Your number is too high." );
+		player.sendUrgent( "Input a number between 0 and 1000000." );
 		return;
 	}
 	std::random_device rd;     // only used once to initialise (seed) engine
