@@ -624,10 +624,14 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
     }
     case GmCommand::Jump:
     {
+      auto instance = player.getCurrentInstance();
+      auto pInstanceContent = instance->getAsInstanceContent();
       if ( targetPlayer->getCurrentInstance() )
-		player.setInstance( targetPlayer->getCurrentInstance() );
-	  
-	  else if ( targetPlayer->getZoneId() != player.getZoneId() )
+      {
+        pInstanceContent->bindPlayer( player.getId() );
+        player.setInstance( targetPlayer->getCurrentInstance() );
+      }
+      else if ( targetPlayer->getZoneId() != player.getZoneId() )
       {
         player.setZone( targetPlayer->getZoneId() );
       }
@@ -638,17 +642,17 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
     }
     case GmCommand::Call:
     {
-	  auto instance = player.getCurrentInstance();
-	  auto pInstanceContent = instance->getAsInstanceContent();
+      auto instance = player.getCurrentInstance();
+      auto pInstanceContent = instance->getAsInstanceContent();
       if( player.getCurrentInstance() )
       {
         pInstanceContent->bindPlayer( targetPlayer->getId() );
         targetPlayer->setInstance( player.getCurrentInstance() );
       }
-	  else if ( targetPlayer->getZoneId() != player.getZoneId() )
-	  {
+      else if ( targetPlayer->getZoneId() != player.getZoneId() )
+      {
         targetPlayer->setZone( player.getZoneId() );
-	  }
+      }
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       player.sendNotice( "Calling " + targetPlayer->getName() );
       break;
