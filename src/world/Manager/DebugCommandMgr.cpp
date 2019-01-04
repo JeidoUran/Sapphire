@@ -1112,9 +1112,14 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
 	Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
                "Command random params: " + tmpCommand );
 			   
-    uint32_t maxnumber;
-	
+    uint32_t maxnumber( 100 );
     sscanf( tmpCommand.c_str(), "%u", &maxnumber );
+	
+	if( maxnumber > 1000000 )
+	{
+		player.sendUrgent( "Your number is too high." );
+		return;
+	}
 	std::random_device rd;     // only used once to initialise (seed) engine
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni(0, ( maxnumber )); // guaranteed unbiased
