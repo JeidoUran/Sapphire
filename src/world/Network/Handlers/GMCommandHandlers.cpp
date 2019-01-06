@@ -498,7 +498,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         }
         if( doTeleport )
         {
-          player.teleport( teleport );
+          targetPlayer->teleport( teleport );
         }
         else
         {
