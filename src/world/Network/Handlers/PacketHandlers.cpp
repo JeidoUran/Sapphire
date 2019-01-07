@@ -353,7 +353,7 @@ void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
   else
   {
     // No zoneline found, revert to last zone
-    player.sendUrgent( "ZoneLine " + std::to_string( zoneLineId ) + " not found." );
+    player.sendUrgent( "ZoneLine {0} not found.", zoneLineId );
     targetPos.x = 0;
     targetPos.y = 0;
     targetPos.z = 0;
@@ -657,7 +657,9 @@ void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
   //tellPacket.data().u2a = 0x2E;
   //tellPacket.data().u2b = 0x40;
   if( player.isActingAsGm() )
-    tellPacket->data().u3b = 0x01;	
+  {
+    tellPacket->data().isGm = true;
+  }
   pTargetPlayer->queueChatPacket( tellPacket );
 
 }
