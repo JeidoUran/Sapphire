@@ -834,7 +834,7 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     sscanf( params.c_str(), "%d", &instanceId );
 
     auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
-    if( instance )
+    if( instance->getAsInstanceContent() )
     {
       auto pInstanceContent = instance->getAsInstanceContent();
       pInstanceContent->bindPlayer( player.getId() );
@@ -842,6 +842,8 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
         "Now bound to instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
         " -> " + pInstanceContent->getName() );
     }
+    else if( instance )
+      player.sendUrgent( instance->getName() + " is a Zone or a PublicContent and do not require binding." );
     else
       player.sendDebug( "Unknown instance with id#{0}", instanceId );
   }
