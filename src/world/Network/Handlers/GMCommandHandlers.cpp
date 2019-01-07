@@ -204,28 +204,6 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       player.sendNotice( "Calling {0}", targetPlayer->getName() );
       break;
     }
-    case GmCommand::Inspect:
-    {
-      player.sendNotice( "Name: {0}"
-                         "\nGil: {1}"
-                         "\nZone: {2}"
-                         "({3})"
-                         "\nClass: {4}"
-                         "\nLevel: {5}"
-                         "\nExp: {6}"
-                         "\nSearchMessage: {7}"
-                         "\nPlayTime: {8}",
-                         targetPlayer->getName(),
-                         targetPlayer->getCurrency( CurrencyType::Gil ),
-                         targetPlayer->getCurrentZone()->getName(),
-                         targetPlayer->getZoneId(),
-                         static_cast< uint8_t >( targetPlayer->getClass() ),
-                         targetPlayer->getLevel(),
-                         targetPlayer->getExp(),
-                         targetPlayer->getSearchMessage(),
-                         targetPlayer->getPlayTime() );
-      break;
-    }
     case GmCommand::Speed:
     {
       targetPlayer->queuePacket( makeActorControl143( player.getId(), Flee, param1 ) );
@@ -664,6 +642,28 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       targetPlayer->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
       player.sendNotice( "Calling {0}", targetPlayer->getName() );
+      break;
+    }
+    case GmCommand::Inspect:
+    {
+      player.sendNotice( "Name: {0}"
+                         "\nGil: {1}"
+                         "\nZone: {2}"
+                         "({3})"
+                         "\nClass: {4}"
+                         "\nLevel: {5}"
+                         "\nExp: {6}"
+                         "\nSearchMessage: {7}"
+                         "\nPlayTime: {8}",
+                         targetPlayer->getName(),
+                         targetPlayer->getCurrency( CurrencyType::Gil ),
+                         targetPlayer->getCurrentZone()->getName(),
+                         targetPlayer->getZoneId(),
+                         static_cast< uint8_t >( targetPlayer->getClass() ),
+                         targetPlayer->getLevel(),
+                         targetPlayer->getExp(),
+                         targetPlayer->getSearchMessage(),
+                         targetPlayer->getPlayTime() );
       break;
     }
     default:
