@@ -906,7 +906,7 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     else
       player.sendDebug( "Failed to create instance with id#{0}", zoneId );
   }
-  if( subCommand == "createbind" || subCommand == "crb" )
+  else if( subCommand == "createbind" || subCommand == "crb" )
   {
     uint32_t instanceContentId;
     sscanf( params.c_str(), "%d", &instanceContentId );
