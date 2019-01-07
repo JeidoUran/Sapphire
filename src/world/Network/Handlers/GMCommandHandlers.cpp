@@ -624,13 +624,6 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
     }
     case GmCommand::Call:
     {
-      auto instance = player.getCurrentInstance();
-      auto pInstanceContent = instance->getAsInstanceContent();
-      if( player.getCurrentInstance() )
-      {
-        pInstanceContent->bindPlayer( targetPlayer->getId() );
-        targetPlayer->setInstance( player.getCurrentInstance() );
-      }
       targetPlayer->prepareZoning( player.getZoneId(), true, 1, 0 );
       if( targetPlayer->getCurrentInstance() )
       {
@@ -638,6 +631,13 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       }
       if( targetPlayer->getCurrentZone()->getGuId() != player.getCurrentZone()->getGuId() )
       {
+        // Checks if the player is in an InstanceContent to avoid binding to a Zone or PublicContent
+        if( player.getCurrentInstance() )
+        {
+          auto pInstanceContent = player.getCurrentInstance()->getAsInstanceContent();
+          // Not sure if GMs actually get bound to an instance they jump to on retail. It's mostly here to avoid a crash for now
+          pInstanceContent->bindPlayer( targetPlayer->getId() );
+        }
         targetPlayer->setInstance( player.getCurrentZone()->getGuId() );
       }
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
