@@ -456,7 +456,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
                                                    player.getPos().x,
                                                    player.getPos().y,
                                                    player.getPos().z,
-												   player.getRot(),
+                                                   player.getRot(),
                                                    1, framework() );
 
     auto playerZone = player.getCurrentZone();
@@ -847,7 +847,7 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     else
       player.sendDebug( "Unknown instance with id#{0}", instanceId );
   }
-  else if( subCommand == "bindall" || subCommand == "binda" )
+  else if( subCommand == "bindrange" || subCommand == "bindr" )
   {
     uint32_t instanceId;
     sscanf( params.c_str(), "%d", &instanceId );
@@ -856,19 +856,19 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     if( instance )
     {
       auto pInstanceContent = instance->getAsInstanceContent();
-	  auto inRange = player.getInRangeActors( true );
-	  for( auto actor : inRange )
-	  {
-		if( actor->isPlayer() )
-		{
+      auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
           pInstanceContent->bindPlayer( actor->getId() );
-		  player.sendDebug( "Player bound." );
-		}
+          player.sendDebug( "Player bound." );
+        }
       }
-	  player.sendDebug(
+       player.sendDebug(
       "All players in range are now bound to instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
       " -> " + pInstanceContent->getName() );
-	}
+    }
     else
       player.sendDebug( "Unknown instance with id: " + std::to_string( instanceId ) );
   }
@@ -905,6 +905,24 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
         "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
     else
       player.sendDebug( "Failed to create instance with id#{0}", zoneId );
+  }
+  if( subCommand == "createbind" || subCommand == "crb" )
+  {
+    uint32_t instanceContentId;
+    sscanf( params.c_str(), "%d", &instanceContentId );
+
+    auto instance = pTeriMgr->createInstanceContent( instanceContentId );
+    if( instance )
+    {
+      auto pInstanceContent = instance->getAsInstanceContent();
+      player.sendDebug( "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
+      pInstanceContent->bindPlayer( player.getId() );
+      player.sendDebug(
+      "Now bound to instance with id: " + std::to_string( instance->getGuId() ) +
+      " -> " + instance->getName() );
+    }
+    else
+      player.sendDebug( "Failed to create instance with id#{0}", instanceContentId );
   }
   else if( subCommand == "remove" || subCommand == "rm" )
   {
