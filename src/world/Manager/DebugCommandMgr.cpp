@@ -267,6 +267,24 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     player.setEorzeaTimeOffset( timestamp );
     player.sendNotice( "Eorzea time offset: {0}", timestamp );
   }
+  else if( subCommand == "fly" )
+  {
+    // TODO: Less ghetto way, current implementation isn't usable in multiplayer.
+    auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( player.getId() );
+    initZonePacket->data().zoneId = player.getCurrentZone()->getTerritoryTypeId();
+    initZonePacket->data().weatherId = static_cast< uint8_t >( player.getCurrentZone()->getCurrentWeather() );
+    initZonePacket->data().bitmask = 0x1;
+    initZonePacket->data().bitmask1 = 16;
+    initZonePacket->data().unknown5 = 0x2A;
+    initZonePacket->data().festivalId = player.getCurrentZone()->getCurrentFestival().first;
+    initZonePacket->data().additionalFestivalId = player.getCurrentZone()->getCurrentFestival().second;
+    initZonePacket->data().pos.x = player.getPos().x;
+    initZonePacket->data().pos.y = player.getPos().y;
+    initZonePacket->data().pos.z = player.getPos().z;
+
+    player.queuePacket( initZonePacket );
+    player.sendNotice( "Flight enabled." );
+  }
   else if( subCommand == "model" )
   {
     uint32_t modelId;
@@ -424,7 +442,6 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     int32_t id;
     int32_t duration;
     uint16_t param;
-
     sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
 
     auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(),
@@ -1147,42 +1164,60 @@ void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player&
 {
   uint32_t elyexcuse;
 
-  elyexcuse = rand() %  7;
+  elyexcuse = rand() %  10;
   if( elyexcuse == 0)
   {
-	  player.sendDebug( "Oui c'est parceque j'ai pas pu utiliser Restreinte parceque j'avais pas la portée vu que l'angle de la caméra relatif à l'inclinaison de la Lune était pas bon." );
+      player.sendDebug( "Oui c'est parceque j'ai pas pu utiliser Restreinte parceque j'avais pas la portée vu que l'angle de la caméra relatif à l'inclinaison de la Lune était pas bon." );
   }
   else if( elyexcuse == 1)
   {
-	  player.sendDebug( "Oui c'est parceque j'étais en plein opener du coup je regardais mes boutons s'allumer et du coup bah lol." );
+      player.sendDebug( "Oui c'est parceque j'étais en plein opener du coup je regardais mes boutons s'allumer et du coup bah lol." );
   }
   else if( elyexcuse == 2)
   {
-	  player.sendDebug( "Oui c'est parceque j'ai pas vu Midgardosrmr sur le bord de l'arène en même temps il est pas super grand hein faut comprendre." );
+      player.sendDebug( "Oui c'est parceque j'ai pas vu Midgardosrmr sur le bord de l'arène en même temps il est pas super grand hein faut comprendre." );
   }
   else if( elyexcuse == 3)
   {
-	  player.sendDebug( "Oui c'est parceque l'Exaflare était superposé sur le sol et du coup baaaaaah je me suis douché dedans :3" );
+       player.sendDebug( "Oui c'est parceque l'Exaflare était superposé sur le sol et du coup baaaaaah je me suis douché dedans :3" );
   }
   else if( elyexcuse == 4)
   {
-	  player.sendDebug( "On peut faire une pause de 50 minutes ? J'ai un event Nouvel An à faire." );
+       player.sendDebug( "On peut faire une pause de 50 minutes ? J'ai un event Nouvel An à faire." );
   }
   else if( elyexcuse == 5)
   {
-	  player.setModelChara( 2335 );
-	  auto inRange = player.getInRangeActors( true );
-	  for( auto actor : inRange )
-	  {
-		if( actor->isPlayer() )
-		{
-	      player.despawn( actor->getAsPlayer() );
-	      player.spawn( actor->getAsPlayer() );
-		}
-	  }
+       player.sendDebug( "Meeeeeerde j'avais pas vu l'Akh Rhai centré sur moi !!" );
+       // inject a packet that spams Akh Rhai on the player here
   }
   else if( elyexcuse == 6)
   {
-	  player.takeDamage( 9999999 );
+       player.sendDebug( "Désolée j'étais juste mal placée hihi." );
+  }
+  else if( elyexcuse == 7)
+  {
+       player.sendDebug( "Rashaza Yinako utilise Midare Setsugekka."
+       "\nJeido Uran utilise VerBrasier."
+       "\nEdenai Tokisaki utilise Flèche Nastrond."
+       "\nStormbriga Kitsu utilise Patate Fendeur."
+       "\nL'effet La Balance se dissipe."
+       "\nElysande Starr utilise Attaque Sournoise." );
+  }
+  else if( elyexcuse == 8)
+  {
+      player.setModelChara( 2335 );
+      auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          player.despawn( actor->getAsPlayer() );
+          player.spawn( actor->getAsPlayer() );
+        }
+      }
+  }
+  else if( elyexcuse == 9)
+  {
+      player.takeDamage( 9999999 );
   }
 }
