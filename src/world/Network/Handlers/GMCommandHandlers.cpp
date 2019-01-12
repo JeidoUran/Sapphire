@@ -655,7 +655,9 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
                          "\nLevel: {5}"
                          "\nExp: {6}"
                          "\nSearchMessage: {7}"
-                         "\nPlayTime: {8}",
+                         "\nPlayTime: {8}"
+                         "\nGMRank: {9}"
+                         "\nTarget: {10}",
                          targetPlayer->getName(),
                          targetPlayer->getCurrency( CurrencyType::Gil ),
                          targetPlayer->getCurrentZone()->getName(),
@@ -664,7 +666,9 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
                          targetPlayer->getLevel(),
                          targetPlayer->getExp(),
                          targetPlayer->getSearchMessage(),
-                         targetPlayer->getPlayTime() );
+                         targetPlayer->getPlayTime(),
+                         targetPlayer->getGmRank(),
+                         targetPlayer->getTargetId() );
       break;
     }
     default:
