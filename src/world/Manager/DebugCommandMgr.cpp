@@ -303,6 +303,33 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
         }
     }
   }
+  else if( subCommand == "targetmodel" || subCommand == "tmodel" )
+  {
+    uint32_t modelId;
+    sscanf( params.c_str(), "%u", &modelId );
+    Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
+    if( player.getTargetId() != player.getId() )
+    {
+      targetActor = player.lookupTargetById( player.getTargetId() );
+    }
+    if( !targetActor )
+    {
+      player.sendDebug( "Invalid target." );
+      return;
+    }
+    player.sendNotice( std::to_string( targetActor->getId() ) );
+    targetActor->getAsPlayer()->setModelChara( modelId );
+    player.sendNotice( "Player model set to " + std::to_string( modelId ) + "." );
+    auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        targetActor->getAsPlayer()->despawn( actor->getAsPlayer() );
+        targetActor->getAsPlayer()->spawn( actor->getAsPlayer() );
+      }
+    }
+  }
   else if( subCommand == "mount" )
   {
     int32_t id;
