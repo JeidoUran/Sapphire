@@ -184,7 +184,14 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::Time:
     {
-      player.setEorzeaTimeOffset( param2 );
+      auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          actor->getAsPlayer()->setEorzeaTimeOffset( param2 );
+        }
+    }
       player.sendNotice( "Eorzea time offset: {0}", param2 );
       break;
     }
@@ -658,7 +665,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
                          "\nGuId: {9}"
                          "\nPos: \nX: {10} \nY: {11} \nZ: {12} \nR: {13}"
                          "\n"
-                         "\nGmRank: {14}"
+                         "\nGMRank: {14}"
                          "\nSearchMessage: {15}"
                          "\nPlayTime: {16}"
                          "\nModelChara: {17}"
