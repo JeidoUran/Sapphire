@@ -284,23 +284,22 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     initZonePacket->data().pos.z = player.getPos().z;
 
     player.queuePacket( initZonePacket );
-    player.sendNotice( "Flight enabled." );
+    player.sendNotice( "Flight temporarily enabled." );
   }
   else if( subCommand == "model" )
   {
     uint32_t modelId;
     sscanf( params.c_str(), "%u", &modelId );
-
     player.setModelChara( modelId );
     player.sendNotice( "Player model set to " + std::to_string( modelId ) + "." );
     auto inRange = player.getInRangeActors( true );
     for( auto actor : inRange )
     {
       if( actor->isPlayer() )
-        {
+      {
         player.despawn( actor->getAsPlayer() );
         player.spawn( actor->getAsPlayer() );
-        }
+      }
     }
   }
   else if( subCommand == "targetmodel" || subCommand == "tmodel" )
@@ -625,16 +624,15 @@ void Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity
 {
   auto pServerZone = framework()->get< World::ServerMgr >();
   auto inRange = player.getInRangeActors( true );
-	for( auto actor : inRange )
-	{
-		if( actor->isPlayer() )
-		{
+  for( auto actor : inRange )
+  {
+    if( actor->isPlayer() )
+    {
       auto pSession = pServerZone->getSession( actor->getId() );
       if( pSession )
       pSession->getZoneConnection()->injectPacket( data + 7, player );
-		}
-	}
-
+    }
+  }
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::injectChatPacket( char* data, Entity::Player& player,
@@ -1288,7 +1286,7 @@ void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player&
 {
   uint32_t elyexcuse;
 
-  elyexcuse = rand() %  10;
+  elyexcuse = rand() %  12;
   if( elyexcuse == 0)
   {
       player.sendDebug( "Oui c'est parceque j'ai pas pu utiliser Restreinte parceque j'avais pas la portée vu que l'angle de la caméra relatif à l'inclinaison de la Lune était pas bon." );
@@ -1329,6 +1327,15 @@ void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player&
   }
   else if( elyexcuse == 8)
   {
+       player.sendDebug( "Désolée je serais en retard, j'ai Mahjong et je sais pas comment quitter." );
+  }
+  else if( elyexcuse == 9)
+  {
+       player.sendDebug( "Je suis super crevée ce soir." );
+       // inflicts some kind of tired status here
+  }
+  else if( elyexcuse == 10)
+  {
       player.setModelChara( 2335 );
       auto inRange = player.getInRangeActors( true );
       for( auto actor : inRange )
@@ -1340,7 +1347,7 @@ void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player&
         }
       }
   }
-  else if( elyexcuse == 9)
+  else if( elyexcuse == 11)
   {
       player.takeDamage( 9999999 );
   }
