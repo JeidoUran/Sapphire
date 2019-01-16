@@ -647,27 +647,36 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
     }
     case GmCommand::Inspect:
     {
-      player.sendNotice( "Name: {0}"
-                         "\nGil: {1}"
-                         "\nZone: {2}"
-                         "({3})"
-                         "\nClass: {4}"
-                         "\nLevel: {5}"
-                         "\nExp: {6}"
-                         "\nSearchMessage: {7}"
-                         "\nPlayTime: {8}"
-                         "\nGMRank: {9}"
-                         "\nTarget: {10}",
-                         targetPlayer->getName(),
-                         targetPlayer->getCurrency( CurrencyType::Gil ),
-                         targetPlayer->getCurrentZone()->getName(),
-                         targetPlayer->getZoneId(),
-                         static_cast< uint8_t >( targetPlayer->getClass() ),
+      auto pExdData = pFw->get< Data::ExdDataGenerated >();
+      player.sendNotice( "\nName: {0} (ID: {1})"
+                         "\nClass: {2} (ID: {3})"
+                         "\nLevel: {4}"
+                         "\nExp: {5}"
+                         "\nGil: {6}"
+                         "\n"
+                         "\nZone: {7} (ID: {8})"
+                         "\nGuId: {9}"
+                         "\nPos: \nX: {10} \nY: {11} \nZ: {12} \nR: {13}"
+                         "\n"
+                         "\nGmRank: {14}"
+                         "\nSearchMessage: {15}"
+                         "\nPlayTime: {16}"
+                         "\nModelChara: {17}"
+                         "\nCurrentMount: {18} (ID: {19})"
+                         "\nTarget: {20}",
+                         targetPlayer->getName(), targetPlayer->getId(),
+                         pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( targetPlayer->getClass() ))->name, static_cast< uint8_t >( targetPlayer->getClass() ),
                          targetPlayer->getLevel(),
                          targetPlayer->getExp(),
+                         targetPlayer->getCurrency( CurrencyType::Gil ),
+                         targetPlayer->getCurrentZone()->getName(), targetPlayer->getZoneId(),
+                         targetPlayer->getCurrentZone()->getGuId(),
+                         targetPlayer->getPos().x, targetPlayer->getPos().y, targetPlayer->getPos().z, targetPlayer->getRot(),
+                         targetPlayer->getGmRank(),
                          targetPlayer->getSearchMessage(),
                          targetPlayer->getPlayTime(),
-                         targetPlayer->getGmRank(),
+                         targetPlayer->getModelChara(),
+                         pExdData->get< Sapphire::Data::Mount >( targetPlayer->getCurrentMount() )->singular, targetPlayer->getCurrentMount(),
                          targetPlayer->getTargetId() );
       break;
     }
