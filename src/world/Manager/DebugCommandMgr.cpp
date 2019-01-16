@@ -286,6 +286,36 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     player.queuePacket( initZonePacket );
     player.sendNotice( "Flight temporarily enabled." );
   }
+  else if( subCommand == "gmrank" )
+  {
+    uint32_t rank;
+    sscanf( params.c_str(), "%u", &rank );
+    Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
+    if( player.getTargetId() != player.getId() )
+    {
+      targetActor = player.lookupTargetById( player.getTargetId() );
+    }
+    if( !targetActor )
+    {
+      player.sendDebug( "Invalid target." );
+      return;
+    }
+    if ( targetActor->getId() == player.getId() )
+    {
+      player.sendDebug( "You cannot use this command on yourself." );
+      return;
+    }
+    else if ( rank > 255 )
+    {
+      player.sendUrgent( "Input a number between 0 and 255.");
+      return;
+    }
+    else
+    {
+      targetActor->getAsPlayer()->setGmRank( rank );
+      player.sendNotice( "The GMRank of {0} is now {1}.", targetActor->getAsPlayer()->getName(), rank );
+    }
+  }
   else if( subCommand == "model" )
   {
     uint32_t modelId;
