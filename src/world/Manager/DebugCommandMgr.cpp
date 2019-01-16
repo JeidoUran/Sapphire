@@ -332,6 +332,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       }
     }
   }
+  // TODO: Better name
   else if( subCommand == "targetmodel" || subCommand == "tmodel" )
   {
     uint32_t modelId;
@@ -922,6 +923,7 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     else
       player.sendDebug( "Unknown instance with id#{0}", instanceId );
   }
+  // TODO: Better name
   else if( subCommand == "rangebind" || subCommand == "rbind" )
   {
     uint32_t instanceId;
@@ -1287,6 +1289,7 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
     player.removeSingleStatusEffectById( id );
     player.sendNotice( "Status {0} ({1}) removed.", id, pExdData->get< Sapphire::Data::Status >( id )->name );
   }
+  // TODO: Better name
   else if( subCommand == "targetremove" || subCommand == "trm" )
   {
     int32_t id;

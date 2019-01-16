@@ -184,6 +184,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::Time:
     {
+      // TODO: Global time setting (check //gm weather code?)
       auto inRange = player.getInRangeActors( true );
       for( auto actor : inRange )
       {
