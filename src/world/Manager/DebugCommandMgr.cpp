@@ -922,7 +922,7 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     else
       player.sendDebug( "Unknown instance with id#{0}", instanceId );
   }
-  else if( subCommand == "bindrange" || subCommand == "bindr" )
+  else if( subCommand == "rangebind" || subCommand == "rbind" )
   {
     uint32_t instanceId;
     sscanf( params.c_str(), "%d", &instanceId );
@@ -1287,7 +1287,7 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
     player.removeSingleStatusEffectById( id );
     player.sendNotice( "Status {0} ({1}) removed.", id, pExdData->get< Sapphire::Data::Status >( id )->name );
   }
-  else if( subCommand == "target remove" || subCommand == "t rm" )
+  else if( subCommand == "targetremove" || subCommand == "trm" )
   {
     int32_t id;
     sscanf( params.c_str(), "%d", &id );
