@@ -60,6 +60,8 @@ namespace Sapphire::World::Manager
 
     void random( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
+    void status( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
     void ely( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
 

@@ -60,6 +60,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "script", &DebugCommandMgr::script, "Server script utilities.", 1 );
   registerCommand( "instance", &DebugCommandMgr::instance, "Instance utilities", 1 );
   registerCommand( "housing", &DebugCommandMgr::housing, "Housing utilities", 1 );
+  registerCommand( "status", &DebugCommandMgr::status, "Fkn", 1 );
   registerCommand( "random", &DebugCommandMgr::random, "Fkn", 1 );
   registerCommand( "ely", &DebugCommandMgr::ely, "Fkn", 1 );
 }
@@ -1161,6 +1162,100 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
   player.queuePacket ( randomResult );
   }
   
+void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+{
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto pTerriMgr = framework()->get< TerritoryMgr >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  std::string subCommand = "";
+  std::string params = "";
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+  std::size_t pos = tmpCommand.find_first_of( " " );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+  if( subCommand == "self" || subCommand == "s" )
+  {
+    int32_t id;
+    int32_t duration;
+    uint16_t param;
+    sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
+
+    auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(),
+                                                   duration, 3000, framework() );
+    effect->setParam( param );
+
+    player.addStatusEffect( effect );
+    player.sendNotice( "Status {0} ({1}) added.", id, pExdData->get< Sapphire::Data::Status >( id )->name );
+  }
+
+  else if( subCommand == "target" || subCommand == "t" )
+  {
+    int32_t id;
+    int32_t duration;
+    uint16_t param;
+    sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
+    Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
+    if( player.getTargetId() != player.getId() )
+    {
+      targetActor = player.lookupTargetById( player.getTargetId() );
+    }
+    if( !targetActor )
+    {
+      player.sendDebug( "Invalid target." );
+      return;
+    }
+
+    auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), targetActor->getAsPlayer(),
+                                                   duration, 3000, framework() );
+    effect->setParam( param );
+
+    targetActor->getAsPlayer()->addStatusEffect( effect );
+    player.sendNotice( "Status {0} ({1}) added to {2}.", id, pExdData->get< Sapphire::Data::Status >( id )->name, targetActor->getAsPlayer()->getName() );
+  }
+  else if( subCommand == "remove" || subCommand == "rm" )
+  {
+    int32_t id;
+    sscanf( params.c_str(), "%d", &id );
+    player.removeSingleStatusEffectById( id );
+    player.sendNotice( "Status {0} ({1}) removed.", id, pExdData->get< Sapphire::Data::Status >( id )->name );
+  }
+  else if( subCommand == "target remove" || subCommand == "t rm" )
+  {
+    int32_t id;
+    sscanf( params.c_str(), "%d", &id );
+    Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
+    if( player.getTargetId() != player.getId() )
+    {
+      targetActor = player.lookupTargetById( player.getTargetId() );
+    }
+    if( !targetActor )
+    {
+      player.sendDebug( "Invalid target." );
+      return;
+    }
+
+    targetActor->getAsPlayer()->removeSingleStatusEffectById( id );
+    player.sendNotice( "Status {0} ({1}) removed from {2}.", id, pExdData->get< Sapphire::Data::Status >( id )->name, targetActor->getAsPlayer()->getName() );
+  }
+  else
+  {
+    player.sendUrgent( "{0} is not a valid status command.", subCommand );
+  }
+}
+
 void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
 {
