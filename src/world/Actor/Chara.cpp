@@ -37,9 +37,13 @@ using namespace Sapphire::Network::ActorControl;
 Sapphire::Entity::Chara::Chara( ObjKind type, FrameworkPtr pFw ) :
   Actor( type ),
   m_pose( 0 ),
-  m_targetId( INVALID_GAME_OBJECT_ID ),
+  m_targetId( INVALID_GAME_OBJECT_ID64 ),
   m_pFw( std::move( std::move( pFw ) ) )
 {
+
+  m_lastTickTime = 0;
+  m_lastUpdate = 0;
+
   // initialize the free slot queue
   for( uint8_t i = 0; i < MAX_STATUS_EFFECTS; i++ )
   {
@@ -239,8 +243,6 @@ bool Sapphire::Entity::Chara::face( const Common::FFXIVARR_POSITION3& p )
   float oldRot = getRot();
   float rot = Util::calcAngFrom( getPos().x, getPos().z, p.x, p.z );
   float newRot = PI - rot + ( PI / 2 );
-
-  m_pCell = nullptr;
 
   setRot( newRot );
 
@@ -793,3 +795,7 @@ bool Sapphire::Entity::Chara::hasStatusEffect( uint32_t id )
   return m_statusEffectMap.find( id ) != m_statusEffectMap.end();
 }
 
+int64_t Sapphire::Entity::Chara::getLastUpdateTime() const
+{
+  return m_lastUpdate;
+}

@@ -565,6 +565,11 @@ namespace Sapphire::Entity
     /*! dismount the current mount and send the packets */
     void dismount();
 
+    void spawnCompanion( uint16_t id );
+    void despawnCompanion();
+
+    uint16_t getCurrentCompanion() const;
+
     /*! get the current mount */
     uint8_t getCurrentMount() const;
 
@@ -962,6 +967,7 @@ namespace Sapphire::Entity
 
     uint64_t m_lastMoveTime;
     uint8_t m_lastMoveflag;
+    bool m_falling;
 
   private:
     uint32_t m_lastWrite;
@@ -1082,6 +1088,7 @@ namespace Sapphire::Entity
     // content finder info
     uint32_t m_cfPenaltyUntil; // unix time
 
+    uint16_t m_companionId;
     uint32_t m_mount;
     uint32_t m_emoteMode;
 

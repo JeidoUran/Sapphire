@@ -36,6 +36,7 @@
 #include "Framework.h"
 #include <Logging/Logger.h>
 #include <Manager/NaviMgr.h>
+#include <Manager/TerritoryMgr.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -91,16 +92,34 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   memcpy( m_customize, pTemplate->getCustomize(), sizeof( m_customize ) );
   memcpy( m_modelEquip, pTemplate->getModelEquip(), sizeof( m_modelEquip ) );
 
-  m_lastTickTime = 0;
+  auto exdData = m_pFw->get< Data::ExdDataGenerated >();
+  assert( exdData );
+
+  auto bNpcBaseData = exdData->get< Data::BNpcBase >( m_bNpcBaseId );
+  assert( bNpcBaseData );
+
+  m_scale = bNpcBaseData->scale;
+
+  // todo: is this actually good?
+  //m_naviTargetReachedDistance = m_scale * 2.f;
+  m_naviTargetReachedDistance = 4.f;
 }
 
-Sapphire::Entity::BNpc::~BNpc()
-{
-}
+Sapphire::Entity::BNpc::~BNpc() = default;
 
 uint8_t Sapphire::Entity::BNpc::getAggressionMode() const
 {
   return m_aggressionMode;
+}
+
+float Sapphire::Entity::BNpc::getNaviTargetReachedDistance() const
+{
+  return m_naviTargetReachedDistance;
+}
+
+float Sapphire::Entity::BNpc::getScale() const
+{
+  return m_scale;
 }
 
 uint8_t Sapphire::Entity::BNpc::getEnemyType() const
@@ -151,7 +170,7 @@ void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )
 void Sapphire::Entity::BNpc::despawn( PlayerPtr pTarget )
 {
   pTarget->freePlayerSpawnId( getId() );
-  pTarget->queuePacket( makeActorControl143(  m_id, DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
+  pTarget->queuePacket( makeActorControl143( m_id, DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
 }
 
 Sapphire::Entity::BNpcState Sapphire::Entity::BNpc::getState() const
@@ -209,7 +228,11 @@ void Sapphire::Entity::BNpc::step()
 
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
-  if( Util::distance( getPos(), pos ) <= 4 )
+  // do this first, this will update local actor position and the position of other actors
+  // and then this npc will then path from the position after pushing/being pushed
+  //pushNearbyBNpcs();
+
+  if( Util::distance( getPos(), pos ) <= m_naviTargetReachedDistance )
   {
     // Reached destination
     m_naviLastPath.clear();
@@ -266,6 +289,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
 
   step();
+  m_pCurrentZone->updateActorPosition( *this );
   return false;
 }
 
@@ -407,7 +431,6 @@ void Sapphire::Entity::BNpc::onTick()
 void Sapphire::Entity::BNpc::update( int64_t currTime )
 {
   const uint8_t minActorDistance = 4;
-  const uint8_t aggroRange = 8;
   const uint8_t maxDistanceToOrigin = 40;
   const uint32_t roamTick = 20;
 
@@ -446,7 +469,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
         m_state = BNpcState::Idle;
       }
 
-      checkAggro( aggroRange );
+      checkAggro();
     }
     break;
 
@@ -467,7 +490,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
         m_state = BNpcState::Roaming;
       }
 
-      checkAggro( aggroRange );
+      checkAggro();
     }
 
     case BNpcState::Combat:
@@ -505,7 +528,11 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
         }
 
         if( distance > minActorDistance )
-          moveTo( pHatedActor->getPos() );
+        {
+          //auto pTeriMgr = m_pFw->get< World::Manager::TerritoryMgr >();
+          //if ( ( currTime - m_lastAttack ) > 600 && pTeriMgr->isDefaultTerritory( getCurrentZone()->getTerritoryTypeId() ) )
+            moveTo( pHatedActor->getPos() );
+        }
         else
         {
           if( face( pHatedActor->getPos() ) )
@@ -554,7 +581,7 @@ void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource
 
 void Sapphire::Entity::BNpc::onDeath()
 {
-  setTargetId( INVALID_GAME_OBJECT_ID );
+  setTargetId( INVALID_GAME_OBJECT_ID64 );
   m_currentStance = Stance::Passive;
   m_state = BNpcState::Dead;
   m_timeOfDeath = Util::getTimeSeconds();
@@ -579,7 +606,7 @@ void Sapphire::Entity::BNpc::setTimeOfDeath( uint32_t timeOfDeath )
   m_timeOfDeath = timeOfDeath;
 }
 
-void Sapphire::Entity::BNpc::checkAggro( uint32_t range )
+void Sapphire::Entity::BNpc::checkAggro()
 {
   // passive mobs should ignore players unless aggro'd
   if( m_aggressionMode == 1 )
@@ -587,14 +614,62 @@ void Sapphire::Entity::BNpc::checkAggro( uint32_t range )
 
   CharaPtr pClosestChara = getClosestChara();
 
-  if( pClosestChara && pClosestChara->isAlive() )
+  if( pClosestChara && pClosestChara->isAlive() && pClosestChara->isPlayer() )
   {
+    // will use this range if chara level is lower than bnpc, otherwise diminishing equation applies
+    float range = 13.f;
+
+    if( pClosestChara->getLevel() > m_level )
+    {
+      auto levelDiff = std::abs( pClosestChara->getLevel() - this->getLevel() );
+
+      if( levelDiff >= 10 )
+        range = 0.f;
+      else
+        range = std::max< float >( 0.f, range - std::pow( 1.53f, levelDiff * 0.6f ) );
+    }
+
     auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
                                     pClosestChara->getPos().x,
                                     pClosestChara->getPos().y,
                                     pClosestChara->getPos().z );
 
-    if( distance < range && pClosestChara->isPlayer() )
+    if( distance < range )
+    {
       aggro( pClosestChara );
+    }
+  }
+}
+
+void Sapphire::Entity::BNpc::pushNearbyBNpcs()
+{
+  for( auto& bNpc : m_inRangeBNpc )
+  {
+    auto pos = bNpc->getPos();
+    auto distance = Util::distance( m_pos, bNpc->getPos() );
+
+
+    // todo: not sure what's good here
+    auto factor = bNpc->getNaviTargetReachedDistance();
+
+    auto delta = static_cast< float >( Util::getTimeMs() - bNpc->getLastUpdateTime() ) / 1000.f;
+    delta = std::min< float >( factor, delta );
+
+    // too far away, ignore it
+    if( distance > factor )
+      continue;
+
+    auto angle = Util::calcAngFrom( m_pos.x, m_pos.y, pos.x, pos.y ) + PI;
+
+    auto x = ( cosf( angle ) );
+    auto z = ( sinf( angle ) );
+
+    bNpc->setPos( pos.x + ( x * factor * delta ),
+                  pos.y,
+                  pos.z + ( z * factor * delta ), true );
+
+//    setPos( m_pos.x + ( xBase * -pushDistance ),
+//            m_pos.y,
+//            m_pos.z + ( zBase * -pushDistance ) );
   }
 }
