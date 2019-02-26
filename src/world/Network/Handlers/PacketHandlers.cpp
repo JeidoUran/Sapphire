@@ -514,16 +514,25 @@ void Sapphire::Network::GameConnection::chatHandler( FrameworkPtr pFw,
   {
     case ChatType::Say:
     {
-      if( player.isActingAsGm() )
+      if( player.isActingAsGm() ) 
+      {
         chatPacket->data().chatType = ChatType::GMSay;
-
+        Logger::debug( "[{0}] (GMSay) {1}: {2}", player.getId(), player.getName(), chatPacket->data().msg );
+      }
+      else
+        Logger::debug( "[{0}] (Say) {1}: {2}", player.getId(), player.getName(), chatPacket->data().msg );
       player.getCurrentZone()->queuePacketForRange( player, 50, chatPacket );
       break;
     }
     case ChatType::Yell:
     {
       if( player.isActingAsGm() )
+      {
         chatPacket->data().chatType = ChatType::GMYell;
+        Logger::debug( "[{0}] (GMYell) {1}: {2}", player.getId(), player.getName(), chatPacket->data().msg );
+      }
+      else
+        Logger::debug( "[{0}] (Yell) {1}: {2}", player.getId(), player.getName(), chatPacket->data().msg );
 
       player.getCurrentZone()->queuePacketForRange( player, 6000, chatPacket );
       break;
@@ -531,7 +540,12 @@ void Sapphire::Network::GameConnection::chatHandler( FrameworkPtr pFw,
     case ChatType::Shout:
     {
       if( player.isActingAsGm() )
+      {
         chatPacket->data().chatType = ChatType::GMShout;
+        Logger::debug( "[{0}] (GMShout) {1}: {2}", player.getId(), player.getName(), chatPacket->data().msg );
+      }
+      else
+        Logger::debug( "[{0}] (Shout) {1}: {2}", player.getId(), player.getName(), chatPacket->data().msg );
 
       player.getCurrentZone()->queuePacketForRange( player, 6000, chatPacket );
       break;
@@ -613,7 +627,10 @@ void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
   if( player.isActingAsGm() )
   {
     tellPacket->data().flags |= TellFlags::GmTellMsg;
+    Logger::debug( "[{0}] (GMTell) {1} > {2}: {3}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
   }
+  else
+    Logger::debug( "[{0}] (Tell) {1} > {2}: {3}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
 
   pTargetPlayer->queueChatPacket( tellPacket );
 }
