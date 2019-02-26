@@ -930,7 +930,7 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     sscanf( params.c_str(), "%d", &instanceId );
 
     auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
-    if( instance->getAsInstanceContent() )
+    if( instance && instance->getAsInstanceContent() )
     {
       auto pInstanceContent = instance->getAsInstanceContent();
       pInstanceContent->bindPlayer( player.getId() );
@@ -959,7 +959,7 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
         if( actor->isPlayer() )
         {
           pInstanceContent->bindPlayer( actor->getId() );
-          player.sendDebug( "Player bound." );
+          player.sendDebug( "{0} bound.", actor->getAsPlayer()->getName() );
         }
       }
        player.sendDebug(
@@ -1012,11 +1012,8 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     if( instance )
     {
       auto pInstanceContent = instance->getAsInstanceContent();
-      player.sendDebug( "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
       pInstanceContent->bindPlayer( player.getId() );
-      player.sendDebug(
-      "Now bound to instance with id: " + std::to_string( instance->getGuId() ) +
-      " -> " + instance->getName() );
+      player.sendDebug( "Created instance with id#{0} -> {1} and bound to it.", instance->getGuId(), instance->getName() );
     }
     else
       player.sendDebug( "Failed to create instance with id#{0}", instanceContentId );
@@ -1235,8 +1232,9 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
 
   //TODO: less ghetto way of displaying the result
   auto randomResult = ( std::make_shared< ServerNoticePacket >( player.getId(), player.getName() + " rolls a " + std::to_string( randomnumber ) + "." ) );
+  auto randomResultCaller = ( std::make_shared< ServerNoticePacket >( player.getId(), "You roll a " + std::to_string( randomnumber ) + "." ) );
   player.getCurrentZone()->queuePacketForRange( player, 50, randomResult);
-  player.queuePacket ( randomResult );
+  player.queuePacket ( randomResultCaller );
   }
   
 void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Player& player,
