@@ -475,6 +475,14 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       }
     }
   }
+  
+  else if( subCommand == "hydastep" )
+  {
+    int32_t step;
+    sscanf( params.c_str(), "%d", &step );
+
+    player.sendToInRangeSet( makeActorControl143( player.getId(), 0x73A, step, 0x3C, 0xFFFFE3, 0, 0 ), true );
+  }
   else
   {
     player.sendUrgent( "{0} is not a valid SET command.", subCommand );

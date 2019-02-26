@@ -361,8 +361,11 @@ enum ActorControlType : uint16_t
 
     OpenPerformInstrumentUI = 0x71C,
 
+//    HydatosStep = 0x73A,
+
     StartReplay = 0x7BC,
     EndReplay = 0x7BD, // request for restoring the original player state (actor, buff, gauge, etc..)
+
 
     OpenDuelUI = 0x898, // Open a duel ui
     DuelRequestResult = 0x899, // either accept/reject
