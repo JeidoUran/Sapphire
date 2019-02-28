@@ -833,6 +833,10 @@ namespace Sapphire::Entity
 
     bool isActingAsGm() const;
 
+    bool getRPMode() const;
+
+    void setRPMode( bool RPMode );
+
     uint8_t getMode() const;
 
     void setMode( uint8_t mode );
@@ -1055,8 +1059,10 @@ namespace Sapphire::Entity
     uint16_t zoneId;
     bool m_gmInvis = false;
 
-	uint16_t m_modelChara;
-	
+    bool m_RPMode = false;
+
+    uint16_t m_modelChara;
+
     uint8_t m_equipDisplayFlags;
 
     bool m_bInCombat;

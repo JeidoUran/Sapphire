@@ -537,21 +537,31 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::TeriInfo:
     {
+      auto pExdData = pFw->get< Data::ExdDataGenerated >();
       auto pCurrentZone = player.getCurrentZone();
       player.sendNotice( "ZoneId: {0}"
                          "\nName: {1}"
                          "\nInternalName: {2}"
                          "\nGuId: {3}"
                          "\nPopCount: {4}"
-                         "\nCurrentWeather: {5}"
-                         "\nNextWeather: {6}",
+                         "\nCurrentWeather: {5} (ID: {6})"
+                         "\nNextWeather: {7} (ID: {8})"
+                         "\nFestival: {9} (ID: {10})"
+                         "\nAdditionalFestival: {11} (ID: {12})"
+                         ,
                          player.getZoneId(),
                          pCurrentZone->getName(),
                          pCurrentZone->getInternalName(),
                          pCurrentZone->getGuId(),
                          pCurrentZone->getPopCount(),
+                         pExdData->get< Sapphire::Data::Weather >( static_cast< uint8_t >( pCurrentZone->getCurrentWeather() ) )->name,
                          static_cast< uint8_t >( pCurrentZone->getCurrentWeather() ),
-                         static_cast< uint8_t >( pCurrentZone->getNextWeather() ) );
+                         pExdData->get< Sapphire::Data::Weather >( static_cast< uint8_t >( pCurrentZone->getNextWeather() ) )->name,
+                         static_cast< uint8_t >( pCurrentZone->getNextWeather() ),
+                         pExdData->get< Sapphire::Data::Festival >( player.getCurrentZone()->getCurrentFestival().first )->name,
+                         player.getCurrentZone()->getCurrentFestival().first,
+                         pExdData->get< Sapphire::Data::Festival >( player.getCurrentZone()->getCurrentFestival().second )->name,
+                         player.getCurrentZone()->getCurrentFestival().second );
       break;
     }
     case GmCommand::Jump:
@@ -687,35 +697,44 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
     {
       auto pExdData = pFw->get< Data::ExdDataGenerated >();
       player.sendNotice( "\nName: {0} (ID: {1})"
-                         "\nClass: {2} (ID: {3})"
-                         "\nLevel: {4}"
-                         "\nExp: {5}"
-                         "\nGil: {6}"
+                         "\nHP: {2}/{3}, MP: {4}/{5}, TP: {6}/1000"
+                         "\nClass: {7} (ID: {8})"
+                         "\nLevel: {9}"
+                         "\nExp: {10}"
+                         "\nGC: {11} (ID: {12})"
+                         "\nGil: {13}"
                          "\n"
-                         "\nZone: {7} (ID: {8})"
-                         "\nGuId: {9}"
-                         "\nPos: \nX: {10} \nY: {11} \nZ: {12} \nR: {13}"
+                         "\nZone: {14} (ID: {15})"
+                         "\nGuId: {16}"
+                         "\nPos: \nX: {17} \nY: {18} \nZ: {19} \nR: {20}"
                          "\n"
-                         "\nGMRank: {14}"
-                         "\nSearchMessage: {15}"
-                         "\nPlayTime: {16}"
-                         "\nModelChara: {17}"
-                         "\nCurrentMount: {18} (ID: {19})"
-                         "\nTarget: {20}",
+                         "\nGMRank: {21}"
+                         "\nInvisibilityFlag: {22}"
+                         "\n"
+                         "\nSearchMessage: {23}"
+                         "\nPlayTime: {24}"
+                         "\nModelChara: {25}"
+                         "\nCurrentMount: {26} (ID: {27})"
+                         "\nTarget: {28}"
+                         "\nRPMode: {29}",
                          targetPlayer->getName(), targetPlayer->getId(),
+                         targetPlayer->getHp(), targetPlayer->getMaxHp(), targetPlayer->getMp(), targetPlayer->getMaxMp(), targetPlayer->getTp(),
                          pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( targetPlayer->getClass() ))->name, static_cast< uint8_t >( targetPlayer->getClass() ),
                          targetPlayer->getLevel(),
                          targetPlayer->getExp(),
+                         pExdData->get< Sapphire::Data::GrandCompany >( targetPlayer->getGc() )->name, targetPlayer->getGc(),
                          targetPlayer->getCurrency( CurrencyType::Gil ),
                          targetPlayer->getCurrentZone()->getName(), targetPlayer->getZoneId(),
                          targetPlayer->getCurrentZone()->getGuId(),
                          targetPlayer->getPos().x, targetPlayer->getPos().y, targetPlayer->getPos().z, targetPlayer->getRot(),
                          targetPlayer->getGmRank(),
+                         targetPlayer->getGmInvis(),
                          targetPlayer->getSearchMessage(),
                          targetPlayer->getPlayTime(),
                          targetPlayer->getModelChara(),
                          pExdData->get< Sapphire::Data::Mount >( targetPlayer->getCurrentMount() )->singular, targetPlayer->getCurrentMount(),
-                         targetPlayer->getTargetId() );
+                         targetPlayer->getTargetId(),
+                         targetPlayer->getRPMode() );
       break;
     }
     default:

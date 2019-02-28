@@ -62,6 +62,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "housing", &DebugCommandMgr::housing, "Housing utilities", 1 );
   registerCommand( "status", &DebugCommandMgr::status, "StatusEffect management.", 1 );
   registerCommand( "random", &DebugCommandMgr::random, "Rolls a random number.", 1 );
+  registerCommand( "rp", &DebugCommandMgr::rp, "RP management.", 1 );
   registerCommand( "ely", &DebugCommandMgr::ely, "Fkn", 1 );
 }
 
@@ -243,7 +244,6 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   {
     auto pExdData = framework()->get< Data::ExdDataGenerated >();
     int32_t id;
-
     sscanf( params.c_str(), "%d", &id );
     if ( !pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( id ) ) )
     {
@@ -263,7 +263,6 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   {
     int32_t minutes;
     sscanf( params.c_str(), "%d", &minutes );
-
     player.setCFPenaltyMinutes( minutes );
     player.sendNotice( "Duty Finder penalty set to {0}.", minutes );
   }
@@ -337,7 +336,6 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       return;
     }
     player.setModelChara( modelId );
-    player.sendNotice( "Player model set to " + std::to_string( modelId ) + "." );
     auto inRange = player.getInRangeActors( true );
     for( auto actor : inRange )
     {
@@ -372,7 +370,6 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     }
     player.sendNotice( std::to_string( targetActor->getId() ) );
     targetActor->getAsPlayer()->setModelChara( modelId );
-    player.sendNotice( "Player model set to " + std::to_string( modelId ) + "." );
     auto inRange = player.getInRangeActors( true );
     for( auto actor : inRange )
     {
@@ -434,7 +431,6 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     auto pExdData = framework()->get< Data::ExdDataGenerated >();
     uint16_t festivalId;
     uint16_t additionalId;
-
     sscanf( params.c_str(), "%hu %hu", &festivalId, &additionalId );
 
     if ( !pExdData->get< Sapphire::Data::Festival >( festivalId ) )
@@ -1293,7 +1289,6 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
   auto randomResult = ( std::make_shared< ServerNoticePacket >( player.getId(), player.getName() + " rolls a " + std::to_string( randomnumber ) + "." ) );
   player.sendToInRangeSet ( randomResult );
   player.sendNotice ( "You roll a {0}.", randomnumber );
-  player.queuePacket ( randomResultCaller );
   }
 
 
@@ -1433,6 +1428,101 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
   else
   {
     player.sendUrgent( "{0} is not a valid status command.", subCommand );
+  }
+}
+
+
+void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+{
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto pTerriMgr = framework()->get< TerritoryMgr >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  std::string subCommand = "";
+  std::string params = "";
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+  std::size_t pos = tmpCommand.find_first_of( " " );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+  if( subCommand == "start" )
+  {
+    //TODO: Current implementation is beyond ghetto
+    char theme [255];
+    sscanf( params.c_str(), "%[^\n]%*c", &theme );
+    uint32_t playeramount( 0 );
+    auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() && !actor->getAsPlayer()->isActingAsGm() )
+      {
+        actor->getAsPlayer()->setRPMode( true );
+        playeramount = playeramount + 1;
+      }
+    }
+    Logger::info( "========================RP START========================" );
+    Logger::info( "RP session started by {0}", player.getName() );
+    Logger::info( "Theme: {0}", theme );
+    Logger::info( "Participants: {0}", playeramount );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        Logger::info( "{0}", actor->getAsPlayer()->getName() );
+      }
+    }
+    auto startmessage = ( std::make_shared< ServerNoticePacket >( player.getId(), "RP session started by " + player.getName() + "." ) );
+    player.sendToInRangeSet( startmessage );
+    player.sendNotice( "RP session started." );
+  }
+  else if( subCommand == "add" )
+  {
+    Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
+    if( player.getTargetId() != player.getId() )
+    {
+      targetActor = player.lookupTargetById( player.getTargetId() );
+    }
+    if( !targetActor || !targetActor->isPlayer() )
+    {
+      player.sendUrgent( "Invalid target." );
+      return;
+    }
+    if( targetActor->getAsPlayer()->getRPMode() == true )
+    {
+      player.sendUrgent( "{0} is already registered to a RP session. Use \"!rp rm\" to remove them.", targetActor->getAsPlayer()->getName() );
+      return;
+    }
+    targetActor->getAsPlayer()->setRPMode( true );
+    Logger::info( "{0} has been added to the RP session", targetActor->getAsPlayer()->getName() );
+    player.sendNotice( "{0} has been added to the RP session.", targetActor->getAsPlayer()->getName() );
+    targetActor->getAsPlayer()->sendNotice( "You have been added to the RP session." );
+  }
+  else if( subCommand == "remove" || subCommand == "rm" )
+  {
+  }
+  else if( subCommand == "storage" )
+  {
+  }
+  
+  
+  else if( subCommand == "summary" )
+  {
+  }
+
+  else
+  {
+    player.sendUrgent( "{0} is not a valid rp command.", subCommand );
   }
 }
 

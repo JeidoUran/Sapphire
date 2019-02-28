@@ -180,6 +180,16 @@ bool Sapphire::Entity::Player::isActingAsGm() const
          status == OnlineStatus::GameMaster2;
 }
 
+bool Sapphire::Entity::Player::getRPMode() const
+{
+  return m_RPMode;
+}
+
+void Sapphire::Entity::Player::setRPMode( bool RPMode )
+{
+  m_RPMode = RPMode;
+}
+
 uint8_t Sapphire::Entity::Player::getMode() const
 {
   return m_mode;
