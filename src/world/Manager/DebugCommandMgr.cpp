@@ -63,7 +63,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "status", &DebugCommandMgr::status, "StatusEffect management.", 1 );
   registerCommand( "random", &DebugCommandMgr::random, "Rolls a random number.", 1 );
   registerCommand( "rp", &DebugCommandMgr::rp, "RP management.", 1 );
-  registerCommand( "ely", &DebugCommandMgr::ely, "Fkn", 1 );
+  registerCommand( "ely", &DebugCommandMgr::ely, "Oui c'est parceque cette commande sert à rien.", 1 );
 }
 
 // clear all loaded commands
@@ -164,7 +164,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
+  Logger::debug( "[{0}] Command: set subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
   if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( params != "" ) )
   {
@@ -560,8 +560,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
-                 "subCommand " + subCommand + " params: " + params );
+  Logger::debug( "[{0}] Command: add subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
 
   if( subCommand == "status" )
@@ -707,7 +706,7 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
+  Logger::debug( "[{0}] Command: get subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
   if( ( subCommand == "pos" ) )
   {
@@ -882,7 +881,7 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
+  Logger::debug( "[{0}] Command: script subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
   if( subCommand == "unload" )
   {
@@ -967,6 +966,8 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     else
       subCommand = params;
   }
+
+  Logger::debug( "[{0}] Command: instance subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
   if( subCommand == "create" || subCommand == "cr" )
   {
@@ -1316,6 +1317,8 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
+  Logger::debug( "[{0}] Command: status subCommand: {1} params: {2}", player.getId(), subCommand, params );
+
   if( subCommand == "self" || subCommand == "s" || subCommand == "add" )
   {
     int32_t id;
@@ -1456,59 +1459,255 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  if( subCommand == "start" )
+  Logger::debug( "[{0}] Command: rp subCommand: {1} params: {2}", player.getId(), subCommand, params );
+
+  if( subCommand == "prepare" )
   {
-    //TODO: Current implementation is beyond ghetto
-    char theme [255];
-    sscanf( params.c_str(), "%[^\n]%*c", &theme );
-    uint32_t playeramount( 0 );
-    auto inRange = player.getInRangeActors( true );
-    for( auto actor : inRange )
+    if( !isRpPrepared == true && isRpStarted == false )
     {
-      if( actor->isPlayer() && !actor->getAsPlayer()->isActingAsGm() )
-      {
-        actor->getAsPlayer()->setRPMode( true );
-        playeramount = playeramount + 1;
-      }
+      m_rpMembers.clear();
+      player.sendNotice( "A RP session is being prepared. The following commands can be used:"
+                         "\n\n\"!rp add\": Adds the targetted player to the RP session."
+                         "\n\"!rp zone Zone PosX PosY PosZ\": Adds a starting zone to the RP session."
+                         "\n\"!rp theme Theme\": Adds a theme to the RP session."
+                         "\n\"!rp test\": Returns a list of current members, theme and starting zone."
+                         "\n\"!rp start\": Starts the RP session.");
+      isRpPrepared = true;
     }
-    Logger::info( "========================RP START========================" );
-    Logger::info( "RP session started by {0}", player.getName() );
-    Logger::info( "Theme: {0}", theme );
-    Logger::info( "Participants: {0}", playeramount );
-    for( auto actor : inRange )
-    {
-      if( actor->isPlayer() )
-      {
-        Logger::info( "{0}", actor->getAsPlayer()->getName() );
-      }
-    }
-    auto startmessage = ( std::make_shared< ServerNoticePacket >( player.getId(), "RP session started by " + player.getName() + "." ) );
-    player.sendToInRangeSet( startmessage );
-    player.sendNotice( "RP session started." );
+    else if ( isRpStarted == true )
+      player.sendUrgent( "A RP session is already underway." );
+    else
+      player.sendUrgent( "A RP session is already being prepared." );
   }
+
   else if( subCommand == "add" )
   {
-    Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
-    if( player.getTargetId() != player.getId() )
+    if( !isRpPrepared == true )
     {
-      targetActor = player.lookupTargetById( player.getTargetId() );
-    }
-    if( !targetActor || !targetActor->isPlayer() )
-    {
-      player.sendUrgent( "Invalid target." );
+      player.sendUrgent( "You need to prepare a RP session before using this command. Use \"!rp prepare\".");
       return;
     }
-    if( targetActor->getAsPlayer()->getRPMode() == true )
+
+    if( isRpPrepared == true )
     {
-      player.sendUrgent( "{0} is already registered to a RP session. Use \"!rp rm\" to remove them.", targetActor->getAsPlayer()->getName() );
+      Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
+      if( player.getTargetId() != player.getId() )
+      {
+        targetActor = player.lookupTargetById( player.getTargetId() );
+      }
+      if( !targetActor || !targetActor->isPlayer() )
+      {
+        player.sendUrgent( "Invalid target." );
+        return;
+      }
+       if( m_rpMembers.count( targetActor->getAsPlayer() ) == 1 )
+      {
+        player.sendUrgent( "{0} is already registered to a RP session. Use \"!rp rm\" to remove them.", targetActor->getAsPlayer()->getName() );
+        return;
+      }
+      m_rpMembers.insert ( targetActor->getAsPlayer() );
+      if( isRpStarted == true )
+        targetActor->getAsPlayer()->setRPMode( true );
+      Logger::info( "{0} has been added to the RP session", targetActor->getAsPlayer()->getName() );
+      player.sendNotice( "{0} has been added to the RP session.", targetActor->getAsPlayer()->getName() );
+      targetActor->getAsPlayer()->sendNotice( "You have been added to a RP session by {0}.", player.getName() );
+    }
+  }
+
+  else if( subCommand == "zone" )
+  {
+    if( isRpStarted == true )
+    {
+      player.sendUrgent( "A RP session is already underway." );
       return;
     }
-    targetActor->getAsPlayer()->setRPMode( true );
-    Logger::info( "{0} has been added to the RP session", targetActor->getAsPlayer()->getName() );
-    player.sendNotice( "{0} has been added to the RP session.", targetActor->getAsPlayer()->getName() );
-    targetActor->getAsPlayer()->sendNotice( "You have been added to the RP session." );
+    else if( !isRpPrepared == true )
+    {
+      player.sendUrgent( "You need to prepare a RP session before using this command. Use \"!rp prepare\".");
+      return;
+    }
+
+    auto pExdData = framework()->get< Data::ExdDataGenerated >();
+    sscanf( params.c_str(), "%d %d %d %d", &startzone, &startposx, &startposy, &startposz );
+    auto pZone = pTerriMgr->getZoneByTerritoryTypeId( startzone );
+    player.sendNotice( "The starting zone of the RP session has been set to {0} (ID: {1}), X: {2}, Y: {3}, Z: {4}.", pZone->getName(),
+                       startzone, startposx, startposy, startposz );
+  }
+
+  else if( subCommand == "theme" )
+  {
+    if( isRpStarted == true )
+    {
+      player.sendUrgent( "A RP session is already underway." );
+      return;
+    }
+    else if( !isRpPrepared == true )
+    {
+      player.sendUrgent( "You need to prepare a RP session before using this command. Use \"!rp prepare\".");
+      return;
+    }
+
+    sscanf( params.c_str(), "%[^\n]%*c", &RpTheme );
+    player.sendNotice( "The theme of the RP session has been set to"
+                       "\n\"{0}\".", RpTheme );
+  }
+
+  else if( subCommand == "test" )
+  {
+    if( isRpStarted == true )
+    {
+      player.sendUrgent( "A RP session is already underway." );
+      return;
+    }
+    else if( !isRpPrepared == true )
+    {
+      player.sendUrgent( "You need to prepare a RP session before using this command. Use \"!rp prepare\".");
+      return;
+    }
+
+    auto pExdData = framework()->get< Data::ExdDataGenerated >();
+    auto pZone = pTerriMgr->getZoneByTerritoryTypeId( startzone );
+    if ( !startzone == 0 )
+      player.sendNotice( "Starting Zone: {0}", pZone->getName() );
+    else
+      player.sendNotice( "Starting Zone: None" );
+    if( strcmp (RpTheme,"") != 0)
+      player.sendNotice( "Theme: {0}", RpTheme );
+    else
+        player.sendNotice( "Theme: None" );
+    player.sendNotice( "Participants: {0}", m_rpMembers.size() );
+    for( auto member : m_rpMembers )
+        player.sendNotice( "{0}", member->getAsPlayer()->getName() );
+  }
+
+  else if( subCommand == "start" )
+  {
+    if( isRpStarted == true )
+    {
+      player.sendUrgent( "A RP session is already underway." );
+      return;
+    }
+    else if( !isRpPrepared == true )
+    {
+      player.sendUrgent( "You need to prepare a RP session before using this command. Use \"!rp prepare\".");
+      return;
+    }
+
+    if( isRpPrepared == true )
+    {
+      m_rpMembers.insert ( player.getAsPlayer() );
+      auto pZone = pTerriMgr->getZoneByTerritoryTypeId( startzone );
+      Logger::info( "==========================RP START=========================" );
+      Logger::info( "RP session started by {0}", player.getName() );
+      if ( !startzone == 0 )
+        Logger::info( "Starting Zone: {0}", pZone->getName() );
+      else
+        Logger::info( "Starting Zone: None" );
+      if( strcmp (RpTheme,"") != 0)
+        Logger::info( "Theme: {0}", RpTheme );
+      else
+          Logger::info( "Theme: None" );
+      Logger::info( "Participants: {0}", m_rpMembers.size() );
+      for( auto member : m_rpMembers )
+      {
+          Logger::info( "{0}", member->getAsPlayer()->getName() );
+          member->getAsPlayer()->setRPMode( true );
+          if( member->getAsPlayer() != player.getAsPlayer() )
+          {
+            //member->getAsPlayer()->setGmRank( 1 );
+            member->getAsPlayer()->sendNotice( "RP session started by {0}.", player.getName() );
+          }
+      }
+      Logger::info( "===========================================================" );
+      if ( !startzone == 0 )
+      {
+        for( auto member : m_rpMembers )
+        {
+            member->getAsPlayer()->prepareZoning( startzone, true, 1, 112 );
+            member->getAsPlayer()->setZone( startzone );
+            member->getAsPlayer()->changePosition( startposx, startposy, startposz, member->getAsPlayer()->getRot() );
+            member->getAsPlayer()->sendZoneInPackets( 0x00, 0x00, 0, 110, false );
+        }
+      }
+      isRpStarted = true;
+      player.sendNotice( "RP session started." );
+    }
+  }
+  else if( subCommand == "log" )
+  {
+    if( !isRpStarted == true )
+    {
+      player.sendUrgent( "You need to start a RP session before using this command. Use \"!rp prepare\ and \"!rp start\"." );
+      return;
+    }
+
+    char logmessage [255] = "";
+    sscanf( params.c_str(), "%[^\n]%*c", &logmessage );
+    Logger::info( "[RP Manual Log] {0}", logmessage );
+    player.sendNotice( "Message added to the server log." );
+  }
+  else if( subCommand == "call" )
+  {
+    {
+    if ( isRpPrepared == false )
+      player.sendUrgent( "You need to prepare a RP session before using this command. Use \"!rp prepare\".");
+      return;
+    }
+    for( auto member : m_rpMembers )
+    {
+      if( member->getAsPlayer() != player.getAsPlayer() )
+      {
+        member->getAsPlayer()->prepareZoning( player.getZoneId(), true, 1, 0 );
+        if( member->getAsPlayer()->getCurrentInstance() )
+        {
+          member->getAsPlayer()->exitInstance();
+        }
+        if( member->getAsPlayer()->getCurrentZone()->getGuId() != player.getCurrentZone()->getGuId() )
+        {
+          if( player.getCurrentInstance() )
+          {
+            auto pInstanceContent = player.getCurrentInstance()->getAsInstanceContent();
+            pInstanceContent->bindPlayer( member->getAsPlayer()->getId() );
+          }
+          member->getAsPlayer()->setInstance( player.getCurrentZone()->getGuId() );
+        }
+        member->getAsPlayer()->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
+        member->getAsPlayer()->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
+        player.sendNotice( "Calling all players registered to the RP session." );
+        break;
+
+
+      }
+    }
   }
   else if( subCommand == "remove" || subCommand == "rm" )
+  {
+  }
+  else if( subCommand == "stop" )
+  {
+    if( !isRpStarted == true )
+    {
+      player.sendUrgent( "You need to start a RP session before using this command. Use \"!rp prepare\ and \"!rp start\"." );
+      return;
+    }
+      Logger::info( "===========================================================" );
+      Logger::info( "RP session stopped by {0}", player.getName() );
+      Logger::info( "Participants: {0}", m_rpMembers.size() );
+      for( auto member : m_rpMembers )
+      {
+          Logger::info( "{0}", member->getAsPlayer()->getName() );
+          member->getAsPlayer()->setRPMode( false );
+          if( member->getAsPlayer() != player.getAsPlayer() )
+            member->getAsPlayer()->sendNotice( "RP session stopped by {0}.", player.getName() );
+      }
+      isRpPrepared = false;
+      isRpStarted = false;
+      m_rpMembers.clear();
+      Logger::info( "===========================RP STOP=========================" );
+
+
+  }
+  else if( subCommand == "mode" )
   {
   }
   else if( subCommand == "storage" )
@@ -1563,7 +1762,7 @@ void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player&
   }
   else if( elyexcuse == 7)
   {
-       player.sendDebug( "Rashaza Yinako utilise Midare Setsugekka."
+       player.sendDebug( "Rashaza Yinako utilise Midare Setsugecouille."
        "\nJeido Uran utilise VerBrasier."
        "\nEdenai Tokisaki utilise Flèche Nastrond."
        "\nStormbriga Kitsu utilise Patate Fendeur."

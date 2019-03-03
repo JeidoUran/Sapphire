@@ -18,6 +18,17 @@ namespace Sapphire::World::Manager
     // container mapping command string to command object
     std::map< std::string, std::shared_ptr< DebugCommand > > m_commandMap;
 
+    std::set< Sapphire::Entity::PlayerPtr > m_rpMembers;
+
+    bool isRpPrepared = ( false );
+    bool isRpStarted = ( false );
+    int32_t startzone = 0;
+    int32_t startposx = 0;
+    int32_t startposy = 0;
+    int32_t startposz = 0;
+    char RpTheme [255] = "";
+
+
   public:
     DebugCommandMgr( FrameworkPtr pFw );
 
