@@ -1,7 +1,7 @@
 #include <Common.h>
 #include <Vector3.cpp>
 #include <Network/CommonNetwork.h>
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include <Network/CommonActorControl.h>
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
@@ -41,7 +41,6 @@
 #include "Manager/RNGMgr.h"
 
 #include "Action/Action.h"
-#include "Action/ActionTeleport.h"
 
 #include "Session.h"
 #include "ServerMgr.h"
@@ -197,7 +196,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
   player.setPos( updatePositionPacket.data().position );
 
   if( ( player.getCurrentAction() != nullptr ) && bPosChanged )
-    player.getCurrentAction()->setInterrupted();
+    player.getCurrentAction()->setInterrupted( Common::ActionInterruptType::RegularInterrupt );
 
   // if no one is in range, don't bother trying to send a position update
   if( !player.hasInRangeActor() )

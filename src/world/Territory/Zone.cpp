@@ -6,7 +6,7 @@
 #include <Logging/Logger.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonNetwork.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
@@ -862,5 +862,10 @@ void Sapphire::Zone::updateSpawnPoints()
     }
   }
 
+}
+
+uint32_t Sapphire::Zone::getNextEffectSequence()
+{
+  return m_effectCounter++;
 }
 

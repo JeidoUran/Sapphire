@@ -42,6 +42,7 @@
 #include "Manager/MarketMgr.h"
 #include "Manager/RNGMgr.h"
 #include "Manager/NaviMgr.h"
+#include "Manager/ActionMgr.h"
 
 using namespace Sapphire::World::Manager;
 
@@ -170,6 +171,9 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   }
   framework()->set< Scripting::ScriptMgr >( pScript );
 
+  auto pActionMgr = std::make_shared< Manager::ActionMgr >( framework() );
+  framework()->set< Manager::ActionMgr >( pActionMgr );
+
   loadBNpcTemplates();
 
   auto pNaviMgr = std::make_shared< Manager::NaviMgr >( framework() );
@@ -207,7 +211,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive, framework() );
 
   std::vector< std::thread > thread_list;
-  thread_list.emplace_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
+  thread_list.emplace_back( std::thread( std::bind( &Network::Hive::run, hive.get() ) ) );
 
   auto pDebugCom = std::make_shared< DebugCommandMgr >( framework() );
   auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >( framework() );
