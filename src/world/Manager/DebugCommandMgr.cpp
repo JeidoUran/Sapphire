@@ -6,6 +6,7 @@
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <Network/PacketContainer.h>
+#include <Network/CommonActorControl.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Database/DatabaseDef.h>
@@ -40,6 +41,7 @@
 
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::World::Manager;
 
@@ -525,12 +527,12 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     }
   }
   
-  else if( subCommand == "hydastep" )
+  else if( subCommand == "eurekastep" )
   {
     int32_t step;
     sscanf( params.c_str(), "%d", &step );
 
-    player.sendToInRangeSet( makeActorControl143( player.getId(), 0x73A, step, 0x3C, 0xFFFFE3, 0, 0 ), true );
+    player.sendToInRangeSet( makeActorControl143( player.getId(), EurekaStep, step, 0x3C, 0xFFFFE3, 0, 0 ), true );
   }
   else
   {
@@ -1715,7 +1717,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
   }
   
   
-  else if( subCommand == "summary" )
+  else if( subCommand == "memo" )
   {
   }
 
