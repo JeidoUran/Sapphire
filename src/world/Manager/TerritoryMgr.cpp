@@ -92,7 +92,6 @@ bool Sapphire::World::Manager::TerritoryMgr::isInstanceContentTerritory( uint32_
   auto intendedUse = pTeri->territoryIntendedUse;
 
   return intendedUse == TerritoryIntendedUse::AllianceRaid ||
-         intendedUse == TerritoryIntendedUse::BeforeTrialDung ||
          intendedUse == TerritoryIntendedUse::Trial ||
          intendedUse == TerritoryIntendedUse::Dungeon ||
          intendedUse == TerritoryIntendedUse::OpenWorldInstanceBattle ||
@@ -112,6 +111,7 @@ bool Sapphire::World::Manager::TerritoryMgr::isPrivateTerritory( uint32_t territ
 
   return pTeri->territoryIntendedUse == TerritoryIntendedUse::OpeningArea ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::Inn ||
+         pTeri->territoryIntendedUse == TerritoryIntendedUse::BeforeTrialDung ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::JailArea ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::MSQPrivateArea;
 }
