@@ -645,15 +645,15 @@ void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
   {
     tellPacket->data().flags |= TellFlags::GmTellMsg;
     /* if( player.getRPMode() == true )
-      Logger::debug( "[RP Chatlog] (GMTell) {1} > {2}: {3}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
+      Logger::debug( "[RP Chatlog] (GMTell) {0} > {1}: {2}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
     else */
-      Logger::debug( "[Chatlog] (GMTell) {1} > {2}: {3}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
+      Logger::debug( "[Chatlog] (GMTell) {0} > {1}: {2}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
   }
   else
     /* if( player.getRPMode() == true )
-      Logger::debug( "[RP Chatlog] (Tell) {1} > {2}: {3}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
+      Logger::debug( "[RP Chatlog] (Tell) {0} > {1}: {2}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
     else */
-      Logger::debug( "[Chatlog] (Tell) {1} > {2}: {3}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
+      Logger::debug( "[Chatlog] (Tell) {0} > {1}: {2}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
 
   pTargetPlayer->queueChatPacket( tellPacket );
 }

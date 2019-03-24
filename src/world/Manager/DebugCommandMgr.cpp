@@ -64,6 +64,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "housing", &DebugCommandMgr::housing, "Housing utilities", 1 );
   registerCommand( "status", &DebugCommandMgr::status, "StatusEffect management.", 1 );
   registerCommand( "random", &DebugCommandMgr::random, "Rolls a random number.", 1 );
+  registerCommand( "tell", &DebugCommandMgr::tell, "Allows in-instance private chatting.", 1 );
   registerCommand( "rp", &DebugCommandMgr::rp, "RP management.", 1 );
   registerCommand( "ely", &DebugCommandMgr::ely, "Oui c'est parceque cette commande sert à rien.", 1 );
 }
@@ -1442,6 +1443,36 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
     player.sendUrgent( "{0} is not a valid status command.", subCommand );
   }
 }
+
+
+void Sapphire::World::Manager::DebugCommandMgr::tell( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+{
+  std::string subCommand;
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+  std::size_t spos = tmpCommand.find_first_of( " " );
+  char tell [500] = "";
+  uint16_t param;
+  sscanf( tmpCommand.c_str(), "%[^\n]%*c", &tell );
+
+  Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
+  if( player.getTargetId() != player.getId() )
+  {
+    targetActor = player.lookupTargetById( player.getTargetId() );
+  }
+  if( !targetActor || !targetActor->isPlayer() )
+  {
+    player.sendUrgent( "Invalid target." );
+    return;
+  }
+  player.sendDebug( "Sent to {0}: {1}", targetActor->getAsPlayer()->getName(), tell );
+  targetActor->getAsPlayer()->sendNotice( "Message from {0}: {1}", player.getName(), tell );
+  Logger::debug( "[Chatlog] (DebugTell) {0} > {1}: {2}", player.getName(), targetActor->getAsPlayer()->getName(), tell );
+  
+}
+
 
 
 void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& player,
