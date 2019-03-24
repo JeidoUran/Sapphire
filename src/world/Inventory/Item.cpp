@@ -29,6 +29,26 @@ Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, FrameworkPtr pFw, bool i
   m_itemLevel = itemInfo->levelItem;
   m_maxStackSize = itemInfo->stackSize;
   m_additionalData = itemInfo->additionalData;
+  m_blockRate = itemInfo->blockRate;
+  m_block = itemInfo->block;
+  m_defense = itemInfo->defensePhys;
+  m_defenseMag = itemInfo->defenseMag;
+
+  for( int i = 0; i < 6; ++i )
+  {
+    m_baseParam[i].baseParam = itemInfo->param[i].baseparam;
+    m_baseParam[i].value = itemInfo->param[i].value;
+  }
+}
+
+uint16_t Sapphire::Item::getDefense() const
+{
+  return m_defense;
+}
+
+uint16_t Sapphire::Item::getDefenseMag() const
+{
+  return m_defenseMag;
 }
 
 float Sapphire::Item::getAutoAttackDmg() const
@@ -180,4 +200,9 @@ uint32_t Sapphire::Item::getReservedFlag() const
 void Sapphire::Item::setReservedFlag( uint32_t flag )
 {
   m_reservedFlag = flag;
+}
+
+Sapphire::Item::BaseParamStruct* Sapphire::Item::getBaseParams()
+{
+  return m_baseParam;
 }

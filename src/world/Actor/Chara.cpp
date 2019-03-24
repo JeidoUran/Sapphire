@@ -386,6 +386,11 @@ void Sapphire::Entity::Chara::setCurrentAction( Sapphire::Action::ActionPtr pAct
   m_pCurrentAction = std::move( pAction );
 }
 
+uint32_t Sapphire::Entity::Chara::getBonusStat( Common::BaseParam bonus ) const
+{
+  return m_bonusStats[ static_cast< uint8_t >( bonus ) ];
+}
+
 /*!
 Autoattack prototype implementation
 TODO: move the check if the autoAttack can be performed to the callee
@@ -652,4 +657,14 @@ bool Sapphire::Entity::Chara::hasStatusEffect( uint32_t id )
 int64_t Sapphire::Entity::Chara::getLastUpdateTime() const
 {
   return m_lastUpdate;
+}
+
+void Sapphire::Entity::Chara::setLastComboActionId( uint32_t actionId )
+{
+  m_lastComboActionId = actionId;
+}
+
+uint32_t Sapphire::Entity::Chara::getLastComboActionId() const
+{
+  return m_lastComboActionId;
 }

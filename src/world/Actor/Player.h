@@ -60,9 +60,8 @@ namespace Sapphire::Entity
                                Action::ActionCallback interruptCallback, uint64_t additional );
 
     /*! start/register a normal event */
-    void
-    eventStart( uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventParam, uint8_t eventParam1,
-                uint32_t eventParam2, Event::EventHandler::EventFinishCallback callback = nullptr );
+    void eventStart( uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventParam, uint8_t eventParam1,
+                     uint32_t eventParam2, Event::EventHandler::EventFinishCallback callback = nullptr );
 
     /*! play a subevent */
     void playScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2, uint32_t eventParam3 );
@@ -70,9 +69,8 @@ namespace Sapphire::Entity
     void playGilShop( uint32_t eventId, uint32_t flags,
                       Event::EventHandler::SceneReturnCallback eventCallback );
 
-    void
-    directorPlayScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam3, uint32_t eventParam4,
-                       uint32_t eventParam5 = 0 );
+    void directorPlayScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam3,
+                            uint32_t eventParam4, uint32_t eventParam5 = 0 );
 
     /*! play a subevent */
     void playScene( uint32_t eventId, uint32_t scene, uint32_t flags,
@@ -321,7 +319,7 @@ namespace Sapphire::Entity
     void equipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendModel );
 
     /*! remove an item from an equipment slot */
-    void unequipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem );
+    void unequipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendModel );
 
     /*! equip a weapon, possibly forcing a job change */
     void equipWeapon( ItemPtr pItem, bool updateClass );

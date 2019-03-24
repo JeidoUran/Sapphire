@@ -275,7 +275,6 @@ void Sapphire::Entity::Player::calculateStats()
   auto tribeInfo = pExdData->get< Sapphire::Data::Tribe >( tribe );
   auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( level );
 
-  // TODO: put formula somewhere else...
   float base = Math::CalcStats::calculateBaseStat( getAsPlayer() );
 
   m_baseStats.str = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierStrength ) / 100 ) +
@@ -291,6 +290,8 @@ void Sapphire::Entity::Player::calculateStats()
   m_baseStats.pie = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierPiety ) / 100 ) +
                                              tribeInfo->pIE );
 
+  m_baseStats.determination = static_cast< uint32_t >( base );
+  m_baseStats.pie = static_cast< uint32_t >( base );
   m_baseStats.skillSpeed = paramGrowthInfo->baseSpeed;
   m_baseStats.spellSpeed = paramGrowthInfo->baseSpeed;
   m_baseStats.accuracy = paramGrowthInfo->baseSpeed;
@@ -298,6 +299,10 @@ void Sapphire::Entity::Player::calculateStats()
   m_baseStats.attackPotMagic = paramGrowthInfo->baseSpeed;
   m_baseStats.healingPotMagic = paramGrowthInfo->baseSpeed;
   m_baseStats.tenacity = paramGrowthInfo->baseSpeed;
+
+  m_baseStats.attack = m_baseStats.str;
+  m_baseStats.attackPotMagic = m_baseStats.inte;
+  m_baseStats.healingPotMagic = m_baseStats.mnd;
 
   m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer(), m_pFw );
 
@@ -308,9 +313,6 @@ void Sapphire::Entity::Player::calculateStats()
 
   if( m_hp > m_baseStats.max_hp )
     m_hp = m_baseStats.max_hp;
-
-
-  m_baseStats.determination = static_cast< uint32_t >( base );
 
 }
 
@@ -330,28 +332,28 @@ void Sapphire::Entity::Player::sendStats()
 {
 
   auto statPacket = makeZonePacket< FFXIVIpcPlayerStats >( getId() );
-  statPacket->data().strength = m_baseStats.str;
-  statPacket->data().dexterity = m_baseStats.dex;
-  statPacket->data().vitality = m_baseStats.vit;
-  statPacket->data().intelligence = m_baseStats.inte;
-  statPacket->data().mind = m_baseStats.mnd;
-  statPacket->data().piety = m_baseStats.pie;
-  statPacket->data().determination = m_baseStats.determination;
-  statPacket->data().hp = m_baseStats.max_hp;
-  statPacket->data().mp = m_baseStats.max_mp;
+  statPacket->data().strength = m_baseStats.str + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Strength ) ];
+  statPacket->data().dexterity = m_baseStats.dex + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Dexterity ) ];
+  statPacket->data().vitality = m_baseStats.vit + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Vitality ) ];
+  statPacket->data().intelligence = m_baseStats.inte + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Intelligence ) ];
+  statPacket->data().mind = m_baseStats.mnd + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Mind ) ];
+  statPacket->data().piety = m_baseStats.pie + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Piety ) ];
+  statPacket->data().determination = m_baseStats.determination + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Determination ) ];
+  statPacket->data().hp = m_baseStats.max_hp + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::HP ) ];
+  statPacket->data().mp = m_baseStats.max_mp + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::MP ) ];
   statPacket->data().accuracy = m_baseStats.accuracy;
-  statPacket->data().attack = m_baseStats.attack;
-  statPacket->data().attackMagicPotency = m_baseStats.attackPotMagic;
-  statPacket->data().healingMagicPotency = m_baseStats.healingPotMagic;
-  statPacket->data().skillSpeed = m_baseStats.skillSpeed;
-  statPacket->data().spellSpeed = m_baseStats.spellSpeed;
-  statPacket->data().spellSpeed1 = m_baseStats.spellSpeed;
+  statPacket->data().attack = m_baseStats.attack + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::AttackPower ) ];
+  statPacket->data().attackMagicPotency = m_baseStats.attackPotMagic + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::AttackMagicPotency ) ];
+  statPacket->data().healingMagicPotency = m_baseStats.healingPotMagic + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::HealingMagicPotency ) ];
+  statPacket->data().skillSpeed = m_baseStats.skillSpeed + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::SkillSpeed ) ];
+  statPacket->data().spellSpeed = m_baseStats.spellSpeed + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::SpellSpeed ) ];
+  statPacket->data().spellSpeed1 = m_baseStats.spellSpeed + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::SpellSpeed ) ];
   statPacket->data().spellSpeedMod = 100;
 
-  statPacket->data().criticalHitRate = m_baseStats.spellSpeed;
-  statPacket->data().defense = m_baseStats.spellSpeed;
-  statPacket->data().magicDefense = m_baseStats.spellSpeed;
-  statPacket->data().attack = m_baseStats.spellSpeed;
+  statPacket->data().criticalHitRate = m_baseStats.critHitRate + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::CriticalHit ) ];
+  statPacket->data().defense = m_baseStats.defense + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Defense ) ];
+  statPacket->data().magicDefense = m_baseStats.magicDefense + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::MagicDefense ) ];
+  statPacket->data().tenacity = m_baseStats.tenacity + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Tenacity ) ];
 
   queuePacket( statPacket );
 }
