@@ -19,6 +19,8 @@ namespace Sapphire::World::Manager
     std::map< std::string, std::shared_ptr< DebugCommand > > m_commandMap;
 
     std::set< Sapphire::Entity::PlayerPtr > m_rpMembers;
+    std::set< Sapphire::Entity::PlayerPtr > m_rpNPC;
+    std::set< Sapphire::Entity::PlayerPtr > m_rpSpectators;
 
     bool isRpPrepared = ( false );
     bool isRpStarted = ( false );

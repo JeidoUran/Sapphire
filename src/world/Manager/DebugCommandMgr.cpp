@@ -237,6 +237,13 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
 
   }
 
+  else if( subCommand == "bgm" )
+  {
+    uint16_t bgmId;
+    sscanf( params.c_str(), "%hd", &bgmId );
+    player.sendToInRangeSet( makeActorControl143( player.getId(), SetBGM, bgmId, 0, 0, 0, 0 ), true );
+  }
+
   else if( subCommand == "discovery_reset" )
   {
     player.resetDiscovery();
@@ -1510,12 +1517,81 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       m_rpMembers.insert ( targetActor->getAsPlayer() );
       if( isRpStarted == true )
         targetActor->getAsPlayer()->setRPMode( true );
-      Logger::info( "{0} has been added to the RP session", targetActor->getAsPlayer()->getName() );
+      Logger::info( "{0} has been added to the RP session.", targetActor->getAsPlayer()->getName() );
       player.sendNotice( "{0} has been added to the RP session.", targetActor->getAsPlayer()->getName() );
       targetActor->getAsPlayer()->sendNotice( "You have been added to a RP session by {0}.", player.getName() );
     }
   }
 
+  
+  else if( subCommand == "addnpc" )
+  {
+    if( !isRpPrepared == true )
+    {
+      player.sendUrgent( "You need to prepare a RP session before using this command. Use \"!rp prepare\".");
+      return;
+    }
+
+    if( isRpPrepared == true )
+    {
+      Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
+      if( player.getTargetId() != player.getId() )
+      {
+        targetActor = player.lookupTargetById( player.getTargetId() );
+      }
+      if( !targetActor || !targetActor->isPlayer() )
+      {
+        player.sendUrgent( "Invalid target." );
+        return;
+      }
+       if( m_rpNPC.count( targetActor->getAsPlayer() ) == 1 )
+      {
+        player.sendUrgent( "{0} is already registered to a RP session. Use \"!rp rm\" to remove them.", targetActor->getAsPlayer()->getName() );
+        return;
+      }
+      m_rpNPC.insert ( targetActor->getAsPlayer() );
+      if( isRpStarted == true )
+        targetActor->getAsPlayer()->setRPMode( true );
+      Logger::info( "{0} has been added to the RP session as a NPC.", targetActor->getAsPlayer()->getName() );
+      player.sendNotice( "{0} has been added to the RP session as a NPC.", targetActor->getAsPlayer()->getName() );
+      targetActor->getAsPlayer()->sendNotice( "You have been added to a RP session as a NPC by {0}.", player.getName() );
+    }
+  }
+  
+  else if( subCommand == "addspectator" || subCommand == "addspec" )
+  {
+    if( !isRpPrepared == true )
+    {
+      player.sendUrgent( "You need to prepare a RP session before using this command. Use \"!rp prepare\".");
+      return;
+    }
+
+    if( isRpPrepared == true )
+    {
+      Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
+      if( player.getTargetId() != player.getId() )
+      {
+        targetActor = player.lookupTargetById( player.getTargetId() );
+      }
+      if( !targetActor || !targetActor->isPlayer() )
+      {
+        player.sendUrgent( "Invalid target." );
+        return;
+      }
+       if( m_rpSpectators.count( targetActor->getAsPlayer() ) == 1 )
+      {
+        player.sendUrgent( "{0} is already registered to a RP session. Use \"!rp rm\" to remove them.", targetActor->getAsPlayer()->getName() );
+        return;
+      }
+      m_rpSpectators.insert ( targetActor->getAsPlayer() );
+      if( isRpStarted == true )
+        targetActor->getAsPlayer()->setRPMode( true );
+      Logger::info( "{0} has been added to the RP session as a spectator.", targetActor->getAsPlayer()->getName() );
+      player.sendNotice( "{0} has been added to the RP session as a spectator.", targetActor->getAsPlayer()->getName() );
+      targetActor->getAsPlayer()->sendNotice( "You have been added to a RP session as a spectator by {0}. Please wait for the RP session to start.", player.getName() );
+    }
+  }
+  
   else if( subCommand == "zone" )
   {
     if( isRpStarted == true )
@@ -1608,17 +1684,37 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       if( strcmp (RpTheme,"") != 0)
         Logger::info( "Theme: {0}", RpTheme );
       else
-          Logger::info( "Theme: None" );
+        Logger::info( "Theme: None" );
       Logger::info( "Participants: {0}", m_rpMembers.size() );
       for( auto member : m_rpMembers )
       {
-          Logger::info( "{0}", member->getAsPlayer()->getName() );
-          member->getAsPlayer()->setRPMode( true );
-          if( member->getAsPlayer() != player.getAsPlayer() )
-          {
-            //member->getAsPlayer()->setGmRank( 1 );
-            member->getAsPlayer()->sendNotice( "RP session started by {0}.", player.getName() );
-          }
+        Logger::info( "{0}", member->getAsPlayer()->getName() );
+        member->getAsPlayer()->setRPMode( true );
+        if( member->getAsPlayer() != player.getAsPlayer() )
+        {
+          //member->getAsPlayer()->setGmRank( 1 );
+          member->getAsPlayer()->sendNotice( "RP session started by {0}.", player.getName() );
+        }
+      Logger::info( "NPC: {0}", m_rpNPC.size() );
+      for( auto npc : m_rpNPC )
+      {
+        Logger::info( "{0}", npc->getAsPlayer()->getName() );
+        npc->getAsPlayer()->setRPMode( true );
+        if( npc->getAsPlayer() != player.getAsPlayer() )
+        {
+          npc->getAsPlayer()->sendNotice( "RP session started by {0}.", player.getName() );
+        }
+      }
+      Logger::info( "Spectators: {0}", m_rpSpectators.size() );
+      for( auto spec : m_rpSpectators )
+      {
+        Logger::info( "{0}", spec->getAsPlayer()->getName() );
+        player.setGmInvis( true );
+        spec->getAsPlayer()->setRPMode( true );
+        if( spec->getAsPlayer() != player.getAsPlayer() )
+        {
+          spec->getAsPlayer()->sendNotice( "RP session started by {0}.", player.getName() );
+        }
       }
       Logger::info( "===========================================================" );
       if ( !startzone == 0 )
@@ -1633,13 +1729,14 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       }
       isRpStarted = true;
       player.sendNotice( "RP session started." );
+      }
     }
   }
   else if( subCommand == "log" )
   {
     if( !isRpStarted == true )
     {
-      player.sendUrgent( "You need to start a RP session before using this command. Use \"!rp prepare\ and \"!rp start\"." );
+      player.sendUrgent( "You need to start a RP session before using this command. Use \"!rp prepare\" and \"!rp start\"." );
       return;
     }
 
@@ -1689,7 +1786,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
   {
     if( !isRpStarted == true )
     {
-      player.sendUrgent( "You need to start a RP session before using this command. Use \"!rp prepare\ and \"!rp start\"." );
+      player.sendUrgent( "You need to start a RP session before using this command. Use \"!rp prepare\" and \"!rp start\"." );
       return;
     }
       Logger::info( "===========================================================" );
@@ -1706,12 +1803,20 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       isRpStarted = false;
       m_rpMembers.clear();
       Logger::info( "===========================RP STOP=========================" );
+      player.sendNotice( "RP session stopped." );
 
 
   }
   else if( subCommand == "mode" )
   {
   }
+  
+/*   else if( subCommand == "spectate" )
+  {
+    uint16_t test;
+    sscanf( params.c_str(), "%hd", &test );
+    player.queuePacket( makeActorControl143( player.getId(), 0x640, 0, test, 0, 0, 0 ) );
+  } */
   else if( subCommand == "storage" )
   {
   }

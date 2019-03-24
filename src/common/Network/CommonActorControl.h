@@ -368,7 +368,7 @@ enum ActorControlType : uint16_t
 
     OpenPerformInstrumentUI = 0x71C,
 
-    EurekaStep = 0x73A, //alters the progress of the player on all of the Eureka maps
+    EurekaStep = 0x73A, // alters the progress of the player on all of the Eureka maps
 
     StartReplay = 0x7BC,
     EndReplay = 0x7BD, // request for restoring the original player state (actor, buff, gauge, etc..)
