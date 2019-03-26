@@ -57,6 +57,7 @@ public:
     instance.registerEObj( "Exit", 2000139, 0, 4, { 4.4316f, 0.716916f, 73.4935f }, 1.000000f, -3.13671f ); 
     instance.registerEObj( "journal1", 2005180, 0, 4, { 57.3137f, 0.578998f, 15.3749f }, 1.000000f, -1.25726f ); 
     instance.registerEObj( "journal2", 2005180, 0, 4, { -49.2352f, 0.578998f, 47.9359f }, 1.000000f, -0.240959f ); 
+    instance.registerEObj( "bombs", 2003249, 0, 4, { -49.2352f, 0.578998f, 47.9359f }, 1.000000f, -0.240959f ); 
 
   }
 
