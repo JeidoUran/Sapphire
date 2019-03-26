@@ -8,6 +8,7 @@
 #include <set>
 #include <map>
 #include <queue>
+#include <array>
 
 namespace Sapphire::Entity
 {
@@ -66,7 +67,7 @@ namespace Sapphire::Entity
     } m_baseStats;
 
     // array for bonuses, 80 to have some spare room.
-    uint32_t m_bonusStats[ 80 ];
+    std::array< uint32_t, 80 > m_bonusStats;
 
   protected:
     char m_name[34];
@@ -102,8 +103,17 @@ namespace Sapphire::Entity
     uint64_t m_targetId;
     /*! Ptr to a queued action */
     Action::ActionPtr m_pCurrentAction;
-    /*! the id of the last combo action used (IgnoresCombo) */
+
+    /*!
+     * @brief the id of the last combo action used (IgnoresCombo)
+     */
     uint32_t m_lastComboActionId;
+
+    /*!
+     * @brief when the last combo action was used in ms
+     */
+    uint64_t m_lastComboActionTime;
+
     /*! Invincibility type */
     Common::InvincibilityType m_invincibilityType;
 

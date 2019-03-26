@@ -11,6 +11,7 @@
 #include "Event/EventHandler.h"
 #include <map>
 #include <queue>
+#include <array>
 
 namespace Sapphire::Entity
 {
@@ -705,6 +706,9 @@ namespace Sapphire::Entity
     /*! load search info */
     bool loadSearchInfo();
 
+    /*! load hunting log entries */
+    bool loadHuntingLog();
+
     // Player Network Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! send current models ( equipment ) */
@@ -968,6 +972,7 @@ namespace Sapphire::Entity
 
     Sapphire::ItemPtr dropInventoryItem( Common::InventoryType type, uint16_t slotId );
 
+    Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1033,7 +1038,7 @@ namespace Sapphire::Entity
     uint8_t m_homePoint;
     uint8_t m_startTown;
     uint16_t m_townWarpFstFlags;
-    uint8_t m_questCompleteFlags[396];
+    uint8_t m_questCompleteFlags[476];
     uint8_t m_discovery[421];
     uint32_t m_playTime;
 
@@ -1104,6 +1109,8 @@ namespace Sapphire::Entity
 
     Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
+
+    std::array< Common::HuntingLogEntry, 12 > m_huntingLogEntries;
   };
 
 }
