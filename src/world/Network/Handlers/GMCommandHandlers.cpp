@@ -463,9 +463,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         // pInstance will be nullptr if you're accessing a normal zone via its allocated instance id rather than its zoneid
         if( pInstance && !pInstance->isPlayerBound( player.getId() ) )
         {
-          player.sendUrgent( "Not able to join instance#{0}", param1 );
-          player.sendUrgent( "Player not bound! ( run !instance bind <instanceId> first ) {0}", param1 );
-          break;
+          player.sendDebug( "Binding to instance..." );
+          pInstance->bindPlayer( targetPlayer->getId() );
+          // player.sendUrgent( "Not able to join instance#{0}", param1 );
+          // player.sendUrgent( "Player not bound! ( run !instance bind <instanceId> first ) {0}", param1 );
+          // break;
         }
 
         player.setInstance( instance );
