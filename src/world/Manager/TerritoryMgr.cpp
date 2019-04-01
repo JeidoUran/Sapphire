@@ -111,8 +111,6 @@ bool Sapphire::World::Manager::TerritoryMgr::isPrivateTerritory( uint32_t territ
 
   return pTeri->territoryIntendedUse == TerritoryIntendedUse::OpeningArea ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::Inn ||
-         pTeri->territoryIntendedUse == TerritoryIntendedUse::BeforeTrialDung ||
-         pTeri->territoryIntendedUse == TerritoryIntendedUse::JailArea ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::MSQPrivateArea;
 }
 
@@ -136,6 +134,7 @@ bool Sapphire::World::Manager::TerritoryMgr::isDefaultTerritory( uint32_t territ
   return pTeri->territoryIntendedUse == TerritoryIntendedUse::Inn ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::Town ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::OpenWorld ||
+         pTeri->territoryIntendedUse == TerritoryIntendedUse::JailArea ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::OpeningArea;
 
 }

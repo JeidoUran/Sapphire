@@ -84,6 +84,8 @@ enum GmCommand
   TeriInfo = 0x025D,
   Jump = 0x025E,
   JumpNpc = 0x025F,
+  Jail = 0x025A,
+  Unjail = 0x025B,
 };
 
 void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
@@ -576,6 +578,12 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       break;
     }
 
+    case GmCommand::Unjail:
+    {
+      targetPlayer->returnToHomepoint();
+      break;
+    }
+
     default:
       player.sendUrgent( "GM1 Command not implemented: {0}", commandId );
       break;
@@ -739,9 +747,19 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
                          targetPlayer->getRPMode() );
       break;
     }
-    default:
-      player.sendUrgent( "GM2 Command not implemented: {0}", commandId );
-      break;
-  }
 
+    case GmCommand::Jail:
+    {
+      targetPlayer->prepareZoning( 176, true, 1, 0 );
+      if( targetPlayer->getCurrentInstance() )
+      {
+        targetPlayer->exitInstance();
+      }
+      targetPlayer->setZone( 176 );
+      targetPlayer->changePosition( 0, 0, 0, 0 );
+      targetPlayer->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
+      player.sendNotice( "Jailed {0}.", targetPlayer->getName() );
+      break;
+    }
+  }
 }
