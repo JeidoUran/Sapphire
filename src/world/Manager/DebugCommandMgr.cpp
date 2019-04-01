@@ -355,7 +355,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
         player.spawn( actor->getAsPlayer() );
       }
     }
-    player.sendNotice( "Player model set to " + std::to_string( modelId ) + "." );
+    player.sendNotice( "Player model set to {0}.", modelId );
   }
   // TODO: Better name
   else if( subCommand == "targetmodel" || subCommand == "tmodel" )
@@ -389,7 +389,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
         targetActor->getAsPlayer()->spawn( actor->getAsPlayer() );
       }
     }
-    player.sendNotice( "Target player model set to " + std::to_string( modelId ) + "." );
+    player.sendNotice( "Target player model set to {0}.", modelId );
   else if( subCommand == "name" )
   {
     char name[34];
@@ -471,7 +471,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     }
     else if ( !pExdData->get< Sapphire::Data::Festival >( festivalId ) || !pExdData->get< Sapphire::Data::Festival >( additionalId ) )
     {
-      player.sendUrgent ( "{0} and {1} are not a valid Festival IDs.", festivalId, additionalId );
+      player.sendUrgent ( "{0} and {1} are not valid Festival IDs.", festivalId, additionalId );
       return;
     }
 

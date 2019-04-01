@@ -153,7 +153,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::Tribe:
     {
       targetPlayer->setLookAt( CharaLook::Tribe, param1 );
-      player.sendNotice( "Tribe for {0} was set to ", targetPlayer->getName(), param1 );
+      player.sendNotice( "Tribe for {0} was set to {1}", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
@@ -169,7 +169,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::Sex:
     {
       targetPlayer->setLookAt( CharaLook::Gender, param1 );
-      player.sendNotice( "Sex for {0} was set to ", targetPlayer->getName(), param1 );
+      player.sendNotice( "Sex for {0} was set to {1}", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetActor->getInRangeActors();
       for( auto actor : inRange )
@@ -709,14 +709,15 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
                          "\nPos: \nX: {17} \nY: {18} \nZ: {19} \nR: {20}"
                          "\n"
                          "\nGMRank: {21}"
-                         "\nInvisibilityFlag: {22}"
+                         "\nisActingAsGM: {22}"
+                         "\nInvisibilityFlag: {23}"
                          "\n"
-                         "\nSearchMessage: {23}"
-                         "\nPlayTime: {24}"
-                         "\nModelChara: {25}"
-                         "\nCurrentMount: {26} (ID: {27})"
-                         "\nTarget: {28}"
-                         "\nRPMode: {29}",
+                         "\nSearchMessage: {24}"
+                         "\nPlayTime: {25}"
+                         "\nModelChara: {26}"
+                         "\nCurrentMount: {27} (ID: {28})"
+                         "\nTarget: {29}"
+                         "\nRPMode: {30}",
                          targetPlayer->getName(), targetPlayer->getId(),
                          targetPlayer->getHp(), targetPlayer->getMaxHp(), targetPlayer->getMp(), targetPlayer->getMaxMp(), targetPlayer->getTp(),
                          pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( targetPlayer->getClass() ))->name, static_cast< uint8_t >( targetPlayer->getClass() ),
@@ -728,6 +729,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
                          targetPlayer->getCurrentZone()->getGuId(),
                          targetPlayer->getPos().x, targetPlayer->getPos().y, targetPlayer->getPos().z, targetPlayer->getRot(),
                          targetPlayer->getGmRank(),
+                         targetPlayer->isActingAsGm(),
                          targetPlayer->getGmInvis(),
                          targetPlayer->getSearchMessage(),
                          targetPlayer->getPlayTime(),

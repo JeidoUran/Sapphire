@@ -850,10 +850,10 @@ namespace Sapphire::Entity
     void setAutoattack( bool mode );
 
     bool isAutoattackOn() const;
-	
-	uint16_t getModelChara() const;
-	
-	void setModelChara( uint16_t modelChara );
+
+    uint16_t getModelChara() const;
+
+    void setModelChara( uint16_t modelChara );
 
     void onMobAggro( BNpcPtr pBNpc );
     void onMobDeaggro( BNpcPtr pBNpc );
