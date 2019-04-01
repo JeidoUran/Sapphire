@@ -84,6 +84,8 @@ enum GmCommand
   TeriInfo = 0x025D,
   Jump = 0x025E,
   JumpNpc = 0x025F,
+  Jail = 0x025A,
+  Unjail = 0x025B,
 };
 
 void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
@@ -153,7 +155,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::Tribe:
     {
       targetPlayer->setLookAt( CharaLook::Tribe, param1 );
-      player.sendNotice( "Tribe for {0} was set to ", targetPlayer->getName(), param1 );
+      player.sendNotice( "Tribe for {0} was set to {1}", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
@@ -169,7 +171,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::Sex:
     {
       targetPlayer->setLookAt( CharaLook::Gender, param1 );
-      player.sendNotice( "Sex for {0} was set to ", targetPlayer->getName(), param1 );
+      player.sendNotice( "Sex for {0} was set to {1}", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetActor->getInRangeActors();
       for( auto actor : inRange )
@@ -461,9 +463,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         // pInstance will be nullptr if you're accessing a normal zone via its allocated instance id rather than its zoneid
         if( pInstance && !pInstance->isPlayerBound( player.getId() ) )
         {
-          player.sendUrgent( "Not able to join instance#{0}", param1 );
-          player.sendUrgent( "Player not bound! ( run !instance bind <instanceId> first ) {0}", param1 );
-          break;
+          player.sendDebug( "Binding to instance..." );
+          pInstance->bindPlayer( targetPlayer->getId() );
+          // player.sendUrgent( "Not able to join instance#{0}", param1 );
+          // player.sendUrgent( "Player not bound! ( run !instance bind <instanceId> first ) {0}", param1 );
+          // break;
         }
 
         player.setInstance( instance );
@@ -573,6 +577,12 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
                              targetActor->getRot() );
 
       player.sendNotice( "Jumping to {0} in range.", targetPlayer->getName() );
+      break;
+    }
+
+    case GmCommand::Unjail:
+    {
+      targetPlayer->returnToHomepoint();
       break;
     }
 
@@ -709,14 +719,15 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
                          "\nPos: \nX: {17} \nY: {18} \nZ: {19} \nR: {20}"
                          "\n"
                          "\nGMRank: {21}"
-                         "\nInvisibilityFlag: {22}"
+                         "\nisActingAsGM: {22}"
+                         "\nInvisibilityFlag: {23}"
                          "\n"
-                         "\nSearchMessage: {23}"
-                         "\nPlayTime: {24}"
-                         "\nModelChara: {25}"
-                         "\nCurrentMount: {26} (ID: {27})"
-                         "\nTarget: {28}"
-                         "\nRPMode: {29}",
+                         "\nSearchMessage: {24}"
+                         "\nPlayTime: {25}"
+                         "\nModelChara: {26}"
+                         "\nCurrentMount: {27} (ID: {28})"
+                         "\nTarget: {29}"
+                         "\nRPMode: {30}",
                          targetPlayer->getName(), targetPlayer->getId(),
                          targetPlayer->getHp(), targetPlayer->getMaxHp(), targetPlayer->getMp(), targetPlayer->getMaxMp(), targetPlayer->getTp(),
                          pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( targetPlayer->getClass() ))->name, static_cast< uint8_t >( targetPlayer->getClass() ),
@@ -728,6 +739,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
                          targetPlayer->getCurrentZone()->getGuId(),
                          targetPlayer->getPos().x, targetPlayer->getPos().y, targetPlayer->getPos().z, targetPlayer->getRot(),
                          targetPlayer->getGmRank(),
+                         targetPlayer->isActingAsGm(),
                          targetPlayer->getGmInvis(),
                          targetPlayer->getSearchMessage(),
                          targetPlayer->getPlayTime(),
@@ -737,9 +749,19 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
                          targetPlayer->getRPMode() );
       break;
     }
-    default:
-      player.sendUrgent( "GM2 Command not implemented: {0}", commandId );
-      break;
-  }
 
+    case GmCommand::Jail:
+    {
+      targetPlayer->prepareZoning( 176, true, 1, 0 );
+      if( targetPlayer->getCurrentInstance() )
+      {
+        targetPlayer->exitInstance();
+      }
+      targetPlayer->setZone( 176 );
+      targetPlayer->changePosition( 0, 0, 0, 0 );
+      targetPlayer->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
+      player.sendNotice( "Jailed {0}.", targetPlayer->getName() );
+      break;
+    }
+  }
 }

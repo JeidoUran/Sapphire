@@ -1228,6 +1228,20 @@ struct FFXIVIpcEventStart :
   /* 0014 */ uint32_t padding1;
 };
 
+/**
+* Structural representation of the packet sent by the server
+* to fill a huntin log entry
+*/
+struct FFXIVIpcHuntingLogEntry : FFXIVIpcBasePacket< HuntingLogEntry >
+{
+  int32_t u0; // -1 for all normal classes
+  uint8_t rank; // starting from 0
+  uint8_t index; // classes and gcs
+  uint8_t entries[10][4];
+  uint16_t pad;
+  uint64_t completeFlags; // 4 bit for each potential entry and the 5th bit for completion of the section
+  uint64_t pad1;
+};
 
 /**
 * Structural representation of the packet sent by the server
@@ -1817,7 +1831,7 @@ struct FFXIVIpcObjectSpawn :
   uint16_t rotation;
   int16_t unknown24a;
   int16_t unknown24b;
-  uint16_t unknown28a;
+  uint16_t flag;
   int16_t unknown28c;
   uint32_t housingLink;
   Common::FFXIVARR_POSITION3 position;

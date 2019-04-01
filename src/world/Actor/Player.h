@@ -11,6 +11,7 @@
 #include "Event/EventHandler.h"
 #include <map>
 #include <queue>
+#include <array>
 
 namespace Sapphire::Entity
 {
@@ -705,6 +706,9 @@ namespace Sapphire::Entity
     /*! load search info */
     bool loadSearchInfo();
 
+    /*! load hunting log entries */
+    bool loadHuntingLog();
+
     // Player Network Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! send current models ( equipment ) */
@@ -833,7 +837,13 @@ namespace Sapphire::Entity
 
     void setGmInvis( bool invis );
 
+    // bool isActingAsEnemy() const;
+
+    // void setActingAsEnemy( bool enemy );
+
     bool isActingAsGm() const;
+
+    bool isActingAsEnemy() const;
 
     bool getRPMode() const;
 
@@ -846,10 +856,30 @@ namespace Sapphire::Entity
     void setAutoattack( bool mode );
 
     bool isAutoattackOn() const;
-	
-	uint16_t getModelChara() const;
-	
-	void setModelChara( uint16_t modelChara );
+
+    uint32_t getbNPCBase() const;
+
+    void setbNPCBase( uint32_t bNPCBase );
+
+    uint32_t getbNPCName() const;
+
+    void setbNPCName( uint32_t bNPCName );
+
+    uint16_t getModelChara() const;
+
+    void setModelChara( uint16_t modelChara );
+
+    uint8_t getModelType() const;
+
+    void setModelType( uint8_t modelType );
+
+    uint8_t getSubType() const;
+
+    void setSubType( uint8_t subtype );
+
+    uint8_t getEnemyType() const;
+
+    void setEnemyType( uint8_t enemyType );
 
     void onMobAggro( BNpcPtr pBNpc );
     void onMobDeaggro( BNpcPtr pBNpc );
@@ -968,6 +998,7 @@ namespace Sapphire::Entity
 
     Sapphire::ItemPtr dropInventoryItem( Common::InventoryType type, uint16_t slotId );
 
+    Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1033,7 +1064,7 @@ namespace Sapphire::Entity
     uint8_t m_homePoint;
     uint8_t m_startTown;
     uint16_t m_townWarpFstFlags;
-    uint8_t m_questCompleteFlags[396];
+    uint8_t m_questCompleteFlags[476];
     uint8_t m_discovery[421];
     uint32_t m_playTime;
 
@@ -1061,9 +1092,16 @@ namespace Sapphire::Entity
     uint16_t zoneId;
     bool m_gmInvis = false;
 
+    uint32_t m_bNPCBase;
+    uint32_t m_bNPCName;
+
     bool m_RPMode = false;
 
     uint16_t m_modelChara;
+
+    uint8_t m_modelType;
+    uint8_t m_subtype;
+    uint8_t m_enemyType;
 
     uint8_t m_equipDisplayFlags;
 
@@ -1104,6 +1142,8 @@ namespace Sapphire::Entity
 
     Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
+
+    std::array< Common::HuntingLogEntry, 12 > m_huntingLogEntries;
   };
 
 }
