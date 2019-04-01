@@ -1831,7 +1831,7 @@ struct FFXIVIpcObjectSpawn :
   uint16_t rotation;
   int16_t unknown24a;
   int16_t unknown24b;
-  uint16_t unknown28a;
+  uint16_t flag;
   int16_t unknown28c;
   uint32_t housingLink;
   Common::FFXIVARR_POSITION3 position;
