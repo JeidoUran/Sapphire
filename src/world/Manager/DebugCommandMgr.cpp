@@ -407,6 +407,13 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       }
     }
   }
+  else if( subCommand == "sptp" )
+  {
+    if( params == "1" )
+      player.sendToInRangeSet( makeActorControl142( player.getId(), 407, 140, 0, 0, 0, 32515 ), true );
+    if( params == "2" )
+      player.sendToInRangeSet( makeActorControl142( player.getId(), 407, 141, 0, 0, 0, 32515 ), true );
+  }
   else if( subCommand == "enemy" )
   {
     if ( player.isActingAsEnemy() == false )
