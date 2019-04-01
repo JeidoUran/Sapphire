@@ -22,6 +22,7 @@
 
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
+#include "Territory/PublicContent.h"
 
 #include "Session.h"
 
@@ -182,6 +183,11 @@ void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( FrameworkPtr
     instance->onEnterTerritory( player, eventId, param1, param2 );
   }
   else if( auto instance = player.getCurrentQuestBattle() )
+  {
+    player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 1, player.getZoneId() );
+    instance->onEnterTerritory( player, eventId, param1, param2 );
+  }
+  else if( auto instance = player.getCurrentPublicContent() )
   {
     player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 1, player.getZoneId() );
     instance->onEnterTerritory( player, eventId, param1, param2 );

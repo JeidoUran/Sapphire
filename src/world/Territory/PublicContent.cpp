@@ -19,7 +19,7 @@
 
 #include "Event/EventHandler.h"
 
-#include "QuestBattle.h"
+#include "PublicContent.h"
 #include "Framework.h"
 
 using namespace Sapphire::Common;
@@ -27,51 +27,51 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle > pBattleDetails,
-                                    uint16_t territoryType,
-                                    uint32_t guId,
-                                    const std::string& internalName,
-                                    const std::string& contentName,
-                                    uint32_t questBattleId,
-                                    FrameworkPtr pFw ) :
+Sapphire::PublicContent::PublicContent( std::shared_ptr< Sapphire::Data::PublicContent > pZoneConfiguration,
+                                            uint16_t territoryType,
+                                            uint32_t guId,
+                                            const std::string& internalName,
+                                            const std::string& contentName,
+                                            uint32_t publicContentId,
+                                            FrameworkPtr pFw ) :
   Zone( static_cast< uint16_t >( territoryType ), guId, internalName, contentName, pFw ),
-  Director( Event::Director::QuestBattle, questBattleId ),
-  m_pBattleDetails( pBattleDetails ),
-  m_questBattleId( questBattleId ),
+  Director( Event::Director::PublicContent, publicContentId ),
+  m_zoneConfiguration( pZoneConfiguration ),
+  m_publicContentId( publicContentId ),
   m_state( Created ),
   m_instanceCommenceTime( 0 )
- // m_currentBgm( pInstanceConfiguration->bGM )
+  // m_currentBgm( pZoneConfiguration->bGM )
 {
 
 }
 
-bool Sapphire::QuestBattle::init()
+bool Sapphire::PublicContent::init()
 {
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceInit( getAsQuestBattle() );
+  pScriptMgr->onInstanceInit( getAsPublicContent() );
 
   return true;
 }
 
 
-Sapphire::QuestBattle::~QuestBattle()
+Sapphire::PublicContent::~PublicContent()
 {
 
 }
 
-uint32_t Sapphire::QuestBattle::getQuestBattleId() const
+uint32_t Sapphire::PublicContent::getPublicContentId() const
 {
-  return m_questBattleId;
+  return m_publicContentId;
 }
 
-Sapphire::Data::ExdDataGenerated::QuestBattlePtr Sapphire::QuestBattle::getQuestBattleDetails() const
+Sapphire::Data::ExdDataGenerated::PublicContentPtr Sapphire::PublicContent::getZoneConfiguration() const
 {
-  return m_pBattleDetails;
+  return m_zoneConfiguration;
 }
 
-void Sapphire::QuestBattle::onPlayerZoneIn( Entity::Player& player )
+void Sapphire::PublicContent::onPlayerZoneIn( Entity::Player& player )
 {
-  Logger::debug( "QuestBattle::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "PublicContent::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
   // mark player as "bound by duty"
@@ -84,33 +84,36 @@ void Sapphire::QuestBattle::onPlayerZoneIn( Entity::Player& player )
 
 }
 
-void Sapphire::QuestBattle::onLeaveTerritory( Entity::Player& player )
+void Sapphire::PublicContent::onLeaveTerritory( Entity::Player& player )
 {
-  Logger::debug( "QuestBattle::onLeaveTerritory: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "PublicContent::onLeaveTerritory: Zone#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
   clearDirector( player );
 }
 
-void Sapphire::QuestBattle::onUpdate( uint32_t currTime )
+void Sapphire::PublicContent::onUpdate( uint32_t currTime )
 {
   switch( m_state )
   {
     case Created:
     {
-      if( m_boundPlayerId == 0 )
+      if( m_boundPlayerIds.size() == 0 )
         return;
 
-      auto it = m_playerMap.find( m_boundPlayerId );
-      if( it == m_playerMap.end() )
-        return;
+      for( auto playerId : m_boundPlayerIds )
+      {
+        auto it = m_playerMap.find( playerId );
+        if( it == m_playerMap.end() )
+          return;
 
-      auto player = it->second;
-      if( !player->isLoadingComplete() ||
-          !player->isDirectorInitialized() ||
-          !player->isOnEnterEventDone() ||
-          player->hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
-        return;
+        auto player = it->second;
+        if( !player->isLoadingComplete() ||
+            !player->isDirectorInitialized() ||
+            !player->isOnEnterEventDone() ||
+            player->hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
+          return;
+      }
 
       if( m_instanceCommenceTime == 0 )
       {
@@ -120,15 +123,18 @@ void Sapphire::QuestBattle::onUpdate( uint32_t currTime )
       else if( Util::getTimeMs() < m_instanceCommenceTime )
         return;
 
-      // TODO: we do not have a list of players for questbattles... just one
       for( const auto& playerIt : m_playerMap )
       {
         auto pPlayer = playerIt.second;
-        pPlayer->sendDebug( " ALL DONE LOADING " );
+        pPlayer->queuePacket( makeActorControl143( pPlayer->getId(), DirectorUpdate,
+                                                   getDirectorId(), 0x40000001,
+                                                   m_zoneConfiguration->timeLimitmin * 60u ) );
       }
 
+      if( m_pEntranceEObj )
+        m_pEntranceEObj->setState( 7 );
       m_state = DutyInProgress;
-      m_instanceExpireTime = Util::getTimeSeconds() + ( m_pBattleDetails->timeLimit * 60u );
+      m_instanceExpireTime = Util::getTimeSeconds() + ( m_zoneConfiguration->timeLimitmin * 60u );
       break;
     }
 
@@ -147,27 +153,27 @@ void Sapphire::QuestBattle::onUpdate( uint32_t currTime )
   }
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceUpdate( getAsQuestBattle(), currTime );
+  pScriptMgr->onInstanceUpdate( getAsPublicContent(), currTime );
 }
 
-void Sapphire::QuestBattle::onFinishLoading( Entity::Player& player )
+void Sapphire::PublicContent::onFinishLoading( Entity::Player& player )
 {
-
+  sendDirectorInit( player );
 }
 
-void Sapphire::QuestBattle::onInitDirector( Entity::Player& player )
+void Sapphire::PublicContent::onInitDirector( Entity::Player& player )
 {
-  player.sendQuestMessage( getDirectorId(), 0, 2, Util::getTimeSeconds(), 0x0708 );
   sendDirectorVars( player );
   player.setDirectorInitialized( true );
 }
 
-void Sapphire::QuestBattle::onDirectorSync( Entity::Player& player )
+void Sapphire::PublicContent::onDirectorSync( Entity::Player& player )
 {
   player.queuePacket( makeActorControl143( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
 }
 
-void Sapphire::QuestBattle::setVar( uint8_t index, uint8_t value )
+
+void Sapphire::PublicContent::setVar( uint8_t index, uint8_t value )
 {
   if( index > 19 )
     return;
@@ -244,7 +250,7 @@ void Sapphire::QuestBattle::setVar( uint8_t index, uint8_t value )
   }
 }
 
-void Sapphire::QuestBattle::setSequence( uint8_t value )
+void Sapphire::PublicContent::setSequence( uint8_t value )
 {
   setDirectorSequence( value );
 
@@ -254,7 +260,7 @@ void Sapphire::QuestBattle::setSequence( uint8_t value )
   }
 }
 
-void Sapphire::QuestBattle::setBranch( uint8_t value )
+void Sapphire::PublicContent::setBranch( uint8_t value )
 {
   setDirectorBranch( value );
 
@@ -264,7 +270,7 @@ void Sapphire::QuestBattle::setBranch( uint8_t value )
   }
 }
 
-void Sapphire::QuestBattle::startQte()
+void Sapphire::PublicContent::startQte()
 {
   for( const auto& playerIt : m_playerMap )
   {
@@ -273,7 +279,7 @@ void Sapphire::QuestBattle::startQte()
   }
 }
 
-void Sapphire::QuestBattle::startEventCutscene()
+void Sapphire::PublicContent::startEventCutscene()
 {
   // TODO: lock player movement
   for( const auto& playerIt : m_playerMap )
@@ -283,7 +289,7 @@ void Sapphire::QuestBattle::startEventCutscene()
   }
 }
 
-void Sapphire::QuestBattle::endEventCutscene()
+void Sapphire::PublicContent::endEventCutscene()
 {
   for( const auto& playerIt : m_playerMap )
   {
@@ -292,10 +298,12 @@ void Sapphire::QuestBattle::endEventCutscene()
   }
 }
 
-void Sapphire::QuestBattle::onRegisterEObj( Entity::EventObjectPtr object )
+void Sapphire::PublicContent::onRegisterEObj( Entity::EventObjectPtr object )
 {
   if( object->getName() != "none" )
     m_eventObjectMap[ object->getName() ] = object;
+  if( object->getObjectId() == 2000182 ) // start
+    m_pEntranceEObj = object;
 
   auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   auto objData = pExdData->get< Sapphire::Data::EObj >( object->getObjectId() );
@@ -303,31 +311,47 @@ void Sapphire::QuestBattle::onRegisterEObj( Entity::EventObjectPtr object )
     // todo: data should be renamed to eventId
     m_eventIdToObjectMap[ objData->data ] = object;
   else
-    Logger::error( "InstanceContent::onRegisterEObj Zone " +
+    Logger::error( "PublicContent::onRegisterEObj Zone " +
                    m_internalName + ": No EObj data found for EObj with ID: " +
                    std::to_string( object->getObjectId() ) );
 }
 
-Sapphire::Event::Director::DirectorState Sapphire::QuestBattle::getState() const
+bool Sapphire::PublicContent::hasPlayerPreviouslySpawned( Entity::Player& player ) const
+{
+  auto it = m_spawnedPlayers.find( player.getId() );
+  return it != m_spawnedPlayers.end();
+}
+
+Sapphire::PublicContent::PublicContentState Sapphire::PublicContent::getState() const
 {
   return m_state;
 }
 
-void Sapphire::QuestBattle::onBeforePlayerZoneIn( Sapphire::Entity::Player& player )
+void Sapphire::PublicContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& player )
 {
   // remove any players from the instance who aren't bound on zone in
   if( !isPlayerBound( player.getId() ) )
     player.exitInstance();
 
-  // TODO: let script set start position??
-  player.setRot( PI );
-  player.setPos( { 0.f, 0.f, 0.f } );
-
+  // if a player has already spawned once inside this instance, don't move them if they happen to zone in again
+  if( !hasPlayerPreviouslySpawned( player ) )
+  {
+    if( m_pEntranceEObj != nullptr )
+    {
+      player.setRot( PI );
+      player.setPos( m_pEntranceEObj->getPos() );
+    }
+    else
+    {
+      player.setRot( PI );
+      player.setPos( { 0.f, 0.f, 0.f } );
+    }
+  }
 
   player.resetObjSpawnIndex();
 }
 
-Sapphire::Entity::EventObjectPtr Sapphire::QuestBattle::getEObjByName( const std::string& name )
+Sapphire::Entity::EventObjectPtr Sapphire::PublicContent::getEObjByName( const std::string& name )
 {
   auto it = m_eventObjectMap.find( name );
   if( it == m_eventObjectMap.end() )
@@ -336,7 +360,7 @@ Sapphire::Entity::EventObjectPtr Sapphire::QuestBattle::getEObjByName( const std
   return it->second;
 }
 
-void Sapphire::QuestBattle::onTalk( Sapphire::Entity::Player& player, uint32_t eventId, uint64_t actorId )
+void Sapphire::PublicContent::onTalk( Sapphire::Entity::Player& player, uint32_t eventId, uint64_t actorId )
 {
   // todo: handle exit (and maybe shortcut?) behaviour here
 
@@ -344,79 +368,33 @@ void Sapphire::QuestBattle::onTalk( Sapphire::Entity::Player& player, uint32_t e
   if( it == m_eventIdToObjectMap.end() )
     return;
 
-  if( auto onTalkHandler = it->second->getOnTalkHandler() )
-    onTalkHandler( player, it->second, getAsQuestBattle(), actorId );
+  if( auto onTalk = it->second->getOnTalkHandler() )
+    onTalk( player, it->second, getAsPublicContent(), actorId );
   else
     player.sendDebug( "No onTalk handler found for interactable eobj with EObjID#{0}, eventId#{1}  ",
                       it->second->getObjectId(), eventId );
 }
 
 void
-Sapphire::QuestBattle::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
+Sapphire::PublicContent::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceEnterTerritory( getAsQuestBattle(), player, eventId, param1, param2 );
+  pScriptMgr->onInstanceEnterTerritory( getAsPublicContent(), player, eventId, param1, param2 );
 
-  // TODO: this may or may not be correct for questbattles
-  player.playScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
-                                        HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
-                                        DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
-                                        // todo: wtf is 0x00100000
-                                        DISABLE_CANCEL_EMOTE, 0 );
-
-}
-
-void Sapphire::QuestBattle::setCurrentBGM( uint16_t bgmIndex )
-{
-  m_currentBgm = bgmIndex;
-
-  for( const auto& playerIt : m_playerMap )
+  if( !hasPlayerPreviouslySpawned( player ) && player.getRPMode() == false )
   {
-    auto player = playerIt.second;
-    // note: retail do send a BGM_MUTE(1) first before any BGM transition, but YOLO in this case.
-    // also do note that this code can't control the bgm granularly. (i.e. per player for WoD submap.) oops.
-    // player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, 1 ) );
-    player->queuePacket(
-      makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmIndex ) );
+    m_spawnedPlayers.insert( player.getId() );
+    player.directorPlayScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
+                                                  HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                                                  DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
+                                                  // todo: wtf is 0x00100000
+                                                  DISABLE_CANCEL_EMOTE, 0, 0x9, getCurrentBGM() );
   }
+  else
+    player.directorPlayScene( getDirectorId(), 2, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0x9, getCurrentBGM() );
 }
 
-void Sapphire::QuestBattle::setPlayerBGM( Sapphire::Entity::Player& player, uint16_t bgmId )
-{
-  player.queuePacket( makeActorControl143( player.getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmId ) );
-}
-
-uint16_t Sapphire::QuestBattle::getCurrentBGM() const
-{
-  return m_currentBgm;
-}
-
-bool Sapphire::QuestBattle::bindPlayer( uint32_t playerId )
-{
-  // if player already bound, return false
-  if( m_boundPlayerId != 0 )
-    return false;
-
-  m_boundPlayerId = playerId;
-  return true;
-}
-
-bool Sapphire::QuestBattle::isPlayerBound( uint32_t playerId ) const
-{
-  return m_boundPlayerId == playerId;
-}
-
-void Sapphire::QuestBattle::unbindPlayer( uint32_t playerId )
-{
-  if( m_boundPlayerId != playerId )
-    return;
-
-  auto it = m_playerMap.find( playerId );
-  if( it != m_playerMap.end() )
-    it->second->exitInstance();
-}
-
-void Sapphire::QuestBattle::clearDirector( Entity::Player& player )
+void Sapphire::PublicContent::clearDirector( Entity::Player& player )
 {
   sendDirectorClear( player );
 

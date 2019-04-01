@@ -12,6 +12,7 @@
 #include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
+#include "Territory/PublicContent.h"
 #include "TerritoryMgr.h"
 #include "HousingMgr.h"
 #include "Framework.h"
@@ -100,7 +101,8 @@ bool Sapphire::World::Manager::TerritoryMgr::isInstanceContentTerritory( uint32_
          intendedUse == TerritoryIntendedUse::RaidFights ||
          intendedUse == TerritoryIntendedUse::Raids ||
          intendedUse == TerritoryIntendedUse::TreasureMapInstance ||
-         intendedUse == TerritoryIntendedUse::EventTrial;
+         intendedUse == TerritoryIntendedUse::EventTrial ||
+         intendedUse == TerritoryIntendedUse::Eureka;
 }
 
 bool Sapphire::World::Manager::TerritoryMgr::isPrivateTerritory( uint32_t territoryTypeId ) const
@@ -339,6 +341,40 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createInstanceContent(
   pZone->init();
 
   m_instanceContentIdToInstanceMap[ instanceContentId ][ pZone->getGuId() ] = pZone;
+  m_instanceIdToZonePtrMap[ pZone->getGuId() ] = pZone;
+  m_instanceZoneSet.insert( pZone );
+
+  return pZone;
+}
+
+Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createPublicContent( uint32_t contentFinderConditionId )
+{
+
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto pContentFinderCondition = pExdData->get< Sapphire::Data::ContentFinderCondition >( contentFinderConditionId );
+  if( !pContentFinderCondition )
+    return nullptr;
+  auto publicContentId = pContentFinderCondition->content;
+
+  auto pPublicContent = pExdData->get< Sapphire::Data::PublicContent >( publicContentId );
+  if( !pPublicContent )
+    return nullptr;
+
+  if( !isInstanceContentTerritory( pContentFinderCondition->territoryType ) )
+    return nullptr;
+
+  auto pTeri = getTerritoryDetail( pContentFinderCondition->territoryType );
+
+  if( !pTeri || pPublicContent->name.empty() )
+    return nullptr;
+
+  Logger::debug( "Starting instance for PublicContent id: {0} ({1})", publicContentId, pPublicContent->name );
+
+  auto pZone = make_PublicContent( pPublicContent, pContentFinderCondition->territoryType, getNextInstanceId(),
+                                     pTeri->name, pPublicContent->name, publicContentId, framework() );
+  pZone->init();
+
+  m_instanceContentIdToInstanceMap[ publicContentId ][ pZone->getGuId() ] = pZone;
   m_instanceIdToZonePtrMap[ pZone->getGuId() ] = pZone;
   m_instanceZoneSet.insert( pZone );
 

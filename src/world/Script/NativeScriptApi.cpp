@@ -214,5 +214,25 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  ///////////////////////////////////////////////////////////////////
+
+  PublicContentScript::PublicContentScript( uint32_t publicContentId ) :
+    ScriptObject( uint32_t{ 0x801A } << 16 | publicContentId, typeid( PublicContentScript ).hash_code() )
+  {
+  }
+
+  void PublicContentScript::onInit( PublicContent& instance )
+  {
+  }
+
+  void PublicContentScript::onUpdate( PublicContent& instance, uint32_t currTime )
+  {
+  }
+
+  void PublicContentScript::onEnterTerritory( PublicContent& instance, Entity::Player& player, uint32_t eventId,
+                                            uint16_t param1, uint16_t param2 )
+  {
+  }
+
 }
 

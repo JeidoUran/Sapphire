@@ -163,6 +163,8 @@ namespace Sapphire
 
     QuestBattlePtr getAsQuestBattle();
 
+    PublicContentPtr getAsPublicContent();
+
     void updateSpawnPoints();
 
     uint32_t getNextEffectSequence();
