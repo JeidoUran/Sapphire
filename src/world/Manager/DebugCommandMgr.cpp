@@ -66,6 +66,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "random", &DebugCommandMgr::random, "Rolls a random number.", 1 );
   registerCommand( "tell", &DebugCommandMgr::tell, "Allows in-instance private chatting.", 1 );
   registerCommand( "rp", &DebugCommandMgr::rp, "RP management.", 1 );
+  registerCommand( "rpevent", &DebugCommandMgr::rpevent, "Commands for specific RP events.", 1 );
   registerCommand( "ely", &DebugCommandMgr::ely, "Oui c'est parceque cette commande sert à rien.", 1 );
 }
 
@@ -1971,6 +1972,76 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
   {
     player.sendUrgent( "{0} is not a valid rp command.", subCommand );
   }
+}
+
+
+void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+{
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto pTerriMgr = framework()->get< TerritoryMgr >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  std::string subCommand = "";
+  std::string params = "";
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+  std::size_t pos = tmpCommand.find_first_of( " " );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+  Logger::debug( "[{0}] Command: rpevent subCommand: {1} params: {2}", player.getId(), subCommand, params );
+
+  if( subCommand == "t11bump" )
+  {
+    Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
+    if( player.getTargetId() != player.getId() )
+    {
+      targetActor = player.lookupTargetById( player.getTargetId() );
+    }
+    // else
+      // targetActor = player.getAsPlayer();
+    if( !targetActor || !targetActor->isPlayer() )
+    {
+      player.sendUrgent( "Invalid target." );
+      return;
+    }
+    if ( params == "1l" )
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 1972864919, 43049, 4, 1, 0 ), true );
+    else if ( params == "2l" )
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 2142861116, 41367, 4, 2, 0 ), true );
+    else if ( params == "3l" )
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 1938652695, 38298, 4, 5, 0 ), true );
+    else if ( params == "4l" )
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 2280161298, 33556, 4, 6, 0 ), true );
+    else if ( params == "1r" )
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 2310376224, 42825, 4, 7, 0 ), true );
+    else if ( params == "2r" )
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 2152036166, 41333, 4, 12, 0 ), true );
+    else if ( params == "3r" )
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 2341175365, 37917, 4, 13, 0 ), true );
+    else if ( params == "4r" )
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 2016247826, 33556, 4, 14, 0 ), true );
+  }
+  if( subCommand == "adsglow" )
+  {
+    if ( params == "0" )
+      player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 0, 32530 ), true );
+    else if ( params == "1" )
+      player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 1, 32530 ), true );
+    else if ( params == "2" )
+      player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 2, 0 ), true );
+  }
+
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player& player,
