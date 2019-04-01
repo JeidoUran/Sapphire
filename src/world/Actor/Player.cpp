@@ -1226,6 +1226,11 @@ void Sapphire::Entity::Player::onMobKill( uint16_t nameId )
 {
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onBNpcKill( *getAsPlayer(), nameId );
+
+  if( isActionLearned( static_cast< uint8_t >( Common::UnlockEntry::HuntingLog ) ) )
+  {
+    updateHuntingLog( nameId );
+  }
 }
 
 void Sapphire::Entity::Player::freePlayerSpawnId( uint32_t actorId )
@@ -1770,6 +1775,9 @@ void Sapphire::Entity::Player::sendZonePackets()
   //setStateFlag( PlayerStateFlag::BetweenAreas );
   //setStateFlag( PlayerStateFlag::BetweenAreas1 );
 
+  if( isActionLearned( static_cast< uint8_t >( Common::UnlockEntry::HuntingLog ) ) )
+    sendHuntingLog();
+
   sendStats();
 
   // only initialize the UI if the player in fact just logged in.
@@ -2075,3 +2083,103 @@ Sapphire::Common::HuntingLogEntry& Sapphire::Entity::Player::getHuntingLogEntry(
   assert( index < m_huntingLogEntries.size() );
   return m_huntingLogEntries[ index ];
 }
+
+void Sapphire::Entity::Player::sendHuntingLog()
+{
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  uint8_t count = 0;
+  for( const auto& entry : m_huntingLogEntries )
+  {
+    uint64_t completionFlag = 0;
+    auto huntPacket = makeZonePacket< FFXIVIpcHuntingLogEntry >( getId() );
+
+    huntPacket->data().u0 = -1;
+    huntPacket->data().rank = entry.rank;
+    huntPacket->data().index = count;
+
+    for( int i = 1; i <= 10; ++i )
+    {
+      auto index0 = i - 1;
+      bool allComplete = true;
+      auto monsterNoteId = ( count + 1 ) * 10000 + entry.rank * 10 + i;
+
+      auto monsterNote = pExdData->get< Data::MonsterNote >( monsterNoteId );
+      if( !monsterNote )
+        continue;
+
+      const auto huntEntry = entry.entries[ index0 ];
+      for( int x = 0; x < 3; ++x )
+      {
+        if( ( huntEntry[ x ] == monsterNote->count[ x ] ) && monsterNote->count[ x ] != 0 )
+          completionFlag |= ( 1ull << ( index0 * 5 + x ) );
+        else if( monsterNote->count[ x ] != 0 )
+          allComplete = false;
+      }
+
+      if( allComplete )
+        completionFlag |= ( 1ull << ( index0 * 5 + 4 ) );
+
+    }
+
+    memcpy( huntPacket->data().entries, entry.entries, sizeof( entry.entries ) );
+    huntPacket->data().completeFlags = completionFlag;
+    ++count;
+    queuePacket( huntPacket );
+  }
+}
+
+void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
+{
+  std::vector< uint32_t > rankRewards{ 2500, 10000, 20000, 30000, 40000 };
+  const auto maxRank = 4;
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+
+  auto& logEntry = m_huntingLogEntries[ static_cast< uint8_t >( getClass() ) - 1 ];
+
+  bool logChanged = false;
+
+  bool allSectionsComplete = true;
+  for( int i = 1; i <= 10; ++i )
+  {
+    bool sectionComplete = true;
+    bool sectionChanged = false;
+    uint32_t monsterNoteId = static_cast< uint32_t >( ( static_cast< uint8_t >( getClass() ) ) * 10000 + logEntry.rank * 10 + i );
+    auto note = pExdData->get< Sapphire::Data::MonsterNote >( monsterNoteId );
+    for( auto x = 0; x < 4; ++x )
+    {
+      auto note1 = pExdData->get< Sapphire::Data::MonsterNoteTarget >( note->monsterNoteTarget[ x ] );
+      if( note1->bNpcName == id && logEntry.entries[ i - 1 ][ x ] < note->count[ x ] )
+      {
+        logEntry.entries[ i - 1 ][ x ]++;
+        queuePacket( makeActorControl143( getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] ) );
+        logChanged = true;
+        sectionChanged = true;
+      }
+      if( logEntry.entries[ i - 1 ][ x ] != note->count[ x ] )
+        sectionComplete = false;
+    }
+    if( logChanged && sectionComplete && sectionChanged )
+    {
+      queuePacket( makeActorControl143( getId(), HuntingLogSectionFinish, monsterNoteId, i, 0 ) );
+      gainExp( note->reward );
+    }
+    if( !sectionComplete )
+    {
+      allSectionsComplete = false;
+    }
+  }
+  if( logChanged && allSectionsComplete )
+  {
+    queuePacket( makeActorControl143( getId(), HuntingLogRankFinish, 4, 0, 0 ) );
+    gainExp( rankRewards[ logEntry.rank ] );
+    if( logEntry.rank < 4 )
+    {
+      logEntry.rank++;
+      memset( logEntry.entries, 0, 40 );
+      queuePacket( makeActorControl143( getId(), HuntingLogRankUnlock,
+                                        static_cast< uint8_t >( getClass() ), logEntry.rank + 1, 0 ) );
+    }
+  }
+  sendHuntingLog();
+}
+

@@ -32,8 +32,7 @@ namespace fs = std::experimental::filesystem;
 
 // garbage to ignore models
 bool ignoreModels = false;
-
-std::string gamePath( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
+std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, std::string > > > zoneInstanceMap;
@@ -291,11 +290,15 @@ void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
 void loadAllInstanceContentEntries()
 {
   auto& catInstance = eData->get_category( "ContentFinderCondition" );
+  auto& catQuest = eData->get_category( "Quest" );
+  auto& catQuestBattle = eData->get_category( "QuestBattle" );
   auto& territoryTypeSheet = eData->get_category( "TerritoryType" );
   auto& instanceContentSheet = eData->get_category( "InstanceContent" );
 
   auto exdInstance = static_cast< xiv::exd::Exd >( catInstance.get_data_ln( xiv::exd::Language::en ) );
   auto instanceContentData = static_cast< xiv::exd::Exd >( instanceContentSheet.get_data_ln( xiv::exd::Language::en ) );
+  auto questBattleData = static_cast< xiv::exd::Exd >( catQuestBattle.get_data_ln( xiv::exd::Language::none ) );
+  auto questDataData = static_cast< xiv::exd::Exd >( catQuest.get_data_ln( xiv::exd::Language::en ) );
 
   if( zoneNameMap.size() == 0 )
   {
@@ -319,11 +322,14 @@ void loadAllInstanceContentEntries()
     auto id = row.first;
     auto& fields = row.second;
 
+    uint16_t teriId;
+
     auto contentLinkType = std::get< uint8_t >( fields.at( 2 ) );
     auto contentLink = std::get< uint16_t >( fields.at( 3 ) );
 
     std::string name;
     uint8_t type = 0;
+    teriId = std::get< uint16_t >( fields.at( 1 ) );
 
     if( contentLinkType == 1 )
     {
@@ -332,6 +338,23 @@ void loadAllInstanceContentEntries()
 
       name = std::get< std::string >( row.at( 3 ) );
       type = std::get< uint8_t >( row.at( 0 ) );
+      id = contentLink;
+      //std::cout << name << "\n";
+    }
+    else if( contentLinkType == 5 )
+    {
+      std::cout << contentLinkType << "\n";
+      // instancecontent
+      auto row = questBattleData.get_row( contentLink );
+      int32_t questId1 = std::get< int32_t >( row.at( 0 ) );
+      if( questId1 > 99999 )
+        continue;
+      auto row1 = questDataData.get_row( questId1 );
+
+      name = std::get< std::string >( row1.at( 0 ) );
+      std::cout << name << "\n";
+
+      type = 7;
       id = contentLink;
     }
 //    else if( contentLinkType == 2 )
@@ -361,7 +384,7 @@ void loadAllInstanceContentEntries()
     if( name.empty() )
       continue;
 
-    auto teri = std::get< uint16_t >( fields.at( 1 ) );
+    auto teri = teriId;
     auto i = 0;
     while( ( i = name.find( ' ' ) ) != std::string::npos )
       name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
@@ -372,7 +395,7 @@ void loadAllInstanceContentEntries()
     //zoneInstanceMap[zoneId].push_back( std::make_pair( id, name ) );
     zoneDumpList.emplace( zoneNameMap[ teri ] );
 
-    std::string remove = "★_ '()[]-\x1a\x1\x2\x1f\x1\x3.:";
+    std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
     Sapphire::Util::eraseAllIn( name, remove );
     name[ 0 ] = toupper( name[ 0 ] );
     contentList.push_back( { id, name, zoneNameMap[ teri ], type } );
@@ -442,7 +465,14 @@ int main( int argc, char* argv[] )
   if( !fs::exists( "instance.tmpl" ) )
     throw std::runtime_error( "instance.tmpl is missing in working directory" );
 
-  initExd( gamePath );
+  try
+  {
+    initExd( gamePath );
+  }
+  catch( std::runtime_error error )
+  {
+    std::cout << error.what();
+  }
   if( dumpInstances )
   {
     loadAllInstanceContentEntries();
@@ -451,6 +481,11 @@ int main( int argc, char* argv[] )
   {
     zoneDumpList.emplace( zoneName );
   }
+
+
+  auto& catQuestBattle = eData->get_category( "QuestBattle" );
+  auto questBattleData = static_cast< xiv::exd::Exd >( catQuestBattle.get_data_ln( xiv::exd::Language::none ) );
+
 
   for( auto entry : contentList )
   {
@@ -629,7 +664,7 @@ int main( int argc, char* argv[] )
                 if( eobjNameMap.find( id ) != eobjNameMap.end() )
                 {
                   name = eobjNameMap[ id ];
-                  std::string remove = "★_ '()[]-\x1a\x1\x2\x1f\x1\x3.:";
+                  std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
                   Sapphire::Util::eraseAllIn( name, remove );
 
                   name[ 0 ] = toupper( name[ 0 ] );
@@ -698,13 +733,38 @@ int main( int argc, char* argv[] )
     }
     std::cout << "\n\n\n";
 
-    std::ifstream t( "instance.tmpl" );
+    std::ifstream t;
+    if( entry.type == 7 )
+    {
+      t = std::ifstream ( "questbattle.tmpl" );
+    }
+    else
+      t = std::ifstream ( "instance.tmpl" );
+
     std::string instanceTpl( ( std::istreambuf_iterator< char >( t ) ),
                              std::istreambuf_iterator< char >() );
 
     auto result = std::regex_replace( instanceTpl, std::regex( "\\INSTANCE_NAME" ), entry.name );
     result = std::regex_replace( result, std::regex( "\\INSTANCE_ID" ), std::to_string( entry.id ) );
     result = std::regex_replace( result, std::regex( "\\EOBJ_INIT" ), eobjects );
+
+    if( entry.type == 7 )
+    {
+      if( entry.id > 200 )
+        continue;
+
+      std::string instruction;
+      auto row = questBattleData.get_row( entry.id );
+      for( int i = 0; i < 149; ++i )
+      {
+        if( std::get< std::string >( row.at( 4 + i ) ).empty() )
+          continue;
+        instruction += "  static constexpr auto " + std::get< std::string >( row.at( 4 + i ) ) + " = " +
+                       std::to_string( std::get< uint32_t >( row.at( 154 + i ) ) )+ ";\n";
+      }
+
+      result = std::regex_replace( result, std::regex( "\\SCRIPT_INSTRUCTIONS" ), instruction );
+    }
 
 
     std::string subdir = "";
