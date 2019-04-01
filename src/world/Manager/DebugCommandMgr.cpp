@@ -390,6 +390,20 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       }
     }
     player.sendNotice( "Target player model set to " + std::to_string( modelId ) + "." );
+  else if( subCommand == "name" )
+  {
+    char name[34];
+    sscanf( params.c_str(), "%[^\n]%*c", &name );
+    player.setName( name );
+    auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        player.despawn( actor->getAsPlayer() );
+        player.spawn( actor->getAsPlayer() );
+      }
+    }
   }
   else if( subCommand == "mount" )
   {

@@ -175,6 +175,8 @@ namespace Sapphire::Entity
 
     std::string getName() const;
 
+    void setName( char name [34] );
+
     bool face( const Common::FFXIVARR_POSITION3& p );
 
     Common::Stance getStance() const;
