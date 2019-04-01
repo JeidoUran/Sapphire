@@ -647,13 +647,13 @@ void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
     /* if( player.getRPMode() == true )
       Logger::debug( "[RP Chatlog] (GMTell) {0} > {1}: {2}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
     else */
-      Logger::debug( "[Chatlog] (GMTell) {0} > {1}: {2}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
+      Logger::debug( "[Chatlog] (GMTell) {0} > {1}: {2}", player.getName(), packet.data().targetPCName, tellPacket->data().msg );
   }
   else
     /* if( player.getRPMode() == true )
       Logger::debug( "[RP Chatlog] (Tell) {0} > {1}: {2}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
     else */
-      Logger::debug( "[Chatlog] (Tell) {0} > {1}: {2}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
+      Logger::debug( "[Chatlog] (Tell) {0} > {1}: {2}", player.getName(), packet.data().targetPCName, tellPacket->data().msg );
 
   pTargetPlayer->queueChatPacket( tellPacket );
 }
