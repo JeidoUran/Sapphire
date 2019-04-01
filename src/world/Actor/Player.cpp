@@ -73,7 +73,12 @@ Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
   m_markedForRemoval( false ),
   m_mount( 0 ),
   m_emoteMode( 0 ),
+  m_bNPCBase ( 0 ),
+  m_bNPCName ( 0 ),
   m_modelChara( 0 ),
+  m_modelType( 0 ),
+  m_subtype( 0 ),
+  m_enemyType( 0 ),
   m_directorInitialized( false ),
   m_onEnterEventDone( false ),
   m_falling( false )
@@ -150,6 +155,26 @@ void Sapphire::Entity::Player::setGmRank( uint8_t rank )
   m_gmRank = rank;
 }
 
+uint32_t Sapphire::Entity::Player::getbNPCBase() const
+{
+  return m_bNPCBase;
+}
+
+void Sapphire::Entity::Player::setbNPCBase( uint32_t bnpcbase )
+{
+  m_bNPCBase = bnpcbase;
+}
+
+uint32_t Sapphire::Entity::Player::getbNPCName() const
+{
+  return m_bNPCName;
+}
+
+void Sapphire::Entity::Player::setbNPCName( uint32_t bnpcname )
+{
+  m_bNPCName = bnpcname;
+}
+
 uint16_t Sapphire::Entity::Player::getModelChara() const
 {
   return m_modelChara;
@@ -158,6 +183,36 @@ uint16_t Sapphire::Entity::Player::getModelChara() const
 void Sapphire::Entity::Player::setModelChara( uint16_t model )
 {
   m_modelChara = model;
+}
+
+uint8_t Sapphire::Entity::Player::getModelType() const
+{
+  return m_modelType;
+}
+
+void Sapphire::Entity::Player::setModelType( uint8_t modeltype )
+{
+  m_modelType = modeltype;
+}
+
+uint8_t Sapphire::Entity::Player::getSubType() const
+{
+  return m_subtype;
+}
+
+void Sapphire::Entity::Player::setSubType( uint8_t subtype )
+{
+  m_subtype = subtype;
+}
+
+uint8_t Sapphire::Entity::Player::getEnemyType() const
+{
+  return m_enemyType;
+}
+
+void Sapphire::Entity::Player::setEnemyType( uint8_t enemytype )
+{
+  m_enemyType = enemytype;
 }
 
 bool Sapphire::Entity::Player::getGmInvis() const
@@ -176,6 +231,22 @@ bool Sapphire::Entity::Player::isActingAsGm() const
   return status == OnlineStatus::GameMaster || status == OnlineStatus::GameMaster1 ||
          status == OnlineStatus::GameMaster2;
 }
+
+bool Sapphire::Entity::Player::isActingAsEnemy() const
+{
+  auto enemy = getEnemyType();
+  return enemy == 4;
+}
+
+// bool Sapphire::Entity::Player::isActingAsEnemy() const
+// {
+  // return m_isActingAsEnemy;
+// }
+
+// void Sapphire::Entity::Player::setActingAsEnemy( bool enemy )
+// {
+  // m_isActingAsEnemy = enemy;
+// }
 
 bool Sapphire::Entity::Player::getRPMode() const
 {

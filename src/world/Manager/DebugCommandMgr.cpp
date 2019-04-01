@@ -390,6 +390,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       }
     }
     player.sendNotice( "Target player model set to {0}.", modelId );
+  }
   else if( subCommand == "name" )
   {
     char name[34];
@@ -405,6 +406,101 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       }
     }
   }
+  else if( subCommand == "enemy" )
+  {
+    if ( player.isActingAsEnemy() == false )
+    {
+      // player.isActingAsEnemy( true );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          player.despawn( actor->getAsPlayer() );
+          player.spawn( actor->getAsPlayer() );
+        }
+      }
+      player.sendNotice( "Player respawned as an enemy." );
+      return;
+    }
+    else
+    {
+      // player.isActingAsEnemy( false );
+      player.setModelType( 1 );
+      player.setSubType( 0 );
+      player.setEnemyType( 0 );
+      player.setbNPCName( 0 );
+      player.setbNPCBase( 0 );
+      auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          player.despawn( actor->getAsPlayer() );
+          player.spawn( actor->getAsPlayer() );
+        }
+      }
+      player.sendNotice( "Player respawned as a regular player." );
+      return;
+    }
+  }
+  else if( subCommand == "bnpcname" )
+  {
+    auto pExdData = framework()->get< Data::ExdDataGenerated >();
+    uint32_t nameId;
+    sscanf( params.c_str(), "%u", &nameId );
+    if ( !pExdData->get< Sapphire::Data::BNpcName > ( nameId ) )
+    {
+      player.sendUrgent ( "{0} is not a valid BNpcName ID.", nameId );
+      return;
+    }
+    player.setbNPCName( nameId );
+    auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        player.despawn( actor->getAsPlayer() );
+        player.spawn( actor->getAsPlayer() );
+      }
+    }
+    player.sendNotice( "BNPCName set to {0} ({1}).", nameId, pExdData->get< Sapphire::Data::BNpcName >( nameId )->singular );
+  }
+  
+  else if( subCommand == "bnpcbase" )
+  {
+    uint32_t baseId;
+    sscanf( params.c_str(), "%u", &baseId );
+    player.setbNPCBase( baseId );
+    auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        player.despawn( actor->getAsPlayer() );
+        player.spawn( actor->getAsPlayer() );
+      }
+    }
+    player.sendNotice( "BNPCBase set to {0}.", baseId );
+  }
+  
+  else if( subCommand == "odinbase" )
+  {
+    player.setbNPCBase( 882 );
+    auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        player.despawn( actor->getAsPlayer() );
+        player.spawn( actor->getAsPlayer() );
+      }
+    }
+  }
+  
   else if( subCommand == "mount" )
   {
     auto pExdData = framework()->get< Data::ExdDataGenerated >();

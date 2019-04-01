@@ -837,7 +837,13 @@ namespace Sapphire::Entity
 
     void setGmInvis( bool invis );
 
+    // bool isActingAsEnemy() const;
+
+    // void setActingAsEnemy( bool enemy );
+
     bool isActingAsGm() const;
+
+    bool isActingAsEnemy() const;
 
     bool getRPMode() const;
 
@@ -851,9 +857,29 @@ namespace Sapphire::Entity
 
     bool isAutoattackOn() const;
 
+    uint32_t getbNPCBase() const;
+
+    void setbNPCBase( uint32_t bNPCBase );
+
+    uint32_t getbNPCName() const;
+
+    void setbNPCName( uint32_t bNPCName );
+
     uint16_t getModelChara() const;
 
     void setModelChara( uint16_t modelChara );
+
+    uint8_t getModelType() const;
+
+    void setModelType( uint8_t modelType );
+
+    uint8_t getSubType() const;
+
+    void setSubType( uint8_t subtype );
+
+    uint8_t getEnemyType() const;
+
+    void setEnemyType( uint8_t enemyType );
 
     void onMobAggro( BNpcPtr pBNpc );
     void onMobDeaggro( BNpcPtr pBNpc );
@@ -1066,9 +1092,16 @@ namespace Sapphire::Entity
     uint16_t zoneId;
     bool m_gmInvis = false;
 
+    uint32_t m_bNPCBase;
+    uint32_t m_bNPCName;
+
     bool m_RPMode = false;
 
     uint16_t m_modelChara;
+
+    uint8_t m_modelType;
+    uint8_t m_subtype;
+    uint8_t m_enemyType;
 
     uint8_t m_equipDisplayFlags;
 
