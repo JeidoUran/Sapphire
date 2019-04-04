@@ -217,7 +217,7 @@ namespace Sapphire::ScriptAPI
   ///////////////////////////////////////////////////////////////////
 
   PublicContentScript::PublicContentScript( uint32_t publicContentId ) :
-    ScriptObject( uint32_t{ 0x801A } << 16 | publicContentId, typeid( PublicContentScript ).hash_code() )
+    ScriptObject( uint32_t{ 0x8004 } << 16 | publicContentId, typeid( PublicContentScript ).hash_code() )
   {
   }
 

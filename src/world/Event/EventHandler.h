@@ -74,7 +74,7 @@ namespace Sapphire::Event
       FcTalk = 0x001F,
       ICDirector = 0x8003,
       QuestBattleDirector = 0x8006,
-      PublicContentDirector = 0x801A,
+      PublicContentDirector = 0x8004,
     };
 
     using SceneReturnCallback = std::function< void( Entity::Player&, const SceneResult& ) >;

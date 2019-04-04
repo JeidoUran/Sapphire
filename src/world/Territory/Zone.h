@@ -27,6 +27,7 @@ namespace Sapphire
   namespace Data
   {
     struct InstanceContent;
+    struct PublicContent;
     struct TerritoryType;
   }
 

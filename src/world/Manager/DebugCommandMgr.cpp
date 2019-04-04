@@ -62,9 +62,9 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "info", &DebugCommandMgr::serverInfo, "Show server info.", 0 );
   registerCommand( "help", &DebugCommandMgr::help, "Shows registered commands.", 0 );
   registerCommand( "script", &DebugCommandMgr::script, "Server script utilities.", 1 );
-  registerCommand( "instance", &DebugCommandMgr::instance, "Instance utilities", 1 );
-  registerCommand( "publicContent", &DebugCommandMgr::publicContent, "Quest battle utilities", 1 );
-  registerCommand( "questbattle", &DebugCommandMgr::questBattle, "Quest battle utilities", 1 );
+  registerCommand( "instance", &DebugCommandMgr::instance, "InstanceContent utilities", 1 );
+  registerCommand( "publiccontent", &DebugCommandMgr::publicContent, "PublicContent utilities", 1 );
+  registerCommand( "questbattle", &DebugCommandMgr::questBattle, "QuestBattle utilities", 1 );
   registerCommand( "housing", &DebugCommandMgr::housing, "Housing utilities", 1 );
   registerCommand( "status", &DebugCommandMgr::status, "StatusEffect management.", 1 );
   registerCommand( "random", &DebugCommandMgr::random, "Rolls a random number.", 1 );
@@ -1414,7 +1414,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
 
     sscanf( params.c_str(), "%s %hhu", objName, &state );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -1432,7 +1432,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
 
     sscanf( params.c_str(), "%s %i %i", objName, &state1, &state2 );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -1451,7 +1451,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
 
     sscanf( params.c_str(), "%hhu", &seq );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
     if( !instance )
       return;
 

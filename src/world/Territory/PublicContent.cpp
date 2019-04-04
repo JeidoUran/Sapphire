@@ -128,13 +128,13 @@ void Sapphire::PublicContent::onUpdate( uint32_t currTime )
         auto pPlayer = playerIt.second;
         pPlayer->queuePacket( makeActorControl143( pPlayer->getId(), DirectorUpdate,
                                                    getDirectorId(), 0x40000001,
-                                                   m_zoneConfiguration->timeLimitmin * 60u ) );
+                                                   m_zoneConfiguration->timeLimit * 60u ) );
       }
 
       if( m_pEntranceEObj )
         m_pEntranceEObj->setState( 7 );
       m_state = DutyInProgress;
-      m_instanceExpireTime = Util::getTimeSeconds() + ( m_zoneConfiguration->timeLimitmin * 60u );
+      m_instanceExpireTime = Util::getTimeSeconds() + ( m_zoneConfiguration->timeLimit * 60u );
       break;
     }
 
@@ -330,8 +330,8 @@ Sapphire::PublicContent::PublicContentState Sapphire::PublicContent::getState() 
 void Sapphire::PublicContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& player )
 {
   // remove any players from the instance who aren't bound on zone in
-  if( !isPlayerBound( player.getId() ) )
-    player.exitInstance();
+  // if( !isPlayerBound( player.getId() ) )
+    // player.exitInstance();
 
   // if a player has already spawned once inside this instance, don't move them if they happen to zone in again
   if( !hasPlayerPreviouslySpawned( player ) )
@@ -393,7 +393,58 @@ Sapphire::PublicContent::onEnterTerritory( Entity::Player& player, uint32_t even
   else
     player.directorPlayScene( getDirectorId(), 2, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0x9, getCurrentBGM() );
 }
+void Sapphire::PublicContent::setCurrentBGM( uint16_t bgmIndex )
+{
+  m_currentBgm = bgmIndex;
 
+  for( const auto& playerIt : m_playerMap )
+  {
+    auto player = playerIt.second;
+    // note: retail do send a BGM_MUTE(1) first before any BGM transition, but YOLO in this case.
+    // also do note that this code can't control the bgm granularly. (i.e. per player for WoD submap.) oops.
+    // player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, 1 ) );
+    player->queuePacket(
+      makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmIndex ) );
+  }
+}
+
+void Sapphire::PublicContent::setPlayerBGM( Sapphire::Entity::Player& player, uint16_t bgmId )
+{
+  player.queuePacket( makeActorControl143( player.getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmId ) );
+}
+
+uint16_t Sapphire::PublicContent::getCurrentBGM() const
+{
+  return m_currentBgm;
+}
+
+bool Sapphire::PublicContent::bindPlayer( uint32_t playerId )
+{
+  // if player already bound, return false
+  if( m_boundPlayerIds.count( playerId ) )
+    return false;
+
+  // TODO: do not allow binding of players if instance already has all it can take
+  // if( m_boundPlayerIds.size() >= party restrictions )
+  //    return false;
+
+  m_boundPlayerIds.insert( playerId );
+  return true;
+}
+
+bool Sapphire::PublicContent::isPlayerBound( uint32_t playerId ) const
+{
+  return m_boundPlayerIds.count( playerId ) > 0;
+}
+
+void Sapphire::PublicContent::unbindPlayer( uint32_t playerId )
+{
+  m_boundPlayerIds.erase( playerId );
+
+  auto it = m_playerMap.find( playerId );
+  if( it != m_playerMap.end() )
+    it->second->exitInstance();
+}
 void Sapphire::PublicContent::clearDirector( Entity::Player& player )
 {
   sendDirectorClear( player );
