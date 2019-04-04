@@ -1827,8 +1827,6 @@ void Sapphire::Entity::Player::sendZonePackets()
   initZonePacket->data().zoneId = getCurrentZone()->getTerritoryTypeId();
   initZonePacket->data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
   initZonePacket->data().bitmask = 0x1;
-  initZonePacket->data().bitmask1 = 42; //Setting this to 16 (decimal) makes it so you can fly in the area (more research needed!)
-  initZonePacket->data().unknown5 = 0x2A;
   initZonePacket->data().festivalId = getCurrentZone()->getCurrentFestival().first;
   initZonePacket->data().additionalFestivalId = getCurrentZone()->getCurrentFestival().second;
   initZonePacket->data().pos.x = getPos().x;
