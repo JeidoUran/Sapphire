@@ -54,6 +54,15 @@ public:
     instance.registerEObj( "Shortcut", 2000700, 0, 4, { -381.085205f, -0.015320f, 6.094601f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "Exit", 2000139, 0, 4, { 393.697998f, -39.047909f, -59.586491f }, 0.991760f, 0.000048f ); 
 
+    //! RP Renamed eobjs
+    instance.registerEObj( "door_1", 2004942, 5033535, 4, { -316.612915f, -0.015320f, 0.045776f }, 0.991760f, 0.000048f ); 
+    instance.registerEObj( "door_2", 2004949, 5033537, 4, { -173.408096f, 12.000000f, -33.362572f }, 0.991760f, 0.000048f ); 
+    instance.registerEObj( "door_3", 2004956, 5033536, 4, { -48.355900f, -0.015320f, 0.747620f }, 0.991760f, 0.000048f ); 
+    instance.registerEObj( "door_4", 2004957, 5033538, 4, { 43.900150f, -0.015320f, -1.083435f }, 0.991760f, 0.000048f ); 
+    instance.registerEObj( "door_5", 2004958, 5004619, 4, { 82.139282f, -8.011047f, 69.748901f }, 0.991760f, 0.000048f ); //16 8
+    instance.registerEObj( "door_6", 2004959, 5004620, 4, { 117.387604f, -9.018127f, 69.291138f }, 0.991760f, 0.000048f ); 
+    instance.registerEObj( "door_7", 2004962, 5033543, 4, { 156.328598f, -9.018127f, 95.628304f }, 0.991760f, 0.000048f ); 
+
   }
 
   void onUpdate( InstanceContent& instance, uint32_t currTime ) override
