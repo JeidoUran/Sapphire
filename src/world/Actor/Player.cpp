@@ -1417,9 +1417,9 @@ uint8_t Sapphire::Entity::Player::getSearchSelectClass() const
   return m_searchSelectClass;
 }
 
-void Sapphire::Entity::Player::sendNotice( const std::string& message ) //Purple Text
+void Sapphire::Entity::Player::sendNotice( uint8_t padding, const std::string& message ) //Purple Text
 {
-  queuePacket( std::make_shared< ServerNoticePacket >( getId(), message ) );
+  queuePacket( std::make_shared< ServerNoticePacket >( getId(), padding, message ) );
 }
 
 void Sapphire::Entity::Player::sendUrgent( const std::string& message ) //Red Text

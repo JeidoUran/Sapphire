@@ -79,6 +79,8 @@ namespace Sapphire::World::Manager
 
     void tell( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
+    void notice( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
     void rp( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
     void rpevent( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
