@@ -2045,7 +2045,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         if( member->getAsPlayer() != player.getAsPlayer() )
         {
           //member->getAsPlayer()->setGmRank( 1 );
-          member->getAsPlayer()->sendNotice( 0, "RP session started by {0}.", player.getName() );
+          member->getAsPlayer()->sendNotice( 5, "RP session started by {0}.", player.getName() );
         }
       }
       Logger::info( "NPC: {0}", m_rpNPC.size() );
@@ -2055,7 +2055,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         npc->getAsPlayer()->setRPMode( true );
         if( npc->getAsPlayer() != player.getAsPlayer() )
         {
-          npc->getAsPlayer()->sendNotice( 0, "RP session started by {0}.", player.getName() );
+          npc->getAsPlayer()->sendNotice( 5, "RP session started by {0}.", player.getName() );
         }
       }
       Logger::info( "Spectators: {0}", m_rpSpectators.size() );
@@ -2066,7 +2066,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         spec->getAsPlayer()->setRPMode( true );
         if( spec->getAsPlayer() != player.getAsPlayer() )
         {
-          spec->getAsPlayer()->sendNotice( 0, "RP session started by {0}.", player.getName() );
+          spec->getAsPlayer()->sendNotice( 5, "RP session started by {0}.", player.getName() );
         }
       }
       Logger::info( "===========================================================" );
@@ -2099,8 +2099,8 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
   }
   else if( subCommand == "call" )
   {
-    {
     if ( isRpPrepared == false )
+    {
       player.sendUrgent( "You need to prepare a RP session before using this command. Use \"!rp prepare\".");
       return;
     }
@@ -2125,9 +2125,6 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         member->getAsPlayer()->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
         member->getAsPlayer()->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
         player.sendNotice( 0, "Calling all players registered to the RP session." );
-        break;
-
-
       }
     }
   }
@@ -2149,15 +2146,18 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
           Logger::info( "{0}", member->getAsPlayer()->getName() );
           member->getAsPlayer()->setRPMode( false );
           if( member->getAsPlayer() != player.getAsPlayer() )
-            member->getAsPlayer()->sendNotice( 0, "RP session stopped by {0}.", player.getName() );
+            member->getAsPlayer()->sendNotice( 5, "RP session stopped by {0}.", player.getName() );
       }
       isRpPrepared = false;
       isRpStarted = false;
       m_rpMembers.clear();
+      m_rpNPC.clear();
+      m_rpSpectators.clear();
       Logger::info( "===========================RP STOP=========================" );
       player.sendNotice( 0, "RP session stopped." );
-
-
+  }
+  else if( subCommand == "clean" )
+  {
   }
   else if( subCommand == "mode" )
   {
