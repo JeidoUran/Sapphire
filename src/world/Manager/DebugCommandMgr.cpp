@@ -2020,6 +2020,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
           //member->getAsPlayer()->setGmRank( 1 );
           member->getAsPlayer()->sendNotice( "RP session started by {0}.", player.getName() );
         }
+      }
       Logger::info( "NPC: {0}", m_rpNPC.size() );
       for( auto npc : m_rpNPC )
       {
@@ -2046,15 +2047,14 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       {
         for( auto member : m_rpMembers )
         {
-            member->getAsPlayer()->prepareZoning( startzone, true, 1, 112 );
-            member->getAsPlayer()->setZone( startzone );
-            member->getAsPlayer()->changePosition( startposx, startposy, startposz, member->getAsPlayer()->getRot() );
-            member->getAsPlayer()->sendZoneInPackets( 0x00, 0x00, 0, 110, false );
+          member->getAsPlayer()->prepareZoning( startzone, true, 1, 112 );
+          member->getAsPlayer()->setZone( startzone );
+          member->getAsPlayer()->changePosition( startposx, startposy, startposz, member->getAsPlayer()->getRot() );
+          member->getAsPlayer()->sendZoneInPackets( 0x00, 0x00, 0, 110, false );
         }
       }
       isRpStarted = true;
       player.sendNotice( "RP session started." );
-      }
     }
   }
   else if( subCommand == "log" )
