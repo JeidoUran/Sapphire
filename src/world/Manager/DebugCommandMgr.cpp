@@ -1590,10 +1590,15 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
 
   Logger::debug( "[{0}] {1} rolled 1d{2}. Result: {3}", player.getId(), player.getName(), maxnumber, randomnumber );
 
-  //TODO: less ghetto way of displaying the result
-  auto randomResult = ( std::make_shared< ServerNoticePacket >( player.getId(), player.getName() + " rolls a " + std::to_string( randomnumber ) + "." ) );
-  player.sendToInRangeSet ( randomResult );
-  player.sendNotice ( "You roll a {0}.", randomnumber );
+  auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        actor->getAsPlayer()->sendNotice( "{0} rolls 1d{1}. Result: {2}.", player.getName(), maxnumber, randomnumber  );
+      }
+    }
+  player.sendNotice( "You roll 1d{1}. Result: {2}.", maxnumber, randomnumber );
   }
 
 
