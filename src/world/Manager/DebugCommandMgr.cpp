@@ -2109,7 +2109,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         }
       }
       isRpStarted = true;
-      player.sendNotice( 0, "RP session started." );
+      player.sendNotice( 5, "RP session started." );
     }
   }
   else if( subCommand == "log" )
@@ -2182,7 +2182,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       m_rpNPC.clear();
       m_rpSpectators.clear();
       Logger::info( "===========================RP STOP=========================" );
-      player.sendNotice( 0, "RP session stopped." );
+      player.sendNotice( 5, "RP session stopped." );
   }
   else if( subCommand == "clean" )
   {
