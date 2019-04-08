@@ -2150,7 +2150,35 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
   else if( subCommand == "memo" )
   {
   }
-
+  
+  else if( subCommand == "blackscreen" )
+  {
+    if( isBlackScreen == false )
+    {
+      auto inRange = player.getInRangeActors( false );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          actor->getAsPlayer()->prepareZoning( player.getZoneId(), true, 1, 0 );
+        }
+      }
+      isBlackScreen = true;
+    }
+    else if( isBlackScreen == true )
+    {
+      auto inRange = player.getInRangeActors( false );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          actor->getAsPlayer()->changePosition( actor->getAsPlayer()->getPos().x, actor->getAsPlayer()->getPos().y, actor->getAsPlayer()->getPos().z, actor->getAsPlayer()->getRot() );
+        }
+      }
+      isBlackScreen = false;
+    }
+  }
+  
   else
   {
     player.sendUrgent( "{0} is not a valid rp command.", subCommand );

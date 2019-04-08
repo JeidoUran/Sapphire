@@ -24,6 +24,7 @@ namespace Sapphire::World::Manager
 
     bool isRpPrepared = ( false );
     bool isRpStarted = ( false );
+    bool isBlackScreen = ( false );
     int32_t startzone = 0;
     int32_t startposx = 0;
     int32_t startposy = 0;
