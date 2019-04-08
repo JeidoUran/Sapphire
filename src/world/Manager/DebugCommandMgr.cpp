@@ -21,6 +21,7 @@
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
+#include "Network/PacketWrappers/EffectPacket.h"
 #include "Network/GameConnection.h"
 #include "Script/ScriptMgr.h"
 #include "Script/NativeScriptMgr.h"
@@ -68,9 +69,10 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "random", &DebugCommandMgr::random, "Rolls a random number.", 1 );
   registerCommand( "tell", &DebugCommandMgr::tell, "Allows in-instance private chatting.", 1 );
   registerCommand( "notice", &DebugCommandMgr::notice, "Allows the sending of server messages.", 1 );
+  registerCommand( "action", &DebugCommandMgr::action, "Displays an action's animation.", 1 );
   registerCommand( "rp", &DebugCommandMgr::rp, "RP management.", 1 );
   registerCommand( "rpevent", &DebugCommandMgr::rpevent, "Commands for specific RP events.", 1 );
-  registerCommand( "ely", &DebugCommandMgr::ely, "Oui c'est parceque cette commande sert à rien.", 1 );
+  registerCommand( "ely", &DebugCommandMgr::ely, "Oui c'est parcequ'en fait cette commande sert à rien.", 1 );
 }
 
 // clear all loaded commands
@@ -694,25 +696,25 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
   Logger::debug( "[{0}] Command: add subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
 
-  if( subCommand == "status" )
-  {
-    auto pExdData = framework()->get< Data::ExdDataGenerated >();
-    int32_t id;
-    int32_t duration;
-    uint16_t param;
-    sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
+  // if( subCommand == "status" )
+  // {
+    // auto pExdData = framework()->get< Data::ExdDataGenerated >();
+    // int32_t id;
+    // int32_t duration;
+    // uint16_t param;
+    // sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
 
-    if ( !pExdData->get< Sapphire::Data::Status >( id ) )
-    {
-      player.sendUrgent ( "{0} is not a valid Status ID.", id );
-      return;
-    }
-    auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(),
-                                                   duration, 3000, framework() );
-    effect->setParam( param );
+    // if ( !pExdData->get< Sapphire::Data::Status >( id ) )
+    // {
+      // player.sendUrgent ( "{0} is not a valid Status ID.", id );
+      // return;
+    // }
+    // auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(),
+                                                   // duration, 3000, framework() );
+    // effect->setParam( param );
 
-    player.addStatusEffect( effect );
-  }
+    // player.addStatusEffect( effect );
+  // }
   else if( subCommand == "title" )
   {
     uint32_t titleId;
@@ -1795,6 +1797,26 @@ void Sapphire::World::Manager::DebugCommandMgr::notice( char* data, Entity::Play
   
 }
 
+
+void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+{
+  std::string subCommand;
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+  std::size_t spos = tmpCommand.find_first_of( " " );
+  uint32_t actionId;
+  sscanf( tmpCommand.c_str(), "%u", &actionId );
+
+    auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), actionId );
+    effectPacket->setRotation( Util::floatToUInt16Rot( player.getRot() ) );
+    // effectPacket->addEffect( effectEntry );
+
+    player.sendToInRangeSet( effectPacket, true );
+
+  
+}
 
 void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
