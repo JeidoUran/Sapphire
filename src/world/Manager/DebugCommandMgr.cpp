@@ -1782,6 +1782,9 @@ void Sapphire::World::Manager::DebugCommandMgr::notice( char* data, Entity::Play
   // check if the command has parameters
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
   std::size_t spos = tmpCommand.find_first_of( " " );
+  
+  Logger::debug( "[{0}] Command: notice params: {1}", player.getId(), tmpCommand );
+  
   char notice [775] = "";
   sscanf( tmpCommand.c_str(), "%[^\n]%*c", &notice );
 
@@ -1806,14 +1809,17 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
   // check if the command has parameters
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
   std::size_t spos = tmpCommand.find_first_of( " " );
+  
+  Logger::debug( "[{0}] Command: action params: {1}", player.getId(), tmpCommand );
+  
   uint32_t actionId;
   sscanf( tmpCommand.c_str(), "%u", &actionId );
+  
+  auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), actionId );
+  effectPacket->setRotation( Util::floatToUInt16Rot( player.getRot() ) );
+  // effectPacket->addEffect( effectEntry );
 
-    auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), actionId );
-    effectPacket->setRotation( Util::floatToUInt16Rot( player.getRot() ) );
-    // effectPacket->addEffect( effectEntry );
-
-    player.sendToInRangeSet( effectPacket, true );
+  player.sendToInRangeSet( effectPacket, true );
 
   
 }
