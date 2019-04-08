@@ -72,6 +72,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "action", &DebugCommandMgr::action, "Displays an action's animation.", 1 );
   registerCommand( "rp", &DebugCommandMgr::rp, "RP management.", 1 );
   registerCommand( "rpevent", &DebugCommandMgr::rpevent, "Commands for specific RP events.", 1 );
+  registerCommand( "search", &DebugCommandMgr::search, "EXPERIMENTAL. Allows to search the EXDs for IDs.", 1 );
   registerCommand( "ely", &DebugCommandMgr::ely, "Oui c'est parcequ'en fait cette commande sert à rien.", 1 );
 }
 
@@ -2103,7 +2104,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         }
       }
       isRpStarted = true;
-      player.sendNotice( 0, "RP session started." );
+      player.sendNotice( 5, "RP session started." );
     }
   }
   else if( subCommand == "log" )
@@ -2176,7 +2177,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       m_rpNPC.clear();
       m_rpSpectators.clear();
       Logger::info( "===========================RP STOP=========================" );
-      player.sendNotice( 0, "RP session stopped." );
+      player.sendNotice( 5, "RP session stopped." );
   }
   else if( subCommand == "clean" )
   {
@@ -2200,7 +2201,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
   {
   }
   
-  else if( subCommand == "blackscreen" )
+  else if( subCommand == "loadscreen" )
   {
     if( isBlackScreen == false )
     {
@@ -2213,6 +2214,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         }
       }
       isBlackScreen = true;
+      player.sendNotice( 0, "Loading screen toggled to ON." );
     }
     else if( isBlackScreen == true )
     {
@@ -2225,6 +2227,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         }
       }
       isBlackScreen = false;
+      player.sendNotice( 0, "Loading screen toggled to OFF." );
     }
   }
   
@@ -2301,8 +2304,71 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
     else if ( params == "2" )
       player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 2, 0 ), true );
   }
-
+  else
+  {
+    player.sendUrgent( "{0} is not a valid rpevent command.", subCommand );
+  }
 }
+
+void Sapphire::World::Manager::DebugCommandMgr::search( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+{
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto pTerriMgr = framework()->get< TerritoryMgr >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  std::string subCommand = "";
+  std::string params = "";
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+  std::size_t pos = tmpCommand.find_first_of( " " );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+  Logger::debug( "[{0}] Command: search subCommand: {1} params: {2}", player.getId(), subCommand, params );
+
+
+  if( subCommand == "mount" )
+  {
+    int a = 1;
+
+
+    for ( pExdData->get< Sapphire::Data::Mount >( a ); pExdData->get< Sapphire::Data::Mount >( a ); a = a + 1 )
+    {
+      if ( pExdData->get< Sapphire::Data::Mount >( a )->singular == params )
+      {
+        player.sendNotice ( 0, "Result found: {0}", a );
+      }
+    }
+    player.sendNotice ( 5, "Done searching." );
+  }
+  else if( subCommand == "action" )
+  {
+    int a = 1;
+
+
+    for ( pExdData->get< Sapphire::Data::Action >( a ); pExdData->get< Sapphire::Data::Action >( a ); a = a + 1 )
+    {
+      if ( pExdData->get< Sapphire::Data::Action >( a )->name == params )
+      {
+        player.sendNotice ( 0, "Result found: {0}", a );
+      }
+    }
+    player.sendNotice ( 5, "Done searching." );
+  }
+}
+
+
+
 
 void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
