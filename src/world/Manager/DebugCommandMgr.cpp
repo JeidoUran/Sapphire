@@ -715,7 +715,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     // player.addStatusEffect( effect );
   // }
-  else if( subCommand == "title" )
+  if( subCommand == "title" )
   {
     uint32_t titleId;
     sscanf( params.c_str(), "%u", &titleId );
