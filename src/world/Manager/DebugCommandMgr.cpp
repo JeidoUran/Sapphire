@@ -21,6 +21,7 @@
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
+#include "Network/PacketWrappers/EffectPacket.h"
 #include "Network/GameConnection.h"
 #include "Script/ScriptMgr.h"
 #include "Script/NativeScriptMgr.h"
@@ -67,9 +68,11 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "status", &DebugCommandMgr::status, "StatusEffect management.", 1 );
   registerCommand( "random", &DebugCommandMgr::random, "Rolls a random number.", 1 );
   registerCommand( "tell", &DebugCommandMgr::tell, "Allows in-instance private chatting.", 1 );
+  registerCommand( "notice", &DebugCommandMgr::notice, "Allows the sending of server messages.", 1 );
+  registerCommand( "action", &DebugCommandMgr::action, "Displays an action's animation.", 1 );
   registerCommand( "rp", &DebugCommandMgr::rp, "RP management.", 1 );
   registerCommand( "rpevent", &DebugCommandMgr::rpevent, "Commands for specific RP events.", 1 );
-  registerCommand( "ely", &DebugCommandMgr::ely, "Oui c'est parceque cette commande sert à rien.", 1 );
+  registerCommand( "ely", &DebugCommandMgr::ely, "Oui c'est parcequ'en fait cette commande sert à rien.", 1 );
 }
 
 // clear all loaded commands
@@ -270,14 +273,14 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     }
     else
       player.setClassJob( static_cast< Common::ClassJob > ( id ) );
-    player.sendNotice( "Class set to {0} ({1}).", id, pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( id ) )->name );
+    player.sendNotice( 0, "Class set to {0} ({1}).", id, pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( id ) )->name );
   }
   else if( subCommand == "cfpenalty" )
   {
     int32_t minutes;
     sscanf( params.c_str(), "%d", &minutes );
     player.setCFPenaltyMinutes( minutes );
-    player.sendNotice( "Duty Finder penalty set to {0}.", minutes );
+    player.sendNotice( 0, "Duty Finder penalty set to {0}.", minutes );
   }
   else if( subCommand == "eorzeatime" )
   {
@@ -285,7 +288,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     sscanf( params.c_str(), "%" SCNu64, &timestamp );
 
     player.setEorzeaTimeOffset( timestamp );
-    player.sendNotice( "Eorzea time offset: {0}", timestamp );
+    player.sendNotice( 0, "Eorzea time offset: {0}", timestamp );
   }
   else if( subCommand == "fly" )
   {
@@ -303,7 +306,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     initZonePacket->data().pos.z = player.getPos().z;
 
     player.queuePacket( initZonePacket );
-    player.sendNotice( "Flight temporarily enabled." );
+    player.sendNotice( 0, "Flight temporarily enabled." );
   }
   else if( subCommand == "gmrank" )
   {
@@ -334,7 +337,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     {
       prevrank = targetActor->getAsPlayer()->getGmRank();
       targetActor->getAsPlayer()->setGmRank( rank );
-      player.sendNotice( "The GMRank of {0} is now {1} (previously {2}).", targetActor->getAsPlayer()->getName(), rank, prevrank );
+      player.sendNotice( 0, "The GMRank of {0} is now {1} (previously {2}).", targetActor->getAsPlayer()->getName(), rank, prevrank );
       Logger::info( "GMRank of {0} changed ({1} > {2}).", targetActor->getAsPlayer()->getName(), prevrank, rank );
     }
   }
@@ -358,7 +361,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
         player.spawn( actor->getAsPlayer() );
       }
     }
-    player.sendNotice( "Player model set to {0}.", modelId );
+    player.sendNotice( 0, "Player model set to {0}.", modelId );
   }
   // TODO: Better name
   else if( subCommand == "targetmodel" || subCommand == "tmodel" )
@@ -381,7 +384,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       player.sendUrgent( "Invalid target." );
       return;
     }
-    player.sendNotice( std::to_string( targetActor->getId() ) );
+    player.sendNotice( 0, std::to_string( targetActor->getId() ) );
     targetActor->getAsPlayer()->setModelChara( modelId );
     auto inRange = player.getInRangeActors( true );
     for( auto actor : inRange )
@@ -392,7 +395,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
         targetActor->getAsPlayer()->spawn( actor->getAsPlayer() );
       }
     }
-    player.sendNotice( "Target player model set to {0}.", modelId );
+    player.sendNotice( 0, "Target player model set to {0}.", modelId );
   }
   else if( subCommand == "name" )
   {
@@ -433,7 +436,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
           player.spawn( actor->getAsPlayer() );
         }
       }
-      player.sendNotice( "Player respawned as an enemy." );
+      player.sendNotice( 0, "Player respawned as an enemy." );
       return;
     }
     else
@@ -453,7 +456,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
           player.spawn( actor->getAsPlayer() );
         }
       }
-      player.sendNotice( "Player respawned as a regular player." );
+      player.sendNotice( 0, "Player respawned as a regular player." );
       return;
     }
   }
@@ -477,7 +480,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
         player.spawn( actor->getAsPlayer() );
       }
     }
-    player.sendNotice( "BNPCName set to {0} ({1}).", nameId, pExdData->get< Sapphire::Data::BNpcName >( nameId )->singular );
+    player.sendNotice( 0, "BNPCName set to {0} ({1}).", nameId, pExdData->get< Sapphire::Data::BNpcName >( nameId )->singular );
   }
   
   else if( subCommand == "bnpcbase" )
@@ -494,7 +497,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
         player.spawn( actor->getAsPlayer() );
       }
     }
-    player.sendNotice( "BNPCBase set to {0}.", baseId );
+    player.sendNotice( 0, "BNPCBase set to {0}.", baseId );
   }
   
   else if( subCommand == "odinbase" )
@@ -524,7 +527,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     }
     player.dismount();
     player.mount( id );
-    player.sendNotice( "Riding mount #{0} ({1}).", id, pExdData->get< Sapphire::Data::Mount >( id )->singular );
+    player.sendNotice( 0, "Riding mount #{0} ({1}).", id, pExdData->get< Sapphire::Data::Mount >( id )->singular );
   }
   else if( subCommand == "msqguide" )
   {
@@ -566,13 +569,13 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     if ( !pExdData->get< Sapphire::Data::Festival >( festivalId ) )
     {
       player.sendUrgent ( "{0} is not a valid Festival ID.", festivalId );
-      player.sendNotice( "Additional festival set to {0} ({1}).", additionalId, pExdData->get< Sapphire::Data::Festival >( additionalId )->name );
+      player.sendNotice( 0, "Additional festival set to {0} ({1}).", additionalId, pExdData->get< Sapphire::Data::Festival >( additionalId )->name );
       return;
     }
     else if ( !pExdData->get< Sapphire::Data::Festival >( additionalId ) )
     {
       player.sendUrgent ( "{0} is not a valid Festival ID.", additionalId );
-      player.sendNotice( "Festival set to {0} ({1}).", festivalId, pExdData->get< Sapphire::Data::Festival >( festivalId )->name );
+      player.sendNotice( 0, "Festival set to {0} ({1}).", festivalId, pExdData->get< Sapphire::Data::Festival >( festivalId )->name );
       return;
     }
     else if ( !pExdData->get< Sapphire::Data::Festival >( festivalId ) || !pExdData->get< Sapphire::Data::Festival >( additionalId ) )
@@ -581,7 +584,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       return;
     }
 
-    player.sendNotice( "Festival set to {0} ({1}). Additional festival set to {2} ({3}).", festivalId, pExdData->get< Sapphire::Data::Festival >( festivalId )->name,
+    player.sendNotice( 0, "Festival set to {0} ({1}). Additional festival set to {2} ({3}).", festivalId, pExdData->get< Sapphire::Data::Festival >( festivalId )->name,
     additionalId, pExdData->get< Sapphire::Data::Festival >( additionalId )->name );
 
     pTerriMgr->setCurrentFestival( festivalId, additionalId );
@@ -693,32 +696,32 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
   Logger::debug( "[{0}] Command: add subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
 
-  if( subCommand == "status" )
-  {
-    auto pExdData = framework()->get< Data::ExdDataGenerated >();
-    int32_t id;
-    int32_t duration;
-    uint16_t param;
-    sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
+  // if( subCommand == "status" )
+  // {
+    // auto pExdData = framework()->get< Data::ExdDataGenerated >();
+    // int32_t id;
+    // int32_t duration;
+    // uint16_t param;
+    // sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
 
-    if ( !pExdData->get< Sapphire::Data::Status >( id ) )
-    {
-      player.sendUrgent ( "{0} is not a valid Status ID.", id );
-      return;
-    }
-    auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(),
-                                                   duration, 3000, framework() );
-    effect->setParam( param );
+    // if ( !pExdData->get< Sapphire::Data::Status >( id ) )
+    // {
+      // player.sendUrgent ( "{0} is not a valid Status ID.", id );
+      // return;
+    // }
+    // auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(),
+                                                   // duration, 3000, framework() );
+    // effect->setParam( param );
 
-    player.addStatusEffect( effect );
-  }
-  else if( subCommand == "title" )
+    // player.addStatusEffect( effect );
+  // }
+  if( subCommand == "title" )
   {
     uint32_t titleId;
     sscanf( params.c_str(), "%u", &titleId );
 
     player.addTitle( titleId );
-    player.sendNotice( "Added title (id#{0})", titleId );
+    player.sendNotice( 0, "Added title (id#{0})", titleId );
   }
   else if( subCommand == "bnpc" )
   {
@@ -728,7 +731,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     if( !bNpcTemplate )
     {
-      player.sendNotice( "Template {0} not found in cache!", params );
+      player.sendNotice( 0, "Template {0} not found in cache!", params );
       return;
     }
     auto playerZone = player.getCurrentZone();
@@ -775,7 +778,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     sscanf( params.c_str(), "%x %x %x %x %x %x %x %x", &opcode, &param1, &param2, &param3, &param4, &param5, &param6,
             &playerId );
 
-    player.sendNotice( "Injecting ACTOR_CONTROL {0}", opcode );
+    player.sendNotice( 0, "Injecting ACTOR_CONTROL {0}", opcode );
 
     auto actorControl = makeZonePacket< FFXIVIpcActorControl143 >( playerId, player.getId() );
     actorControl->data().category = opcode;
@@ -843,7 +846,7 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
 
     int16_t map_id = pExdData->get< Sapphire::Data::TerritoryType >( player.getCurrentZone()->getTerritoryTypeId() )->map;
 
-    player.sendNotice( "Pos:\n {0}\n {1}\n {2}\n {3}\n MapId: {4}\n ZoneId:{5}",
+    player.sendNotice( 0, "Pos:\n {0}\n {1}\n {2}\n {3}\n MapId: {4}\n ZoneId:{5}",
                        player.getPos().x, player.getPos().y, player.getPos().z,
                        player.getRot(), map_id, player.getCurrentZone()->getTerritoryTypeId() );
   }
@@ -952,12 +955,12 @@ void Sapphire::World::Manager::DebugCommandMgr::nudge( char* data, Entity::Playe
   if( direction[ 0 ] == 'u' || direction[ 0 ] == '+' )
   {
     pos.y += offset;
-    player.sendNotice( "nudge: Placing up {0} yalms", offset );
+    player.sendNotice( 0, "nudge: Placing up {0} yalms", offset );
   }
   else if( direction[ 0 ] == 'd' || direction[ 0 ] == '-' )
   {
     pos.y -= offset;
-    player.sendNotice( "nudge: Placing down {0} yalms", offset );
+    player.sendNotice( 0, "nudge: Placing down {0} yalms", offset );
 
   }
   else
@@ -965,7 +968,7 @@ void Sapphire::World::Manager::DebugCommandMgr::nudge( char* data, Entity::Playe
     float angle = player.getRot() + ( PI / 2 );
     pos.x -= offset * cos( angle );
     pos.z += offset * sin( angle );
-    player.sendNotice( "nudge: Placing forward {0} yalms", offset );
+    player.sendNotice( 0, "nudge: Placing forward {0} yalms", offset );
   }
   if( offset != 0 )
   {
@@ -1590,10 +1593,15 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
 
   Logger::debug( "[{0}] {1} rolled 1d{2}. Result: {3}", player.getId(), player.getName(), maxnumber, randomnumber );
 
-  //TODO: less ghetto way of displaying the result
-  auto randomResult = ( std::make_shared< ServerNoticePacket >( player.getId(), player.getName() + " rolls a " + std::to_string( randomnumber ) + "." ) );
-  player.sendToInRangeSet ( randomResult );
-  player.sendNotice ( "You roll a {0}.", randomnumber );
+  auto inRange = player.getInRangeActors( false );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        actor->getAsPlayer()->sendNotice( 0, "{0} rolls 1d{1}. Result: {2}.", player.getName(), maxnumber, randomnumber  );
+      }
+    }
+  player.sendNotice( 0, "You roll 1d{0}. Result: {1}.", maxnumber, randomnumber );
   }
 
 
@@ -1646,7 +1654,7 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
     effect->setParam( param );
 
     player.addStatusEffect( effect );
-    player.sendNotice( "Status {0} ({1}) added.", id, pExdData->get< Sapphire::Data::Status >( id )->name );
+    player.sendNotice( 0, "Status {0} ({1}) added.", id, pExdData->get< Sapphire::Data::Status >( id )->name );
   }
 
   else if( subCommand == "target" || subCommand == "t" )
@@ -1683,7 +1691,7 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
     effect->setParam( param );
 
     targetActor->getAsPlayer()->addStatusEffect( effect );
-    player.sendNotice( "Status {0} ({1}) added to {2}.", id, pExdData->get< Sapphire::Data::Status >( id )->name, targetActor->getAsPlayer()->getName() );
+    player.sendNotice( 0, "Status {0} ({1}) added to {2}.", id, pExdData->get< Sapphire::Data::Status >( id )->name, targetActor->getAsPlayer()->getName() );
   }
   else if( subCommand == "remove" || subCommand == "rm" )
   {
@@ -1701,7 +1709,7 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
       return;
     } */
     player.removeSingleStatusEffectById( id );
-    player.sendNotice( "Status {0} ({1}) removed.", id, pExdData->get< Sapphire::Data::Status >( id )->name );
+    player.sendNotice( 0, "Status {0} ({1}) removed.", id, pExdData->get< Sapphire::Data::Status >( id )->name );
   }
   // TODO: Better name
   else if( subCommand == "targetremove" || subCommand == "trm" )
@@ -1730,7 +1738,7 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
       return;
     } */
     targetActor->getAsPlayer()->removeSingleStatusEffectById( id );
-    player.sendNotice( "Status {0} ({1}) removed from {2}.", id, pExdData->get< Sapphire::Data::Status >( id )->name, targetActor->getAsPlayer()->getName() );
+    player.sendNotice( 0, "Status {0} ({1}) removed from {2}.", id, pExdData->get< Sapphire::Data::Status >( id )->name, targetActor->getAsPlayer()->getName() );
   }
   else
   {
@@ -1748,7 +1756,6 @@ void Sapphire::World::Manager::DebugCommandMgr::tell( char* data, Entity::Player
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
   std::size_t spos = tmpCommand.find_first_of( " " );
   char tell [500] = "";
-  uint16_t param;
   sscanf( tmpCommand.c_str(), "%[^\n]%*c", &tell );
 
   Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
@@ -1762,12 +1769,60 @@ void Sapphire::World::Manager::DebugCommandMgr::tell( char* data, Entity::Player
     return;
   }
   player.sendDebug( "Sent to {0}: {1}", targetActor->getAsPlayer()->getName(), tell );
-  targetActor->getAsPlayer()->sendNotice( "Message from {0}: {1}", player.getName(), tell );
+  targetActor->getAsPlayer()->sendNotice( 0, "Message from {0}: {1}", player.getName(), tell );
   Logger::debug( "[Chatlog] (DebugTell) {0} > {1}: {2}", player.getName(), targetActor->getAsPlayer()->getName(), tell );
   
 }
 
+void Sapphire::World::Manager::DebugCommandMgr::notice( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+{
+  std::string subCommand;
 
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+  std::size_t spos = tmpCommand.find_first_of( " " );
+  
+  Logger::debug( "[{0}] Command: notice params: {1}", player.getId(), tmpCommand );
+  
+  char notice [775] = "";
+  sscanf( tmpCommand.c_str(), "%[^\n]%*c", &notice );
+
+  auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        actor->getAsPlayer()->sendNotice( 4, "{0}", notice );
+      }
+    }
+
+  
+}
+
+
+void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+{
+  std::string subCommand;
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+  std::size_t spos = tmpCommand.find_first_of( " " );
+  
+  Logger::debug( "[{0}] Command: action params: {1}", player.getId(), tmpCommand );
+  
+  uint32_t actionId;
+  sscanf( tmpCommand.c_str(), "%u", &actionId );
+  
+  auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), actionId );
+  effectPacket->setRotation( Util::floatToUInt16Rot( player.getRot() ) );
+  // effectPacket->addEffect( effectEntry );
+
+  player.sendToInRangeSet( effectPacket, true );
+
+  
+}
 
 void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
@@ -1800,7 +1855,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
     if( !isRpPrepared == true && isRpStarted == false )
     {
       m_rpMembers.clear();
-      player.sendNotice( "A RP session is being prepared. The following commands can be used:"
+      player.sendNotice( 0, "A RP session is being prepared. The following commands can be used:"
                          "\n\n\"!rp add\": Adds the targetted player to the RP session."
                          "\n\"!rp zone Zone PosX PosY PosZ\": Adds a starting zone to the RP session."
                          "\n\"!rp theme Theme\": Adds a theme to the RP session."
@@ -1843,8 +1898,8 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       if( isRpStarted == true )
         targetActor->getAsPlayer()->setRPMode( true );
       Logger::info( "{0} has been added to the RP session.", targetActor->getAsPlayer()->getName() );
-      player.sendNotice( "{0} has been added to the RP session.", targetActor->getAsPlayer()->getName() );
-      targetActor->getAsPlayer()->sendNotice( "You have been added to a RP session by {0}.", player.getName() );
+      player.sendNotice( 0, "{0} has been added to the RP session.", targetActor->getAsPlayer()->getName() );
+      targetActor->getAsPlayer()->sendNotice( 0, "You have been added to a RP session by {0}.", player.getName() );
     }
   }
 
@@ -1878,8 +1933,8 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       if( isRpStarted == true )
         targetActor->getAsPlayer()->setRPMode( true );
       Logger::info( "{0} has been added to the RP session as a NPC.", targetActor->getAsPlayer()->getName() );
-      player.sendNotice( "{0} has been added to the RP session as a NPC.", targetActor->getAsPlayer()->getName() );
-      targetActor->getAsPlayer()->sendNotice( "You have been added to a RP session as a NPC by {0}.", player.getName() );
+      player.sendNotice( 0, "{0} has been added to the RP session as a NPC.", targetActor->getAsPlayer()->getName() );
+      targetActor->getAsPlayer()->sendNotice( 0, "You have been added to a RP session as a NPC by {0}.", player.getName() );
     }
   }
   
@@ -1912,8 +1967,8 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       if( isRpStarted == true )
         targetActor->getAsPlayer()->setRPMode( true );
       Logger::info( "{0} has been added to the RP session as a spectator.", targetActor->getAsPlayer()->getName() );
-      player.sendNotice( "{0} has been added to the RP session as a spectator.", targetActor->getAsPlayer()->getName() );
-      targetActor->getAsPlayer()->sendNotice( "You have been added to a RP session as a spectator by {0}. Please wait for the RP session to start.", player.getName() );
+      player.sendNotice( 0, "{0} has been added to the RP session as a spectator.", targetActor->getAsPlayer()->getName() );
+      targetActor->getAsPlayer()->sendNotice( 0, "You have been added to a RP session as a spectator by {0}. Please wait for the RP session to start.", player.getName() );
     }
   }
   
@@ -1933,7 +1988,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
     auto pExdData = framework()->get< Data::ExdDataGenerated >();
     sscanf( params.c_str(), "%d %d %d %d", &startzone, &startposx, &startposy, &startposz );
     auto pZone = pTerriMgr->getZoneByTerritoryTypeId( startzone );
-    player.sendNotice( "The starting zone of the RP session has been set to {0} (ID: {1}), X: {2}, Y: {3}, Z: {4}.", pZone->getName(),
+    player.sendNotice( 0, "The starting zone of the RP session has been set to {0} (ID: {1}), X: {2}, Y: {3}, Z: {4}.", pZone->getName(),
                        startzone, startposx, startposy, startposz );
   }
 
@@ -1951,7 +2006,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
     }
 
     sscanf( params.c_str(), "%[^\n]%*c", &RpTheme );
-    player.sendNotice( "The theme of the RP session has been set to"
+    player.sendNotice( 0, "The theme of the RP session has been set to"
                        "\n\"{0}\".", RpTheme );
   }
 
@@ -1971,16 +2026,16 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
     auto pExdData = framework()->get< Data::ExdDataGenerated >();
     auto pZone = pTerriMgr->getZoneByTerritoryTypeId( startzone );
     if ( !startzone == 0 )
-      player.sendNotice( "Starting Zone: {0}", pZone->getName() );
+      player.sendNotice( 0, "Starting Zone: {0}", pZone->getName() );
     else
-      player.sendNotice( "Starting Zone: None" );
+      player.sendNotice( 0, "Starting Zone: None" );
     if( strcmp (RpTheme,"") != 0)
-      player.sendNotice( "Theme: {0}", RpTheme );
+      player.sendNotice( 0, "Theme: {0}", RpTheme );
     else
-        player.sendNotice( "Theme: None" );
-    player.sendNotice( "Participants: {0}", m_rpMembers.size() );
+        player.sendNotice( 0, "Theme: None" );
+    player.sendNotice( 0, "Participants: {0}", m_rpMembers.size() );
     for( auto member : m_rpMembers )
-        player.sendNotice( "{0}", member->getAsPlayer()->getName() );
+        player.sendNotice( 0, "{0}", member->getAsPlayer()->getName() );
   }
 
   else if( subCommand == "start" )
@@ -2018,8 +2073,9 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         if( member->getAsPlayer() != player.getAsPlayer() )
         {
           //member->getAsPlayer()->setGmRank( 1 );
-          member->getAsPlayer()->sendNotice( "RP session started by {0}.", player.getName() );
+          member->getAsPlayer()->sendNotice( 5, "RP session started by {0}.", player.getName() );
         }
+      }
       Logger::info( "NPC: {0}", m_rpNPC.size() );
       for( auto npc : m_rpNPC )
       {
@@ -2027,7 +2083,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         npc->getAsPlayer()->setRPMode( true );
         if( npc->getAsPlayer() != player.getAsPlayer() )
         {
-          npc->getAsPlayer()->sendNotice( "RP session started by {0}.", player.getName() );
+          npc->getAsPlayer()->sendNotice( 5, "RP session started by {0}.", player.getName() );
         }
       }
       Logger::info( "Spectators: {0}", m_rpSpectators.size() );
@@ -2038,7 +2094,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         spec->getAsPlayer()->setRPMode( true );
         if( spec->getAsPlayer() != player.getAsPlayer() )
         {
-          spec->getAsPlayer()->sendNotice( "RP session started by {0}.", player.getName() );
+          spec->getAsPlayer()->sendNotice( 5, "RP session started by {0}.", player.getName() );
         }
       }
       Logger::info( "===========================================================" );
@@ -2046,15 +2102,14 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       {
         for( auto member : m_rpMembers )
         {
-            member->getAsPlayer()->prepareZoning( startzone, true, 1, 112 );
-            member->getAsPlayer()->setZone( startzone );
-            member->getAsPlayer()->changePosition( startposx, startposy, startposz, member->getAsPlayer()->getRot() );
-            member->getAsPlayer()->sendZoneInPackets( 0x00, 0x00, 0, 110, false );
+          member->getAsPlayer()->prepareZoning( startzone, true, 1, 112 );
+          member->getAsPlayer()->setZone( startzone );
+          member->getAsPlayer()->changePosition( startposx, startposy, startposz, member->getAsPlayer()->getRot() );
+          member->getAsPlayer()->sendZoneInPackets( 0x00, 0x00, 0, 110, false );
         }
       }
       isRpStarted = true;
-      player.sendNotice( "RP session started." );
-      }
+      player.sendNotice( 5, "RP session started." );
     }
   }
   else if( subCommand == "log" )
@@ -2068,12 +2123,12 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
     char logmessage [255] = "";
     sscanf( params.c_str(), "%[^\n]%*c", &logmessage );
     Logger::info( "[RP Manual Log] {0}", logmessage );
-    player.sendNotice( "Message added to the server log." );
+    player.sendNotice( 0, "Message added to the server log." );
   }
   else if( subCommand == "call" )
   {
-    {
     if ( isRpPrepared == false )
+    {
       player.sendUrgent( "You need to prepare a RP session before using this command. Use \"!rp prepare\".");
       return;
     }
@@ -2097,10 +2152,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         }
         member->getAsPlayer()->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
         member->getAsPlayer()->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
-        player.sendNotice( "Calling all players registered to the RP session." );
-        break;
-
-
+        player.sendNotice( 0, "Calling all players registered to the RP session." );
       }
     }
   }
@@ -2122,15 +2174,18 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
           Logger::info( "{0}", member->getAsPlayer()->getName() );
           member->getAsPlayer()->setRPMode( false );
           if( member->getAsPlayer() != player.getAsPlayer() )
-            member->getAsPlayer()->sendNotice( "RP session stopped by {0}.", player.getName() );
+            member->getAsPlayer()->sendNotice( 5, "RP session stopped by {0}.", player.getName() );
       }
       isRpPrepared = false;
       isRpStarted = false;
       m_rpMembers.clear();
+      m_rpNPC.clear();
+      m_rpSpectators.clear();
       Logger::info( "===========================RP STOP=========================" );
-      player.sendNotice( "RP session stopped." );
-
-
+      player.sendNotice( 5, "RP session stopped." );
+  }
+  else if( subCommand == "clean" )
+  {
   }
   else if( subCommand == "mode" )
   {
@@ -2150,7 +2205,35 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
   else if( subCommand == "memo" )
   {
   }
-
+  
+  else if( subCommand == "blackscreen" )
+  {
+    if( isBlackScreen == false )
+    {
+      auto inRange = player.getInRangeActors( false );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          actor->getAsPlayer()->prepareZoning( player.getZoneId(), true, 1, 0 );
+        }
+      }
+      isBlackScreen = true;
+    }
+    else if( isBlackScreen == true )
+    {
+      auto inRange = player.getInRangeActors( false );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          actor->getAsPlayer()->changePosition( actor->getAsPlayer()->getPos().x, actor->getAsPlayer()->getPos().y, actor->getAsPlayer()->getPos().z, actor->getAsPlayer()->getRot() );
+        }
+      }
+      isBlackScreen = false;
+    }
+  }
+  
   else
   {
     player.sendUrgent( "{0} is not a valid rp command.", subCommand );

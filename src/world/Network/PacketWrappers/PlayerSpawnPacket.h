@@ -31,6 +31,9 @@ namespace Sapphire::Network::Packets::Server
       m_data.classJob = static_cast< uint8_t >( player.getClass() );
       //m_data.status = static_cast< uint8_t >( pPlayer->getStatus() );
 
+      m_data.currentWorldId = 97;
+      m_data.homeWorldId = 97;
+
       m_data.hPCurr = player.getHp();
       m_data.mPCurr = player.getMp();
       m_data.tPCurr = player.getTp();

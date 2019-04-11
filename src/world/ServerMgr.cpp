@@ -51,7 +51,7 @@ Sapphire::World::ServerMgr::ServerMgr( const std::string& configName, FrameworkP
   m_configName( configName ),
   m_bRunning( true ),
   m_lastDBPingTime( 0 ),
-  m_worldId( 67 )
+  m_worldId( 97 )
 {
 }
 

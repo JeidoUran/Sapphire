@@ -24,6 +24,7 @@ namespace Sapphire::World::Manager
 
     bool isRpPrepared = ( false );
     bool isRpStarted = ( false );
+    bool isBlackScreen = ( false );
     int32_t startzone = 0;
     int32_t startposx = 0;
     int32_t startposy = 0;
@@ -66,6 +67,7 @@ namespace Sapphire::World::Manager
     void unlockCharacter( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
     void instance( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
     void questBattle( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
     void housing( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command) ;
@@ -77,6 +79,10 @@ namespace Sapphire::World::Manager
     void status( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
     void tell( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void notice( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void action( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
     void rp( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 

@@ -639,7 +639,7 @@ void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
   strcpy( tellPacket->data().receipientName, player.getName().c_str() );
   // TODO: world id from server
   tellPacket->data().contentId = player.getContentId();
-  tellPacket->data().worldId = 67;
+  tellPacket->data().worldId = 97;
 
   if( player.isActingAsGm() )
   {

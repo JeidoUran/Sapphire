@@ -55,7 +55,7 @@ bool Sapphire::ConfigMgr::loadGlobalConfig( Common::Config::GlobalConfig& config
   // params
   config.general.dataPath = getValue< std::string >( "General", "DataPath", "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
   config.general.serverSecret = getValue< std::string >( "General", "ServerSecret", "default" );
-  config.general.worldID = getValue< uint16_t >( "General", "WorldID", 67 );
+  config.general.worldID = getValue< uint16_t >( "General", "WorldID", 97 );
   config.general.defaultGMRank = getValue< uint8_t >( "General", "DefaultGMRank", 255 );
   config.general.logLevel = getValue< uint8_t >( "General", "LogLevel", 1 );
   config.general.logFilter = getValue< uint32_t >( "General", "LogFilter", 0 );
