@@ -290,6 +290,7 @@ enum ActorControlType : uint16_t
     ToggleAutoAttack = 0x02,
     ChangeTarget = 0x03,
 
+    BluActionLearn = 0x63,
     DismountReq = 0x65,
     SpawnCompanionReq = 0x66,
     RemoveStatusEffect = 0x68,

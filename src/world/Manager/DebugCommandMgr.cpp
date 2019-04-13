@@ -20,6 +20,7 @@
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/ModelEquipPacket.h"
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
 #include "Network/PacketWrappers/EffectPacket.h"
 #include "Network/GameConnection.h"
@@ -292,7 +293,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   }
   else if( subCommand == "fly" )
   {
-    // TODO: Less ghetto way, current implementation isn't usable in multiplayer.
+    // TODO: Less ghetto way, current implementation isn't ideal in multiplayer.
     auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( player.getId() );
     initZonePacket->data().zoneId = player.getCurrentZone()->getTerritoryTypeId();
     initZonePacket->data().weatherId = static_cast< uint8_t >( player.getCurrentZone()->getCurrentWeather() );
@@ -396,6 +397,15 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       }
     }
     player.sendNotice( 0, "Target player model set to {0}.", modelId );
+  }
+  else if( subCommand == "modelequip" )
+  {
+  // auto equipPacket = std::make_shared< ModelEquipPacket >( player.getAsPlayer() );
+  // equipPacket->data().mainWeapon = 0xFD08010002007600;
+  // equipPacket->data().offWeapon = player.getModelSubWeapon();
+  // player.sendToInRangeSet( equipPacket, true );
+  player.setModelMainWeapon( 0x00650001003C05DD );
+  player.sendModel();
   }
   else if( subCommand == "name" )
   {
@@ -2302,6 +2312,42 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
   {
     if ( params == "0" )
       player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 0, 32530 ), true );
+    else if ( params == "1" )
+      player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 1, 32530 ), true );
+    else if ( params == "2" )
+      player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 2, 0 ), true );
+  }
+  if( subCommand == "afterimage" )
+  {
+    if ( params == "swap" )
+    {
+      Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
+      if( player.getTargetId() != player.getId() )
+      {
+        targetActor = player.lookupTargetById( player.getTargetId() );
+      }
+      // else
+        // targetActor = player.getAsPlayer();
+      if( !targetActor || !targetActor->isPlayer() )
+      {
+        player.sendUrgent( "Invalid target." );
+        return;
+      }
+    int32_t cyrusposx = player.getPos().x;
+    int32_t cyrusposy = player.getPos().y;
+    int32_t cyrusposz = player.getPos().z;
+    int32_t cyrusrot = player.getRot();
+    int32_t imageposx = targetActor->getAsPlayer()->getPos().x;
+    int32_t imageposy = targetActor->getAsPlayer()->getPos().y;
+    int32_t imageposz = targetActor->getAsPlayer()->getPos().z;
+    int32_t imagerot = targetActor->getAsPlayer()->getRot();
+    player.changePosition( imageposx, imageposy, imageposz, imagerot );
+    targetActor->getAsPlayer()->changePosition( cyrusposx, cyrusposy, cyrusposz, cyrusrot );
+    auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), targetActor->getAsPlayer()->getId(), 3176 );
+    auto effectPacket2 = std::make_shared< Server::EffectPacket >( targetActor->getAsPlayer()->getId(), player.getId(), 3176 );
+    player.sendToInRangeSet( effectPacket, true );
+    targetActor->getAsPlayer()->sendToInRangeSet( effectPacket2, true );
+    }
     else if ( params == "1" )
       player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 1, 32530 ), true );
     else if ( params == "2" )
