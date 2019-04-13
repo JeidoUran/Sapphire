@@ -343,6 +343,12 @@ namespace Sapphire::Entity
     /*! get the current off hand model */
     uint64_t getModelSubWeapon() const;
 
+    /*! get the current main hand model */
+    void setModelMainWeapon( uint64_t modelmainweapon );
+
+    /*! get the current off hand model */
+    void setModelSubWeapon( uint64_t modelsubweapon );
+
     /*! get the current system hand model */
     uint64_t getModelSystemWeapon() const;
 
@@ -790,6 +796,14 @@ namespace Sapphire::Entity
     void sendDebug( const std::string& message, const Args&... args )
     {
       sendDebug( fmt::format( message, args... ) );
+    }
+
+    void sendTell( const std::string& message );
+
+    template< typename... Args >
+    void sendTell( const std::string& message, const Args&... args )
+    {
+      sendTell( fmt::format( message, args... ) );
     }
 
     void sendLogMessage( uint32_t messageId, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0, uint32_t param5 = 0, uint32_t param6 = 0 );

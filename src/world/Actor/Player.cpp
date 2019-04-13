@@ -956,6 +956,16 @@ uint64_t Sapphire::Entity::Player::getModelSubWeapon() const
   return m_modelSubWeapon;
 }
 
+void Sapphire::Entity::Player::setModelMainWeapon( uint64_t modelmainweapon )
+{
+  m_modelMainWeapon = modelmainweapon;
+}
+
+void Sapphire::Entity::Player::setModelSubWeapon( uint64_t modelsubweapon )
+{
+  m_modelSubWeapon = modelsubweapon;
+}
+
 uint64_t Sapphire::Entity::Player::getModelSystemWeapon() const
 {
   return m_modelSystemWeapon;
@@ -1430,6 +1440,11 @@ void Sapphire::Entity::Player::sendUrgent( const std::string& message ) //Red Te
 void Sapphire::Entity::Player::sendDebug( const std::string& message ) //Grey Text
 {
   queuePacket( std::make_shared< ChatPacket >( *getAsPlayer(), ChatType::ServerDebug, message ) );
+}
+
+void Sapphire::Entity::Player::sendTell( const std::string& message ) //Grey Text
+{
+  queuePacket( std::make_shared< ChatPacket >( *getAsPlayer(), ChatType::TellReceive, message ) );
 }
 
 void Sapphire::Entity::Player::sendLogMessage( uint32_t messageId, uint32_t param2, uint32_t param3,
