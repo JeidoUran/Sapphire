@@ -2353,6 +2353,15 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
     else if ( params == "2" )
       player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 2, 0 ), true );
   }
+  else if( subCommand == "maguswep" )
+  {
+  // auto equipPacket = std::make_shared< ModelEquipPacket >( player.getAsPlayer() );
+  // equipPacket->data().mainWeapon = 0xFD08010002007600;
+  // equipPacket->data().offWeapon = player.getModelSubWeapon();
+  // player.sendToInRangeSet( equipPacket, true );
+  player.setModelMainWeapon( 0x0000000100031F4C );
+  player.sendModel();
+  }
 
 }
 
