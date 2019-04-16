@@ -283,6 +283,8 @@ enum ActorControlType : uint16_t
     SetDutyActionHud = 0x5E9, // disable/enable
     SetDutyActionActive = 0x5EA,
     SetDutyActionRemaining = 0x5EB,
+
+    EurekaStep = 0x73A, // alters the progress of the player on all of the Eureka maps
   };
 
   enum ClientTriggerType
@@ -375,8 +377,6 @@ enum ActorControlType : uint16_t
     CompanionActionUnlock = 0x6A6,
 
     OpenPerformInstrumentUI = 0x71C,
-
-    EurekaStep = 0x73A, // alters the progress of the player on all of the Eureka maps
 
     StartReplay = 0x7BC,
     EndReplay = 0x7BD, // request for restoring the original player state (actor, buff, gauge, etc..)
