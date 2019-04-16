@@ -385,7 +385,6 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       player.sendUrgent( "Invalid target." );
       return;
     }
-    player.sendNotice( 0, std::to_string( targetActor->getId() ) );
     targetActor->getAsPlayer()->setModelChara( modelId );
     auto inRange = player.getInRangeActors( true );
     for( auto actor : inRange )
@@ -2343,8 +2342,8 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
     int32_t imagerot = targetActor->getAsPlayer()->getRot();
     player.changePosition( imageposx, imageposy, imageposz, imagerot );
     targetActor->getAsPlayer()->changePosition( cyrusposx, cyrusposy, cyrusposz, cyrusrot );
-    auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), targetActor->getAsPlayer()->getId(), 3176 );
-    auto effectPacket2 = std::make_shared< Server::EffectPacket >( targetActor->getAsPlayer()->getId(), player.getId(), 3176 );
+    auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), targetActor->getAsPlayer()->getId(), 2919 );
+    auto effectPacket2 = std::make_shared< Server::EffectPacket >( targetActor->getAsPlayer()->getId(), player.getId(), 2919 );
     player.sendToInRangeSet( effectPacket, true );
     targetActor->getAsPlayer()->sendToInRangeSet( effectPacket2, true );
     }

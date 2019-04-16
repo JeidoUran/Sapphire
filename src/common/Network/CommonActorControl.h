@@ -178,6 +178,7 @@ enum ActorControlType : uint16_t
     EObjAnimation = 0x19D,
 
     SetTitle = 0x1F4,
+    InstanceDialogue = 0x1F5,
 
     SetStatusIcon = 0x1F8,
     LimitBreakGauge = 0x1F9, // Max level, amount, build type (chop sound), lb type(0=pve lb 1=pvp lb)
