@@ -64,6 +64,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "script", &DebugCommandMgr::script, "Server script utilities.", 1 );
   registerCommand( "instance", &DebugCommandMgr::instance, "InstanceContent utilities", 1 );
   registerCommand( "publiccontent", &DebugCommandMgr::publicContent, "PublicContent utilities", 1 );
+  registerCommand( "pc", &DebugCommandMgr::publicContent, "PublicContent utilities", 1 );
   registerCommand( "questbattle", &DebugCommandMgr::questBattle, "QuestBattle utilities", 1 );
   registerCommand( "housing", &DebugCommandMgr::housing, "Housing utilities", 1 );
   registerCommand( "status", &DebugCommandMgr::status, "StatusEffect management.", 1 );
@@ -1368,17 +1369,20 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
     else
       player.sendDebug( "Failed to create instance with id#{0}", contentFinderConditionId );
   }
-  else if( subCommand == "createzone" || subCommand == "crz" )
+  else if( subCommand == "bind" )
   {
-    uint32_t zoneId;
-    sscanf( params.c_str(), "%d", &zoneId );
+    uint32_t instanceId;
+    sscanf( params.c_str(), "%d", &instanceId );
 
-    auto instance = pTeriMgr->createTerritoryInstance( zoneId );
-    if( instance )
+    auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
+    if( instance && instance->getAsPublicContent() )
+    {
+      auto pPublicContent = instance->getAsPublicContent();
+      pPublicContent->bindPlayer( player.getId() );
       player.sendDebug(
-        "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
-    else
-      player.sendDebug( "Failed to create instance with id#{0}", zoneId );
+        "Now bound to instance with id: " + std::to_string( pPublicContent->getGuId() ) +
+        " -> " + pPublicContent->getName() );
+    }
   }
   else if( subCommand == "remove" || subCommand == "rm" )
   {
@@ -1401,7 +1405,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
     sscanf( params.c_str(), "%d %d", &index, &value );
 
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -1463,7 +1467,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
 
     sscanf( params.c_str(), "%hhu", &branch );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -1471,7 +1475,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
   }
   else if( subCommand == "qte_start" )
   {
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -1480,7 +1484,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
   }
   else if( subCommand == "event_start" )
   {
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -1489,21 +1493,21 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
   }
   else if( subCommand == "event_end" )
   {
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
     player.sendDebug( "evt end" );
     instance->endEventCutscene();
   }
-  else if( subCommand == "bgm" )
-  {
-    uint16_t bgmId;
-    sscanf( params.c_str(), "%hd", &bgmId );
+  // else if( subCommand == "bgm" )
+  // {
+    // uint16_t bgmId;
+    // sscanf( params.c_str(), "%hd", &bgmId );
 
-    if( auto instance = player.getCurrentInstance() )
-      instance->setCurrentBGM( bgmId );
-  }
+    // if( auto instance = player.getCurrentInstance() )
+      // instance->setCurrentBGM( bgmId );
+  // }
   else
   {
     player.sendDebug( "Unknown sub command." );

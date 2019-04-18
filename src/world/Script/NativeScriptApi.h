@@ -257,6 +257,8 @@ namespace Sapphire::ScriptAPI
   public:
     explicit PublicContentScript( uint32_t publicContentId );
 
+    virtual void onPlayerSetup( Sapphire::PublicContent& instance, Entity::Player& player );
+
     virtual void onInit( Sapphire::PublicContent& instance );
 
     virtual void onUpdate( Sapphire::PublicContent& instance, uint32_t currTime );

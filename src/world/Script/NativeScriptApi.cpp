@@ -225,6 +225,10 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void PublicContentScript::onPlayerSetup( Sapphire::PublicContent& instance, Entity::Player& player )
+  {
+  }
+
   void PublicContentScript::onInit( PublicContent& instance )
   {
   }

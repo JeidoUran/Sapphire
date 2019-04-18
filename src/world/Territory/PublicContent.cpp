@@ -131,8 +131,7 @@ void Sapphire::PublicContent::onUpdate( uint32_t currTime )
                                                    m_zoneConfiguration->timeLimit * 60u ) );
       }
 
-      if( m_pEntranceEObj )
-        m_pEntranceEObj->setState( 7 );
+
       m_state = DutyInProgress;
       m_instanceExpireTime = Util::getTimeSeconds() + ( m_zoneConfiguration->timeLimit * 60u );
       break;
@@ -302,8 +301,6 @@ void Sapphire::PublicContent::onRegisterEObj( Entity::EventObjectPtr object )
 {
   if( object->getName() != "none" )
     m_eventObjectMap[ object->getName() ] = object;
-  if( object->getObjectId() == 2000182 ) // start
-    m_pEntranceEObj = object;
 
   auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   auto objData = pExdData->get< Sapphire::Data::EObj >( object->getObjectId() );
@@ -329,24 +326,10 @@ Sapphire::PublicContent::PublicContentState Sapphire::PublicContent::getState() 
 
 void Sapphire::PublicContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& player )
 {
-  // remove any players from the instance who aren't bound on zone in
-  // if( !isPlayerBound( player.getId() ) )
-    // player.exitInstance();
-
-  // if a player has already spawned once inside this instance, don't move them if they happen to zone in again
-  if( !hasPlayerPreviouslySpawned( player ) )
-  {
-    if( m_pEntranceEObj != nullptr )
-    {
-      player.setRot( PI );
-      player.setPos( m_pEntranceEObj->getPos() );
-    }
-    else
-    {
-      player.setRot( PI );
-      player.setPos( { 0.f, 0.f, 0.f } );
-    }
-  }
+  player.setRot( PI );
+  player.setPos( { 0.f, 0.f, 0.f } );
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  pScriptMgr->onPlayerSetup( *this, player );
 
   player.resetObjSpawnIndex();
 }
@@ -380,19 +363,14 @@ Sapphire::PublicContent::onEnterTerritory( Entity::Player& player, uint32_t even
 {
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onInstanceEnterTerritory( getAsPublicContent(), player, eventId, param1, param2 );
-
-  if( !hasPlayerPreviouslySpawned( player ) && player.getRPMode() == false )
-  {
-    m_spawnedPlayers.insert( player.getId() );
-    player.directorPlayScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
-                                                  HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
-                                                  DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
-                                                  // todo: wtf is 0x00100000
-                                                  DISABLE_CANCEL_EMOTE, 0, 0x9, getCurrentBGM() );
-  }
-  else
-    player.directorPlayScene( getDirectorId(), 2, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0x9, getCurrentBGM() );
+  m_spawnedPlayers.insert( player.getId() );
+  player.directorPlayScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
+                                                HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                                                DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
+                                                // todo: wtf is 0x00100000
+                                                DISABLE_CANCEL_EMOTE, 0, 0x9, getCurrentBGM() );
 }
+
 void Sapphire::PublicContent::setCurrentBGM( uint16_t bgmIndex )
 {
   m_currentBgm = bgmIndex;

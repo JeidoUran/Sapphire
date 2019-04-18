@@ -1827,6 +1827,7 @@ void Sapphire::Entity::Player::sendZonePackets()
   initZonePacket->data().zoneId = getCurrentZone()->getTerritoryTypeId();
   initZonePacket->data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
   initZonePacket->data().bitmask = 0x1;
+  initZonePacket->data().bitmask1 = 16;
   initZonePacket->data().festivalId = getCurrentZone()->getCurrentFestival().first;
   initZonePacket->data().additionalFestivalId = getCurrentZone()->getCurrentFestival().second;
   initZonePacket->data().pos.x = getPos().x;
