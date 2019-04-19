@@ -437,13 +437,13 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceInit( InstanceContentPtr instance
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContentPtr instance, uint32_t currTime )
+bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContentPtr instance, uint64_t tickCount )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
 
   if( script )
   {
-    script->onUpdate( *instance, currTime );
+    script->onUpdate( *instance, tickCount );
     return true;
   }
 
@@ -487,13 +487,27 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceInit( QuestBattlePtr instance )
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( QuestBattlePtr instance, uint32_t currTime )
+bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( QuestBattlePtr instance, uint64_t tickCount )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance->getDirectorId() );
 
   if( script )
   {
-    script->onUpdate( *instance, currTime );
+    script->onUpdate( *instance, tickCount );
+    return true;
+  }
+
+  return false;
+}
+
+
+bool Sapphire::Scripting::ScriptMgr::onDutyCommence( QuestBattle& instance, Entity::Player& player )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
+
+  if( script )
+  {
+    script->onDutyCommence( instance, player );
     return true;
   }
 
@@ -566,4 +580,17 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( PublicContentPtr 
 Sapphire::Scripting::NativeScriptMgr& Sapphire::Scripting::ScriptMgr::getNativeScriptHandler()
 {
   return *m_nativeScriptMgr;
+}
+
+bool
+Sapphire::Scripting::ScriptMgr::onDutyComplete( Sapphire::QuestBattlePtr instance, Sapphire::Entity::Player& player )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance->getDirectorId() );
+  if( script )
+  {
+    script->onDutyComplete( *instance, player );
+    return true;
+  }
+
+  return false;
 }

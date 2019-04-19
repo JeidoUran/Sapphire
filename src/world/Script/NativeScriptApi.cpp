@@ -185,7 +185,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void InstanceContentScript::onUpdate( InstanceContent& instance, uint32_t currTime )
+  void InstanceContentScript::onUpdate( InstanceContent& instance, uint64_t tickCount )
   {
   }
 
@@ -201,6 +201,11 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void QuestBattleScript::onDutyComplete( Sapphire::QuestBattle& instance, Entity::Player& player )
+  {
+
+  }
+
   void QuestBattleScript::onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player )
   {
   }
@@ -209,7 +214,11 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void QuestBattleScript::onUpdate( QuestBattle& instance, uint32_t currTime )
+  void QuestBattleScript::onUpdate( QuestBattle& instance, uint64_t tickCount )
+  {
+  }
+
+  void QuestBattleScript::onDutyCommence( QuestBattle& instance, Entity::Player& player )
   {
   }
 

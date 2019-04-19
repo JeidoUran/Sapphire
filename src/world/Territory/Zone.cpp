@@ -29,6 +29,7 @@
 #include "Actor/EventObject.h"
 #include "Actor/SpawnGroup.h"
 #include "Actor/SpawnPoint.h"
+#include "Actor/BNpcTemplate.h"
 
 #include "Network/GameConnection.h"
 
@@ -69,7 +70,9 @@ Sapphire::Zone::Zone( uint16_t territoryTypeId, uint32_t guId,
   m_currentWeather( Weather::FairSkies ),
   m_nextEObjId( 0x400D0000 ),
   m_nextActorId( 0x500D0000 ),
-  m_pFw( pFw )
+  m_pFw( pFw ),
+  m_lastUpdate( 0 ),
+  m_lastActivityTime( Util::getTimeMs() )
 {
   auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   m_guId = guId;
@@ -234,9 +237,6 @@ void Sapphire::Zone::pushActor( Entity::ActorPtr pActor )
     auto pPlayer = pActor->getAsPlayer();
 
     auto pServerZone = m_pFw->get< World::ServerMgr >();
-    auto pSession = pServerZone->getSession( pPlayer->getId() );
-    if( pSession )
-      m_sessionSet.insert( pSession );
     m_playerMap[ pPlayer->getId() ] = pPlayer;
     updateCellActivity( cx, cy, 2 );
   }
@@ -259,7 +259,7 @@ void Sapphire::Zone::removeActor( Entity::ActorPtr pActor )
 
   Cell* pCell = getCellPtr( cx, cy );
   if( pCell && pCell->hasActor( pActor ) )
-    pCell->removeActor( pActor );
+    pCell->removeActorFromCell( pActor );
 
   if( pActor->isPlayer() )
   {
@@ -387,13 +387,13 @@ bool Sapphire::Zone::checkWeather()
   return false;
 }
 
-void Sapphire::Zone::updateBNpcs( int64_t tickCount )
+void Sapphire::Zone::updateBNpcs( uint64_t tickCount )
 {
   if( ( tickCount - m_lastMobUpdate ) <= 250 )
     return;
 
   m_lastMobUpdate = tickCount;
-  uint32_t currTime = Sapphire::Util::getTimeSeconds();
+  uint64_t currTime = Sapphire::Util::getTimeSeconds();
 
   for( const auto& entry : m_bNpcMap )
   {
@@ -442,60 +442,64 @@ void Sapphire::Zone::updateBNpcs( int64_t tickCount )
 
 }
 
-
-bool Sapphire::Zone::update( uint32_t currTime )
+uint64_t Sapphire::Zone::getLastActivityTime() const
 {
-  int64_t tickCount = Util::getTimeMs();
+  return m_lastActivityTime;
+}
 
+bool Sapphire::Zone::update( uint64_t tickCount )
+{
   //TODO: this should be moved to a updateWeather call and pulled out of updateSessions
   bool changedWeather = checkWeather();
 
-  updateSessions( changedWeather );
-  updateBNpcs( tickCount );
-  onUpdate( currTime );
+  updateSessions( tickCount, changedWeather );
+  onUpdate( tickCount );
 
   updateSpawnPoints();
+
+  if( m_playerMap.size() > 0 )
+    m_lastActivityTime = tickCount;
+
   return true;
 }
 
-void Sapphire::Zone::updateSessions( bool changedWeather )
+void Sapphire::Zone::updateSessions( uint64_t tickCount, bool changedWeather )
 {
-  auto it = m_sessionSet.begin();
-
   // update sessions in this zone
-  for( ; it != m_sessionSet.end(); )
+  for( auto it = m_playerMap.begin(); it != m_playerMap.end(); ++it )
   {
 
-    auto pSession = ( *it );
+    auto pPlayer = it->second;
 
-    if( !pSession )
+    if( !pPlayer )
     {
-      it = m_sessionSet.erase( it );
-      continue;
+      m_playerMap.erase( it );
+      return;
     }
-
-    auto pPlayer = pSession->getPlayer();
 
     // this session is not linked to this area anymore, remove it from zone session list
     if( ( !pPlayer->getCurrentZone() ) || ( pPlayer->getCurrentZone() != shared_from_this() ) )
     {
-      removeActor( pSession->getPlayer() );
-
-      it = m_sessionSet.erase( it );
-      continue;
+      removeActor( pPlayer );
+      return;
     }
+
+    m_lastUpdate = tickCount;
 
     if( changedWeather )
     {
       auto weatherChangePacket = makeZonePacket< FFXIVIpcWeatherChange >( pPlayer->getId() );
       weatherChangePacket->data().weatherId = static_cast< uint8_t >( m_currentWeather );
       weatherChangePacket->data().delay = 5.0f;
-      pSession->getPlayer()->queuePacket( weatherChangePacket );
+      pPlayer->queuePacket( weatherChangePacket );
     }
 
     // perform session duties
-    pSession->update();
-    ++it;
+    pPlayer->getSession()->update();
+
+    // this session is not linked to this area anymore, remove it from zone session list
+    if( ( !pPlayer->getCurrentZone() ) || ( pPlayer->getCurrentZone() != shared_from_this() ) )
+      return;
   }
 }
 
@@ -602,7 +606,7 @@ void Sapphire::Zone::updateActorPosition( Entity::Actor& actor )
 
     if( pOldCell )
     {
-      pOldCell->removeActor( actor.shared_from_this() );
+      pOldCell->removeActorFromCell( actor.shared_from_this() );
     }
 
     pCell->addActor( actor.shared_from_this() );
@@ -703,9 +707,9 @@ void Sapphire::Zone::onLeaveTerritory( Entity::Player& player )
   Logger::debug( "Zone::onLeaveTerritory: Zone#{0}|{1}, Entity#{2}", getGuId(), getTerritoryTypeId(), player.getId() );
 }
 
-void Sapphire::Zone::onUpdate( uint32_t currTime )
+void Sapphire::Zone::onUpdate( uint64_t tickCount )
 {
-
+  updateBNpcs( tickCount );
 }
 
 void Sapphire::Zone::onFinishLoading( Entity::Player& player )
@@ -881,3 +885,107 @@ uint32_t Sapphire::Zone::getNextEffectSequence()
   return m_effectCounter++;
 }
 
+Sapphire::Entity::BNpcPtr
+  Sapphire::Zone::createBNpcFromLevelEntry( uint32_t levelId, uint8_t level, uint8_t type,
+                                            uint32_t hp, uint16_t nameId, uint32_t directorId,
+                                            uint8_t bnpcType )
+{
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto levelData = pExdData->get< Sapphire::Data::Level >( levelId );
+  if( !levelData )
+    return nullptr;
+
+  if( levelData->type != 9 )
+    return nullptr;
+
+  auto bnpcBaseId = levelData->object;
+
+  auto bnpcBaseData = pExdData->get< Sapphire::Data::BNpcBase >( bnpcBaseId );
+  if( !bnpcBaseData )
+    return nullptr;
+
+  //BNpcTemplate( uint32_t id, uint32_t baseId, uint32_t nameId, uint64_t weaponMain, uint64_t weaponSub,
+  //  uint8_t aggressionMode, uint8_t enemyType, uint8_t onlineStatus, uint8_t pose,
+  //  uint16_t modelChara, uint32_t displayFlags, uint32_t* modelEquip,
+  //  uint8_t* customize )
+
+  std::vector< uint8_t > customize( 26 );
+  if( bnpcBaseData->bNpcCustomize != 0 )
+  {
+    auto bnpcCustomizeData = pExdData->get< Sapphire::Data::BNpcCustomize >( bnpcBaseData->bNpcCustomize );
+    if( bnpcCustomizeData )
+    {
+      customize[0] = bnpcCustomizeData->race;
+      customize[1] = bnpcCustomizeData->gender;
+      customize[2] = bnpcCustomizeData->bodyType;
+      customize[3] = bnpcCustomizeData->height;
+      customize[4] = bnpcCustomizeData->tribe;
+      customize[5] = bnpcCustomizeData->face;
+      customize[6] = bnpcCustomizeData->hairStyle;
+      customize[7] = bnpcCustomizeData->hairHighlight;
+      customize[8] = bnpcCustomizeData->skinColor;
+      customize[9] = bnpcCustomizeData->eyeHeterochromia;
+      customize[10] = bnpcCustomizeData->hairColor;
+      customize[11] = bnpcCustomizeData->hairHighlightColor;
+      customize[12] = bnpcCustomizeData->facialFeature;
+      customize[13] = bnpcCustomizeData->facialFeatureColor;
+      customize[14] = bnpcCustomizeData->eyebrows;
+      customize[15] = bnpcCustomizeData->eyeColor;
+      customize[16] = bnpcCustomizeData->eyeShape;
+      customize[17] = bnpcCustomizeData->nose;
+      customize[18] = bnpcCustomizeData->jaw;
+      customize[19] = bnpcCustomizeData->mouth;
+      customize[20] = bnpcCustomizeData->lipColor;
+      customize[21] = bnpcCustomizeData->bustOrTone1;
+      customize[22] = bnpcCustomizeData->extraFeature1;
+      customize[23] = bnpcCustomizeData->extraFeature2OrBust;
+      customize[24] = bnpcCustomizeData->facePaint;
+      customize[25] = bnpcCustomizeData->facePaintColor;
+    }
+  }
+
+  std::vector< uint32_t > models( 10 );
+  uint64_t modelMain = 0;
+  uint64_t modeloff = 0;
+  if( bnpcBaseData->npcEquip != 0 )
+  {
+    auto npcEquipData = pExdData->get< Sapphire::Data::NpcEquip >( bnpcBaseData->npcEquip );
+    if( npcEquipData )
+    {
+      modelMain = npcEquipData->modelMainHand;
+      modeloff = npcEquipData->modelOffHand;
+
+      models[0] = npcEquipData->modelHead;
+      models[1] = npcEquipData->modelBody;
+      models[2] = npcEquipData->modelHands;
+      models[3] = npcEquipData->modelLegs;
+      models[4] = npcEquipData->modelFeet;
+      models[5] = npcEquipData->modelEars;
+      models[6] = npcEquipData->modelNeck;
+      models[7] = npcEquipData->modelWrists;
+      models[8] = npcEquipData->modelLeftRing;
+      models[9] = npcEquipData->modelRightRing;
+    }
+  }
+
+  auto tmp = std::make_shared< Entity::BNpcTemplate >( 0, bnpcBaseId, nameId, modelMain, modeloff, 1, bnpcType, 0, 4,
+                                                       bnpcBaseData->modelChara, 0, &models[0], &customize[0] );
+
+  auto bnpc = std::make_shared< Entity::BNpc >( getNextActorId(), tmp, levelData->x, levelData->y, levelData->z,
+                                                levelData->yaw, level, hp, shared_from_this(), m_pFw );
+
+  bnpc->setDirectorId( directorId );
+  bnpc->setLevelId( levelId );
+  pushActor( bnpc );
+  return bnpc;
+}
+
+Sapphire::Entity::BNpcPtr Sapphire::Zone::getActiveBNpcByLevelId( uint32_t levelId )
+{
+  for( auto bnpcIt : m_bNpcMap )
+  {
+    if( bnpcIt.second->getLevelId() == levelId )
+      return bnpcIt.second;
+  }
+  return nullptr;
+}

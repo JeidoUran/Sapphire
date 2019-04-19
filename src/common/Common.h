@@ -63,6 +63,12 @@ namespace Sapphire::Common
     GmTellMsg = 0x4,
   };
 
+  enum BNpcType : uint8_t
+  {
+    Friendly = 0,
+    Enemy = 4,
+  };
+
   enum ObjKind : uint8_t
   {
     None = 0x00,
@@ -970,6 +976,13 @@ namespace Sapphire::Common
     HP,
     ELMT,
     THREAT
+  };
+
+  enum CastType : uint8_t
+  {
+    SingleTarget = 1,
+    CircularAOE = 2,
+    RectangularAOE = 4,
   };
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;

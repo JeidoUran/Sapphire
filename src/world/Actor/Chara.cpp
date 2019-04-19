@@ -37,7 +37,8 @@ Sapphire::Entity::Chara::Chara( ObjKind type, FrameworkPtr pFw ) :
   Actor( type ),
   m_pose( 0 ),
   m_targetId( INVALID_GAME_OBJECT_ID64 ),
-  m_pFw( std::move( std::move( pFw ) ) )
+  m_pFw( std::move( std::move( pFw ) ) ),
+  m_directorId( 0 )
 {
 
   m_lastTickTime = 0;
@@ -82,6 +83,11 @@ Sapphire::Entity::Chara::ActorStats Sapphire::Entity::Chara::getStats() const
 uint32_t Sapphire::Entity::Chara::getHp() const
 {
   return m_hp;
+}
+
+uint32_t Sapphire::Entity::Chara::getHpPercent() const
+{
+  return ( m_hp * 100 ) / m_maxHp;
 }
 
 /*! \return current MP */
@@ -185,6 +191,13 @@ void Sapphire::Entity::Chara::setGp( uint32_t gp )
   sendStatusUpdate();
 }
 
+/*! \param tp amount to set*/
+void Sapphire::Entity::Chara::setTp( uint32_t tp )
+{
+  m_tp = tp;
+  sendStatusUpdate();
+}
+
 /*! \param type invincibility type to set */
 void Sapphire::Entity::Chara::setInvincibilityType( Common::InvincibilityType type )
 {
@@ -281,16 +294,16 @@ bool Sapphire::Entity::Chara::checkAction()
 
 }
 
-void Sapphire::Entity::Chara::update( int64_t currTime )
+void Sapphire::Entity::Chara::update( uint64_t tickCount )
 {
-  if( std::difftime( currTime, m_lastTickTime ) > 3000 )
+  if( std::difftime( tickCount, m_lastTickTime ) > 3000 )
   {
     onTick();
 
-    m_lastTickTime = currTime;
+    m_lastTickTime = tickCount;
   }
 
-  m_lastUpdate = currTime;
+  m_lastUpdate = tickCount;
 }
 
 /*!
@@ -682,4 +695,14 @@ uint32_t Sapphire::Entity::Chara::getLastComboActionId() const
   }
 
   return m_lastComboActionId;
+}
+
+uint32_t Sapphire::Entity::Chara::getDirectorId() const
+{
+  return m_directorId;
+}
+
+void Sapphire::Entity::Chara::setDirectorId( uint32_t directorId )
+{
+  m_directorId = directorId;
 }

@@ -14,6 +14,7 @@
 
 #include "Manager/HousingMgr.h"
 #include "Manager/TerritoryMgr.h"
+#include "Manager/RNGMgr.h"
 
 #include "Territory/Zone.h"
 #include "Territory/ZonePosition.h"
@@ -581,6 +582,9 @@ bool Sapphire::Entity::Player::exitInstance()
 
   auto pZone = getCurrentZone();
   auto pInstance = pZone->getAsInstanceContent();
+
+  resetHp();
+  resetMp();
 
   // check if housing zone
   if( pTeriMgr->isHousingTerritory( m_prevTerritoryTypeId ) )
@@ -1156,10 +1160,10 @@ void Sapphire::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
                       true );
 }
 
-void Sapphire::Entity::Player::update( int64_t currTime )
+void Sapphire::Entity::Player::update( uint64_t tickCount )
 {
   // a zoning is pending, lets do it
-  if( m_queuedZoneing && ( currTime - m_queuedZoneing->m_queueTime ) > 800 )
+  if( m_queuedZoneing && ( tickCount - m_queuedZoneing->m_queueTime ) > 800 )
   {
     Common::FFXIVARR_POSITION3 targetPos = m_queuedZoneing->m_targetPosition;
     if( getCurrentZone()->getTerritoryTypeId() != m_queuedZoneing->m_targetZone )
@@ -1189,7 +1193,7 @@ void Sapphire::Entity::Player::update( int64_t currTime )
 
   updateStatusEffects();
 
-  m_lastUpdate = currTime;
+  m_lastUpdate = tickCount;
 
   if( !checkAction() )
   {
@@ -1217,9 +1221,9 @@ void Sapphire::Entity::Player::update( int64_t currTime )
                               actor->getPos().x, actor->getPos().y, actor->getPos().z ) <= range )
           {
 
-            if( ( currTime - m_lastAttack ) > mainWeap->getDelay() )
+            if( ( tickCount - m_lastAttack ) > mainWeap->getDelay() )
             {
-              m_lastAttack = currTime;
+              m_lastAttack = tickCount;
               autoAttack( actor->getAsChara() );
             }
 
@@ -1229,7 +1233,7 @@ void Sapphire::Entity::Player::update( int64_t currTime )
     }
   }
 
-  Chara::update( currTime );
+  Chara::update( tickCount );
 }
 
 void Sapphire::Entity::Player::onMobKill( uint16_t nameId )
@@ -1658,8 +1662,11 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
   //uint64_t tick = Util::getTimeMs();
   //srand(static_cast< uint32_t >(tick));
 
-  uint32_t damage = static_cast< uint32_t >( mainWeap->getAutoAttackDmg() );
-  uint32_t variation = 0 + rand() % 3;
+  auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
+  auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 0, 3 ).next() );
+
+  auto damage = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( static_cast< uint32_t > ( getLevel() * 1.5f ),
+                                         getLevel() + static_cast< uint32_t >( mainWeap->getAutoAttackDmg() * 2 ) ).next() );
 
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
@@ -1670,6 +1677,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     entry.value = damage;
     entry.effectType = Common::ActionEffectType::Damage;
     entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+    entry.param = variation;
 
     effectPacket->addEffect( entry );
 
@@ -2152,13 +2160,24 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
 
   bool logChanged = false;
 
+  // make sure we get the matching base-class if a job is being used
+  auto currentClass = static_cast< uint8_t >( getClass() );
+  auto classJobInfo = pExdData->get< Sapphire::Data::ClassJob >( currentClass );
+  if( !classJobInfo )
+    return;
+
   bool allSectionsComplete = true;
   for( int i = 1; i <= 10; ++i )
   {
     bool sectionComplete = true;
     bool sectionChanged = false;
-    uint32_t monsterNoteId = static_cast< uint32_t >( ( static_cast< uint8_t >( getClass() ) ) * 10000 + logEntry.rank * 10 + i );
+    uint32_t monsterNoteId = static_cast< uint32_t >( classJobInfo->classJobParent * 10000 + logEntry.rank * 10 + i );
     auto note = pExdData->get< Sapphire::Data::MonsterNote >( monsterNoteId );
+
+    // for classes that don't have entries, if the first fails the rest will fail
+    if( !note )
+      break;
+
     for( auto x = 0; x < 4; ++x )
     {
       auto note1 = pExdData->get< Sapphire::Data::MonsterNoteTarget >( note->monsterNoteTarget[ x ] );
@@ -2194,6 +2213,13 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
                                         static_cast< uint8_t >( getClass() ), logEntry.rank + 1, 0 ) );
     }
   }
-  sendHuntingLog();
+
+  if( logChanged )
+    sendHuntingLog();
+}
+
+Sapphire::World::SessionPtr Sapphire::Entity::Player::getSession()
+{
+  return m_pSession;
 }
 

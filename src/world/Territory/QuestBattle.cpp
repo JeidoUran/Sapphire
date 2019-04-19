@@ -12,6 +12,8 @@
 
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
+#include "Actor/BNpc.h"
+#include "Actor/BNpcTemplate.h"
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -40,7 +42,6 @@ Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle
   m_questBattleId( questBattleId ),
   m_state( Created ),
   m_instanceCommenceTime( 0 )
- // m_currentBgm( pInstanceConfiguration->bGM )
 {
 
 }
@@ -51,12 +52,6 @@ bool Sapphire::QuestBattle::init()
   pScriptMgr->onInstanceInit( getAsQuestBattle() );
 
   return true;
-}
-
-
-Sapphire::QuestBattle::~QuestBattle()
-{
-
 }
 
 uint32_t Sapphire::QuestBattle::getQuestBattleId() const
@@ -79,10 +74,7 @@ void Sapphire::QuestBattle::onPlayerZoneIn( Entity::Player& player )
   // mark player as "bound by duty"
   player.setStateFlag( PlayerStateFlag::BoundByDuty );
 
-  // if the instance was not started yet, director init is sent on enter event.
-  // else it will be sent on finish loading.
-  if( m_state == Created )
-    sendDirectorInit( player );
+  sendDirectorInit( player );
 
 }
 
@@ -101,14 +93,16 @@ void Sapphire::QuestBattle::onEnterSceneFinish( Entity::Player& player )
   setSequence( 2 );
 }
 
-void Sapphire::QuestBattle::onUpdate( uint32_t currTime )
+void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
 {
+  if( !m_pPlayer )
+    return;
+
   switch( m_state )
   {
     case Created:
     {
-      if( !m_pPlayer )
-        return;
+
 
       if( !m_pPlayer->isLoadingComplete() ||
           !m_pPlayer->isDirectorInitialized() ||
@@ -125,6 +119,8 @@ void Sapphire::QuestBattle::onUpdate( uint32_t currTime )
         return;
 
       onEnterSceneFinish( *m_pPlayer );
+      auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+      pScriptMgr->onDutyCommence( *this, *m_pPlayer );
 
       m_state = DutyInProgress;
       m_instanceExpireTime = Util::getTimeSeconds() + ( m_pBattleDetails->timeLimit * 60u );
@@ -135,16 +131,31 @@ void Sapphire::QuestBattle::onUpdate( uint32_t currTime )
       break;
 
     case DutyInProgress:
-    {
+      updateBNpcs( tickCount );
       break;
-    }
 
     case DutyFinished:
       break;
+
+    case DutyFailed:
+    {
+      if( getSequence() != 0xFE )
+      {
+        setSequence( 0xFE );
+        m_instanceFailTime = tickCount;
+      }
+
+      if( ( static_cast< int64_t >( tickCount ) - static_cast< int64_t >( m_instanceFailTime ) ) > 6000 )
+      {
+        m_pPlayer->exitInstance();
+        m_pPlayer.reset();
+      }
+      break;
+    }
   }
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceUpdate( getAsQuestBattle(), currTime );
+  pScriptMgr->onInstanceUpdate( getAsQuestBattle(), tickCount );
 }
 
 void Sapphire::QuestBattle::onFinishLoading( Entity::Player& player )
@@ -247,7 +258,6 @@ void Sapphire::QuestBattle::setBranch( uint8_t value )
 {
   setDirectorBranch( value );
   sendDirectorVars( *m_pPlayer );
-
 }
 
 void Sapphire::QuestBattle::startQte()
@@ -325,14 +335,6 @@ Sapphire::QuestBattle::onEnterTerritory( Entity::Player& player, uint32_t eventI
 {
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onInstanceEnterTerritory( getAsQuestBattle(), player, eventId, param1, param2 );
-
-  // TODO: this may or may not be correct for questbattles
-  player.playScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
-                                        HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
-                                        DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
-                                        // todo: wtf is 0x00100000
-                                        DISABLE_CANCEL_EMOTE, 0 );
-
 }
 
 void Sapphire::QuestBattle::clearDirector( Entity::Player& player )
@@ -342,4 +344,51 @@ void Sapphire::QuestBattle::clearDirector( Entity::Player& player )
   player.setDirectorInitialized( false );
   // remove "bound by duty" state
   player.unsetStateFlag( PlayerStateFlag::BoundByDuty );
+}
+
+void Sapphire::QuestBattle::success()
+{
+  //m_state = DutyFinished;
+  m_pPlayer->eventStart( m_pPlayer->getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
+  m_pPlayer->playScene( getDirectorId(), 60001, 0x40000,
+    [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    {
+      player.eventFinish( getDirectorId(), 1 );
+      player.eventStart( player.getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
+      player.playScene( getDirectorId(), 6, HIDE_HOTBAR | NO_DEFAULT_CAMERA,
+                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                        {
+                          player.eventFinish( getDirectorId(), 1 );
+                          auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+                          pScriptMgr->onDutyComplete( getAsQuestBattle(), *m_pPlayer );
+                          player.exitInstance();
+                        } );
+
+    } );
+}
+
+void Sapphire::QuestBattle::fail()
+{
+  m_state = DutyFailed;
+}
+
+uint32_t Sapphire::QuestBattle::getQuestId() const
+{
+  return m_pBattleDetails->quest;
+}
+
+uint32_t Sapphire::QuestBattle::getCountEnemyBNpc()
+{
+  uint32_t count = 0;
+  for( auto bnpcIt : m_bNpcMap )
+  {
+    if( bnpcIt.second->getEnemyType() == 4 && bnpcIt.second->isAlive() )
+      count++;
+  }
+  return count;
+}
+
+Sapphire::Entity::PlayerPtr Sapphire::QuestBattle::getPlayerPtr()
+{
+  return m_pPlayer;
 }

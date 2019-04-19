@@ -183,6 +183,7 @@ void Sapphire::Entity::Player::updateModels( GearSetSlot equipSlotId, const Sapp
       auto modelSlot = equipSlotToModelSlot( equipSlotId );
       if( modelSlot == GearModelSlot::ModelInvalid )
         break;
+
       model = model | stain << 24;
       m_modelEquip[ static_cast< uint8_t >( modelSlot ) ] = static_cast< uint32_t >( model );
       break;

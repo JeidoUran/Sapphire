@@ -21,7 +21,6 @@ namespace Sapphire
 
   class ZonePosition;
 
-  using SessionSet = std::set< World::SessionPtr >;
   using FestivalPair = std::pair< uint16_t, uint16_t >;
 
   namespace Data
@@ -45,13 +44,14 @@ namespace Sapphire
     std::unordered_map< int32_t, Entity::BNpcPtr > m_bNpcMap;
     std::unordered_map< int32_t, Entity::EventObjectPtr > m_eventObjects;
 
-    SessionSet m_sessionSet;
-
     Common::Weather m_currentWeather;
     Common::Weather m_weatherOverride;
     std::map< uint8_t, int32_t > m_weatherRateMap;
 
     int64_t m_lastMobUpdate;
+    int64_t m_lastUpdate;
+
+    uint64_t m_lastActivityTime;
 
     FestivalPair m_currentFestival;
 
@@ -84,6 +84,8 @@ namespace Sapphire
 
     std::shared_ptr< Data::TerritoryType > getTerritoryTypeInfo() const;
 
+    uint64_t getLastActivityTime() const;
+
     virtual bool init();
 
     virtual void loadCellCache();
@@ -102,7 +104,7 @@ namespace Sapphire
 
     virtual void onLeaveTerritory( Entity::Player& player );
 
-    virtual void onUpdate( uint32_t currTime );
+    virtual void onUpdate( uint64_t tickCount );
 
     virtual void onRegisterEObj( Entity::EventObjectPtr object ) {};
 
@@ -147,16 +149,19 @@ namespace Sapphire
     bool loadSpawnGroups();
 
     bool checkWeather();
-    void updateBNpcs( int64_t tickCount );
+    void updateBNpcs( uint64_t tickCount );
 
-    bool update( uint32_t currTime );
+    bool update( uint64_t tickCount );
 
-    void updateSessions( bool changedWeather );
+    void updateSessions( uint64_t tickCount, bool changedWeather );
 
     Entity::EventObjectPtr registerEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
                                          uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale, float rotation );
 
     void registerEObj( Entity::EventObjectPtr object );
+    Entity::BNpcPtr createBNpcFromLevelEntry( uint32_t levelId, uint8_t level, uint8_t type,
+                                              uint32_t hp, uint16_t nameId, uint32_t directorId, uint8_t bnpcType );
+    Entity::BNpcPtr getActiveBNpcByLevelId( uint32_t levelId );
 
     Entity::EventObjectPtr getEObj( uint32_t objId );
 

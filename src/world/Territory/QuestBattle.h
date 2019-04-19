@@ -23,7 +23,7 @@ namespace Sapphire
                  uint32_t questBattleId,
                  FrameworkPtr pFw );
 
-    virtual ~QuestBattle();
+    virtual ~QuestBattle() = default;
 
     bool init() override;
 
@@ -39,7 +39,7 @@ namespace Sapphire
 
     void onDirectorSync( Entity::Player& player ) override;
 
-    void onUpdate( uint32_t currTime ) override;
+    void onUpdate( uint64_t tickCount ) override;
 
     void onTalk( Entity::Player& player, uint32_t eventId, uint64_t actorId );
 
@@ -61,6 +61,13 @@ namespace Sapphire
 
     void endEventCutscene();
 
+    uint32_t getQuestId() const;
+
+    void fail();
+    void success();
+
+    uint32_t getCountEnemyBNpc();
+
     void clearDirector( Entity::Player& player );
 
     Event::Director::DirectorState getState() const;
@@ -74,13 +81,16 @@ namespace Sapphire
     /*! number of milliseconds after all players are ready for the instance to commence (spawn circle removed) */
     const uint32_t instanceStartDelay = 1250;
 
+    Entity::PlayerPtr getPlayerPtr();
+
   private:
     std::shared_ptr< Sapphire::Data::QuestBattle > m_pBattleDetails;
     uint32_t m_questBattleId;
     Event::Director::DirectorState m_state;
 
-    int64_t m_instanceExpireTime;
+    uint64_t m_instanceExpireTime;
     uint64_t m_instanceCommenceTime;
+    uint64_t m_instanceFailTime;
 
     std::map< std::string, Entity::EventObjectPtr > m_eventObjectMap;
     std::unordered_map< uint32_t, Entity::EventObjectPtr > m_eventIdToObjectMap;
