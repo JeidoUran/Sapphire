@@ -6,6 +6,7 @@
 #include "Territory/Zone.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
+#include "Territory/PublicContent.h"
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
 #include "ServerMgr.h"
@@ -436,13 +437,13 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceInit( InstanceContentPtr instance
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContentPtr instance, uint32_t currTime )
+bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContentPtr instance, uint64_t tickCount )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
 
   if( script )
   {
-    script->onUpdate( *instance, currTime );
+    script->onUpdate( *instance, tickCount );
     return true;
   }
 
@@ -486,13 +487,27 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceInit( QuestBattlePtr instance )
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( QuestBattlePtr instance, uint32_t currTime )
+bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( QuestBattlePtr instance, uint64_t tickCount )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance->getDirectorId() );
 
   if( script )
   {
-    script->onUpdate( *instance, currTime );
+    script->onUpdate( *instance, tickCount );
+    return true;
+  }
+
+  return false;
+}
+
+
+bool Sapphire::Scripting::ScriptMgr::onDutyCommence( QuestBattle& instance, Entity::Player& player )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
+
+  if( script )
+  {
+    script->onDutyCommence( instance, player );
     return true;
   }
 
@@ -512,7 +527,70 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( QuestBattlePtr in
   return false;
 }
 
+bool Sapphire::Scripting::ScriptMgr::onPlayerSetup( PublicContent& instance, Entity::Player& player )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::PublicContentScript >( instance.getDirectorId() );
+  if( script )
+  {
+    script->onPlayerSetup( instance, player );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onInstanceInit( PublicContentPtr instance )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::PublicContentScript >( instance->getDirectorId() );
+  if( script )
+  {
+    script->onInit( *instance );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( PublicContentPtr instance, uint32_t currTime )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::PublicContentScript >( instance->getDirectorId() );
+
+  if( script )
+  {
+    script->onUpdate( *instance, currTime );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( PublicContentPtr instance, Entity::Player& player,
+                                                               uint32_t eventId, uint16_t param1, uint16_t param2 )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::PublicContentScript >( instance->getDirectorId() );
+  if( script )
+  {
+    script->onEnterTerritory( *instance, player, eventId, param1, param2 );
+    return true;
+  }
+
+  return false;
+}
+
 Sapphire::Scripting::NativeScriptMgr& Sapphire::Scripting::ScriptMgr::getNativeScriptHandler()
 {
   return *m_nativeScriptMgr;
+}
+
+bool
+Sapphire::Scripting::ScriptMgr::onDutyComplete( Sapphire::QuestBattlePtr instance, Sapphire::Entity::Player& player )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance->getDirectorId() );
+  if( script )
+  {
+    script->onDutyComplete( *instance, player );
+    return true;
+  }
+
+  return false;
 }

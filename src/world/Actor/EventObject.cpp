@@ -1,6 +1,7 @@
 #include "EventObject.h"
 
 #include "Territory/InstanceContent.h"
+#include "Territory/PublicContent.h"
 #include "Actor/Player.h"
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"

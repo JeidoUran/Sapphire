@@ -1,5 +1,6 @@
 #include <Actor/Player.h>
 #include "Manager/EventMgr.h"
+#include "Manager/TerritoryMgr.h"
 #include <ScriptObject.h>
 #include "Framework.h"
 
@@ -64,9 +65,36 @@ class ManFst005 : public Sapphire::ScriptAPI::EventScript
      auto actor = pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
      if( actor == Actor0 )
-       Scene00000( player );
+     {
+       if( !player.hasQuest( eventId ) )
+       {
+         Scene00000( player );
+       }
+       else
+       {
+         Scene00009( player );
+       }
+     }
+
      if( actor == Eobject0 )
        Scene00002( player );
+     if( actor == Eobject1 )
+     {
+       player.eventActionStart( getId(), EventActionProcessShor,
+                                [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                {
+                                  player.updateQuest( getId(), SeqFinish );
+                                },
+                                nullptr, getId() );
+     }
+   }
+
+   void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
+   {
+     if( player.getQuestSeq( eventId ) == Seq2 )
+     {
+       Scene00005( player );
+     }
    }
 
    private:
@@ -114,7 +142,11 @@ class ManFst005 : public Sapphire::ScriptAPI::EventScript
                        {
                          if( result.param2 == 1 )
                          {
-                           // enter instance
+                           auto pTeriMgr = framework()->get< Sapphire::World::Manager::TerritoryMgr >();
+                           if( !pTeriMgr )
+                             return;
+                           player.eventFinish( result.eventId, 0 );
+                           pTeriMgr->createAndJoinQuestBattle( player, Questbattle0 );
                          }
                        } );
    }
@@ -129,9 +161,14 @@ class ManFst005 : public Sapphire::ScriptAPI::EventScript
 
    void Scene00005( Entity::Player& player )
    {
-     player.playScene( getId(), 5, HIDE_HOTBAR,
+     player.playScene( getId(), 5, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
+                                   HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                                   DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
+                                   // todo: wtf is 0x00100000
+                                   DISABLE_CANCEL_EMOTE,
                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
                        {
+                         player.updateQuest( result.eventId, Seq3 );
                        } );
    }
 
@@ -164,14 +201,20 @@ class ManFst005 : public Sapphire::ScriptAPI::EventScript
      player.playScene( getId(), 9, HIDE_HOTBAR,
                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
                        {
+                         Scene00010( player );
                        } );
    }
 
    void Scene00010( Entity::Player& player )
    {
-     player.playScene( getId(), 10, HIDE_HOTBAR,
+     player.playScene( getId(), 10, FADE_OUT | HIDE_HOTBAR | CONDITION_CUTSCENE | HIDE_UI,
                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
                        {
+                         if( result.param2 == 1 )
+                           if( player.giveQuestRewards( getId(), 0 ) )
+                           {
+                             player.finishQuest( getId() );
+                           }
                        } );
    }
 

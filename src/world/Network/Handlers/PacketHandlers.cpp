@@ -620,12 +620,12 @@ void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
     return;
   }
 
-  if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BoundByDuty ) && !player.isActingAsGm() )
+/*   if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BoundByDuty ) && !player.isActingAsGm() )
   {
     // send error for player bound by duty
     // TODO: implement me
     return;
-  }
+  } */
 
   if( pTargetPlayer->getOnlineStatus() == OnlineStatus::Busy && !player.isActingAsGm() )
   {

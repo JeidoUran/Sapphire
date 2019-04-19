@@ -50,6 +50,7 @@ namespace Sapphire::Network::Packets::Server
       m_data.pos.y = bnpc.getPos().y;
       m_data.pos.z = bnpc.getPos().z;
       m_data.rotation = Util::floatToUInt16Rot( bnpc.getRot() );
+      m_data.levelId = bnpc.getLevelId();
 
       m_data.enemyType = bnpc.getEnemyType();
       m_data.mainWeaponModel = bnpc.getWeaponMain();
@@ -59,6 +60,7 @@ namespace Sapphire::Network::Packets::Server
       m_data.classJob = 0;
       m_data.currentMount = bnpc.getCurrentMount();
 
+      m_data.directorId = bnpc.getDirectorId();
       m_data.targetId = bnpc.getTargetId();
       m_data.spawnerId = Common::INVALID_GAME_OBJECT_ID64;
       m_data.parentActorId = Common::INVALID_GAME_OBJECT_ID64;

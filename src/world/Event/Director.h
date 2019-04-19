@@ -26,7 +26,9 @@ namespace Sapphire::Event
       PublicContent = 0x8004,
       QuestBattle = 0x8006,
       CompanyLeve = 0x8007,
+      TreasureHunt = 0x8009,
       GoldSaucer = 0x800A,
+      CompanyCraftDirector = 0x800B,
       DpsChallange = 0x800D,
       Fate = 0x801A
     };
@@ -36,7 +38,8 @@ namespace Sapphire::Event
       Created,
       DutyReset,
       DutyInProgress,
-      DutyFinished
+      DutyFinished,
+      DutyFailed
     };
 
     Director( DirectorType type, uint16_t contentId );
@@ -100,6 +103,9 @@ namespace Sapphire::Event
     void setDirectorSequence( uint8_t value );
 
     void setDirectorBranch( uint8_t value );
+
+    void setCustomVar( uint32_t varId, uint32_t value );
+    uint32_t getCustomVar( uint32_t varId );
 
   private:
     /*! Id of the content of the director */
@@ -177,6 +183,7 @@ namespace Sapphire::Event
 
     uint32_t m_elapsedTime;
 
+    std::unordered_map< uint32_t, uint32_t > m_customVarMap;
 
   };
 

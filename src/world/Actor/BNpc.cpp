@@ -36,6 +36,7 @@
 #include <Logging/Logger.h>
 #include <Manager/NaviMgr.h>
 #include <Manager/TerritoryMgr.h>
+#include <Manager/RNGMgr.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -61,7 +62,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_bNpcNameId = pTemplate->getBNpcNameId();
   m_bNpcBaseId = pTemplate->getBNpcBaseId();
   m_enemyType = pTemplate->getEnemyType();
-  m_currentMount = pTemplate->getCurrentMount();
+  // m_currentMount = pTemplate->getCurrentMount();
   m_pos.x = posX;
   m_pos.y = posY;
   m_pos.z = posZ;
@@ -69,6 +70,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_level = level;
   m_invincibilityType = InvincibilityNone;
   m_currentStance = Common::Stance::Passive;
+  m_levelId = 0;
 
   m_pCurrentZone = pZone;
 
@@ -163,6 +165,7 @@ uint8_t Sapphire::Entity::BNpc::getCurrentMount() const
 
 void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )
 {
+  m_lastRoamTargetReached = Util::getTimeSeconds();
   pTarget->queuePacket( std::make_shared< NpcSpawnPacket >( *this, *pTarget ) );
 }
 
@@ -342,6 +345,11 @@ void Sapphire::Entity::BNpc::hateListAdd( Sapphire::Entity::CharaPtr pChara, int
   hateEntry->m_pChara = pChara;
 
   m_hateList.insert( hateEntry );
+  if( pChara->isPlayer() )
+  {
+    auto pPlayer = pChara->getAsPlayer();
+    pPlayer->hateListAdd( getAsBNpc() );
+  }
 }
 
 void Sapphire::Entity::BNpc::hateListUpdate( Sapphire::Entity::CharaPtr pChara, int32_t hateAmount )
@@ -391,7 +399,10 @@ bool Sapphire::Entity::BNpc::hateListHasActor( Sapphire::Entity::CharaPtr pChara
 
 void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
 {
-  m_lastAttack = Util::getTimeMs();
+  auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
+  auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 50, 600 ).next() );
+
+  m_lastAttack = Util::getTimeMs() + variation;
   hateListUpdate( pChara, 1 );
 
   changeTarget( pChara->getId() );
@@ -399,11 +410,11 @@ void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
   m_state = BNpcState::Combat;
 
   sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 1, 1, 0 ) );
+  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleAggro, 1, 0, 0 ) );
 
   if( pChara->isPlayer() )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleAggro, 1, 0, 0 ) );
     tmpPlayer->onMobAggro( getAsBNpc() );
   }
 
@@ -430,7 +441,7 @@ void Sapphire::Entity::BNpc::onTick()
   }
 }
 
-void Sapphire::Entity::BNpc::update( int64_t currTime )
+void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 {
   const uint8_t minActorDistance = 4;
   const uint8_t maxDistanceToOrigin = 40;
@@ -478,7 +489,11 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
 
     case BNpcState::Idle:
     {
-      if( Util::getTimeSeconds() - m_lastRoamTargetReached > roamTick )
+      auto pHatedActor = hateListGetHighest();
+      if( pHatedActor )
+        aggro( pHatedActor );
+
+      if( !hasFlag( Immobile ) && ( Util::getTimeSeconds() - m_lastRoamTargetReached > roamTick ) )
       {
         auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
         auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getBgPath() );
@@ -520,7 +535,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
                                         pHatedActor->getPos().y,
                                         pHatedActor->getPos().z );
 
-        if( distanceOrig > maxDistanceToOrigin )
+        if( !hasFlag( NoDeaggro ) && ( distanceOrig > maxDistanceToOrigin ) )
         {
           hateListClear();
           changeTarget( INVALID_GAME_OBJECT_ID64 );
@@ -530,7 +545,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
           break;
         }
 
-        if( distance > minActorDistance )
+        if( !hasFlag( Immobile ) && ( distance > minActorDistance ) )
         {
           //auto pTeriMgr = m_pFw->get< World::Manager::TerritoryMgr >();
           //if ( ( currTime - m_lastAttack ) > 600 && pTeriMgr->isDefaultTerritory( getCurrentZone()->getTerritoryTypeId() ) )
@@ -538,7 +553,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
         }
         else
         {
-          if( face( pHatedActor->getPos() ) )
+          if( !hasFlag( TurningDisabled ) && face( pHatedActor->getPos() ) )
             sendPositionUpdate();
           // in combat range. ATTACK!
           autoAttack( pHatedActor );
@@ -555,7 +570,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
   }
 
 
-  Chara::update( currTime );
+  Chara::update( tickCount );
 }
 
 void Sapphire::Entity::BNpc::regainHp()
@@ -694,5 +709,55 @@ void Sapphire::Entity::BNpc::setOwner( Sapphire::Entity::CharaPtr m_pChara )
     setOwnerPacket->data().type = 0x01;
     setOwnerPacket->data().actorId = 0;
     sendToInRangeSet( setOwnerPacket );
+  }
+}
+
+void Sapphire::Entity::BNpc::setLevelId( uint32_t levelId )
+{
+  m_levelId = levelId;
+}
+
+uint32_t Sapphire::Entity::BNpc::getLevelId() const
+{
+  return m_levelId;
+}
+
+bool Sapphire::Entity::BNpc::hasFlag( uint32_t flag ) const
+{
+  return m_flags & flag;
+}
+
+void Sapphire::Entity::BNpc::setFlag( uint32_t flag )
+{
+  m_flags |= flag;
+}
+
+void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
+{
+
+  uint64_t tick = Util::getTimeMs();
+
+  // todo: this needs to use the auto attack delay for the equipped weapon
+  if( ( tick - m_lastAttack ) > 2500 )
+  {
+    pTarget->onActionHostile( getAsChara() );
+    m_lastAttack = tick;
+    srand( static_cast< uint32_t >( tick ) );
+
+    auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
+    auto damage = static_cast< uint16_t >( pRNGMgr->getRandGenerator< float >( m_level, m_level + m_level * 1.5f ).next() );
+
+    auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
+    effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
+    Common::EffectEntry effectEntry{};
+    effectEntry.value = damage;
+    effectEntry.effectType = ActionEffectType::Damage;
+    effectEntry.hitSeverity = ActionHitSeverityType::NormalDamage;
+    effectPacket->addEffect( effectEntry );
+
+    sendToInRangeSet( effectPacket );
+
+    pTarget->takeDamage( damage );
+
   }
 }

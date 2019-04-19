@@ -147,7 +147,7 @@ namespace Sapphire::Entity
     void onDeath() override;
 
     /*! Event called on every session iteration */
-    void update( int64_t currTime ) override;
+    void update( uint64_t tickCount ) override;
 
     /*! Event to be called upon Bnpc kill */
     void onMobKill( uint16_t nameId );
@@ -1020,6 +1020,8 @@ namespace Sapphire::Entity
 
     void updateHuntingLog( uint16_t id );
 
+    World::SessionPtr getSession();
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     uint64_t m_lastMoveTime;
@@ -1029,6 +1031,8 @@ namespace Sapphire::Entity
   private:
     uint32_t m_lastWrite;
     uint32_t m_lastPing;
+
+    World::SessionPtr m_pSession;
 
     bool m_bIsLogin;
 

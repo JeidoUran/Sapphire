@@ -225,7 +225,7 @@ namespace Sapphire::ScriptAPI
 
     virtual void onInit( Sapphire::InstanceContent& instance );
 
-    virtual void onUpdate( Sapphire::InstanceContent& instance, uint32_t currTime );
+    virtual void onUpdate( Sapphire::InstanceContent& instance, uint64_t tickCount );
 
     virtual void onEnterTerritory( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId,
                                    uint16_t param1, uint16_t param2 );
@@ -239,15 +239,38 @@ namespace Sapphire::ScriptAPI
   public:
     explicit QuestBattleScript( uint32_t questBattleId );
 
+    virtual void onDutyComplete( Sapphire::QuestBattle& instance, Entity::Player& player );
+
+    virtual void onDutyCommence( QuestBattle& instance, Entity::Player& player );
+
     virtual void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player );
 
     virtual void onInit( Sapphire::QuestBattle& instance );
 
-    virtual void onUpdate( Sapphire::QuestBattle& instance, uint32_t currTime );
+    virtual void onUpdate( Sapphire::QuestBattle& instance, uint64_t tickCount );
 
     virtual void onEnterTerritory( Sapphire::QuestBattle& instance, Sapphire::Entity::Player& player, uint32_t eventId,
                                    uint16_t param1, uint16_t param2 );
   };
+
+  /*!
+  * @brief The base class for any scripts that implement behaviour related to instance content zones
+  */
+  class PublicContentScript : public ScriptObject
+  {
+  public:
+    explicit PublicContentScript( uint32_t publicContentId );
+
+    virtual void onPlayerSetup( Sapphire::PublicContent& instance, Entity::Player& player );
+
+    virtual void onInit( Sapphire::PublicContent& instance );
+
+    virtual void onUpdate( Sapphire::PublicContent& instance, uint32_t currTime );
+
+    virtual void onEnterTerritory( Sapphire::PublicContent& instance, Sapphire::Entity::Player& player, uint32_t eventId,
+                                   uint16_t param1, uint16_t param2 );
+  };
+
 
 }
 

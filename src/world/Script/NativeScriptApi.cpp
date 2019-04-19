@@ -185,7 +185,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void InstanceContentScript::onUpdate( InstanceContent& instance, uint32_t currTime )
+  void InstanceContentScript::onUpdate( InstanceContent& instance, uint64_t tickCount )
   {
   }
 
@@ -201,6 +201,11 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void QuestBattleScript::onDutyComplete( Sapphire::QuestBattle& instance, Entity::Player& player )
+  {
+
+  }
+
   void QuestBattleScript::onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player )
   {
   }
@@ -209,11 +214,39 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void QuestBattleScript::onUpdate( QuestBattle& instance, uint32_t currTime )
+  void QuestBattleScript::onUpdate( QuestBattle& instance, uint64_t tickCount )
+  {
+  }
+
+  void QuestBattleScript::onDutyCommence( QuestBattle& instance, Entity::Player& player )
   {
   }
 
   void QuestBattleScript::onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId,
+                                            uint16_t param1, uint16_t param2 )
+  {
+  }
+
+  ///////////////////////////////////////////////////////////////////
+
+  PublicContentScript::PublicContentScript( uint32_t publicContentId ) :
+    ScriptObject( uint32_t{ 0x8004 } << 16 | publicContentId, typeid( PublicContentScript ).hash_code() )
+  {
+  }
+
+  void PublicContentScript::onPlayerSetup( Sapphire::PublicContent& instance, Entity::Player& player )
+  {
+  }
+
+  void PublicContentScript::onInit( PublicContent& instance )
+  {
+  }
+
+  void PublicContentScript::onUpdate( PublicContent& instance, uint32_t currTime )
+  {
+  }
+
+  void PublicContentScript::onEnterTerritory( PublicContent& instance, Entity::Player& player, uint32_t eventId,
                                             uint16_t param1, uint16_t param2 )
   {
   }

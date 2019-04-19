@@ -103,6 +103,8 @@ namespace Sapphire::Entity
     uint64_t m_targetId;
     /*! Ptr to a queued action */
     Action::ActionPtr m_pCurrentAction;
+    /*! id of the director this chara is assigned to */
+    uint32_t m_directorId;
 
     /*!
      * @brief the id of the last combo action used (IgnoresCombo)
@@ -187,6 +189,8 @@ namespace Sapphire::Entity
 
     uint32_t getHp() const;
 
+    uint32_t getHpPercent() const;
+
     uint32_t getMp() const;
 
     uint16_t getTp() const;
@@ -218,6 +222,8 @@ namespace Sapphire::Entity
     void setMp( uint32_t mp );
 
     void setGp( uint32_t gp );
+
+    void setTp( uint32_t tp );
 
     void setInvincibilityType( Common::InvincibilityType type );
 
@@ -251,7 +257,7 @@ namespace Sapphire::Entity
 
     virtual bool checkAction();
 
-    virtual void update( int64_t currTime );
+    virtual void update( uint64_t tickCount );
 
     Action::ActionPtr getCurrentAction() const;
 
@@ -261,6 +267,9 @@ namespace Sapphire::Entity
     void setLastComboActionId( uint32_t actionId );
 
     uint32_t getBonusStat( Common::BaseParam bonus ) const;
+
+    uint32_t getDirectorId() const;
+    void setDirectorId( uint32_t directorId );
 
   };
 

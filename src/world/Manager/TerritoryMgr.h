@@ -57,7 +57,7 @@ namespace Sapphire::World::Manager
       EventTrial = 36,
       TheFeastArea = 37,
       PrivateEventArea = 40,
-      //Eureka = 41, // wat
+      Eureka = 41, // wat
     };
 
     TerritoryMgr( FrameworkPtr pFw );
@@ -108,19 +108,23 @@ namespace Sapphire::World::Manager
 
     ZonePtr createQuestBattle( uint32_t contentFinderConditionId );
 
+    void createAndJoinQuestBattle( Entity::Player& player, uint16_t contentFinderConditionId );
+
+    ZonePtr createPublicContent( uint32_t contentFinderConditionId );
+
     ZonePtr findOrCreateHousingInterior( const Common::LandIdent landIdent );
 
     /*! removes instance by instanceId, return true if successful */
-    bool removeTerritoryInstance( uint32_t territoryTypeId );
+    bool removeTerritoryInstance( uint32_t guId );
 
     /*! returns a ZonePtr to the instance or nullptr if not found */
-    ZonePtr getInstanceZonePtr( uint32_t instanceId ) const;
+    ZonePtr getInstanceZonePtr( uint32_t guId ) const;
 
     /*! returns the cached detail of a territory, nullptr if not found */
     Data::TerritoryTypePtr getTerritoryDetail( uint32_t territoryTypeId ) const;
 
     /*! loop for processing territory logic, iterating all existing instances */
-    void updateTerritoryInstances( uint32_t currentTime );
+    void updateTerritoryInstances( uint64_t tickCount );
 
     /*! returns a ZonePositionPtr if found, else nullptr */
     ZonePositionPtr getTerritoryPosition( uint32_t territoryPositionId ) const;
@@ -165,6 +169,8 @@ namespace Sapphire::World::Manager
     using LandSetIdToZonePtrMap = std::unordered_map< uint32_t, ZonePtr >;
     using TerritoryTypeIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
     using InstanceContentIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
+    using QuestBattleIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
+    using QuestBattleIdToContentFinderCondMap = std::unordered_map< uint16_t, uint16_t >;
     using PlayerIdToInstanceIdMap = std::unordered_map< uint32_t, uint32_t >;
     using PositionMap = std::unordered_map< int32_t, ZonePositionPtr >;
     using InstanceIdList = std::vector< uint32_t >;
@@ -182,8 +188,11 @@ namespace Sapphire::World::Manager
     /*! map holding actual instances of InstanceContent */
     InstanceContentIdToInstanceMap m_instanceContentIdToInstanceMap;
 
+    /*! map holding actual instances of InstanceContent */
+    QuestBattleIdToInstanceMap m_questBattleIdToInstanceMap;
+
     /*! flat map for easier lookup of instances by guid */
-    InstanceIdToZonePtrMap m_instanceIdToZonePtrMap;
+    InstanceIdToZonePtrMap m_guIdToZonePtrMap;
 
     /*! map holding positions for zonelines */
     PositionMap m_territoryPositionMap;
@@ -208,6 +217,9 @@ namespace Sapphire::World::Manager
 
     /*! Max distance at which actors in range of a player are sent */
     float m_inRangeDistance;
+
+    /*! Map used to find a contentFinderConditionID to a questBattle */
+    QuestBattleIdToContentFinderCondMap m_questBattleToContentFinderMap;
 
   public:
     /*! returns a list of instanceContent InstanceIds currently active */

@@ -54,6 +54,11 @@ Sapphire::Common::FFXIVARR_POSITION3& Sapphire::Entity::Actor::getPos()
   return m_pos;
 }
 
+const Sapphire::Common::FFXIVARR_POSITION3& Sapphire::Entity::Actor::getPos() const
+{
+  return m_pos;
+}
+
 void Sapphire::Entity::Actor::setPos( float x, float y, float z, bool broadcastUpdate )
 {
   m_pos.x = x;
@@ -351,6 +356,15 @@ Sapphire::QuestBattlePtr Sapphire::Entity::Actor::getCurrentQuestBattle() const
 {
   if( m_pCurrentZone )
     return m_pCurrentZone->getAsQuestBattle();
+
+  return nullptr;
+}
+
+/*! \return PublicContentPtr to the current instance, nullptr if not an instance or not set */
+Sapphire::PublicContentPtr Sapphire::Entity::Actor::getCurrentPublicContent() const
+{
+  if( m_pCurrentZone )
+    return m_pCurrentZone->getAsPublicContent();
 
   return nullptr;
 }
