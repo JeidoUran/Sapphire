@@ -18,6 +18,7 @@
 #include "Zone.h"
 #include "InstanceContent.h"
 #include "QuestBattle.h"
+#include "PublicContent.h"
 #include "Manager/TerritoryMgr.h"
 
 #include "Session.h"
@@ -733,7 +734,7 @@ void Sapphire::Zone::registerEObj( Entity::EventObjectPtr object )
 
   onRegisterEObj( object );
 
-  //Logger::debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
+  Logger::debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
 Sapphire::Entity::EventObjectPtr Sapphire::Zone::getEObj( uint32_t objId )
@@ -753,6 +754,11 @@ Sapphire::InstanceContentPtr Sapphire::Zone::getAsInstanceContent()
 Sapphire::QuestBattlePtr Sapphire::Zone::getAsQuestBattle()
 {
   return std::dynamic_pointer_cast< QuestBattle, Zone >( shared_from_this() );
+}
+
+Sapphire::PublicContentPtr Sapphire::Zone::getAsPublicContent()
+{
+  return std::dynamic_pointer_cast< PublicContent, Zone >( shared_from_this() );
 }
 
 uint32_t Sapphire::Zone::getNextEObjId()

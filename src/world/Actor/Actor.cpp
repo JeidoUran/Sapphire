@@ -355,6 +355,15 @@ Sapphire::QuestBattlePtr Sapphire::Entity::Actor::getCurrentQuestBattle() const
   return nullptr;
 }
 
+/*! \return PublicContentPtr to the current instance, nullptr if not an instance or not set */
+Sapphire::PublicContentPtr Sapphire::Entity::Actor::getCurrentPublicContent() const
+{
+  if( m_pCurrentZone )
+    return m_pCurrentZone->getAsPublicContent();
+
+  return nullptr;
+}
+
 /*!
 Get the current cell of a region the actor is in
 

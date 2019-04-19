@@ -249,6 +249,25 @@ namespace Sapphire::ScriptAPI
                                    uint16_t param1, uint16_t param2 );
   };
 
+  /*!
+  * @brief The base class for any scripts that implement behaviour related to instance content zones
+  */
+  class PublicContentScript : public ScriptObject
+  {
+  public:
+    explicit PublicContentScript( uint32_t publicContentId );
+
+    virtual void onPlayerSetup( Sapphire::PublicContent& instance, Entity::Player& player );
+
+    virtual void onInit( Sapphire::PublicContent& instance );
+
+    virtual void onUpdate( Sapphire::PublicContent& instance, uint32_t currTime );
+
+    virtual void onEnterTerritory( Sapphire::PublicContent& instance, Sapphire::Entity::Player& player, uint32_t eventId,
+                                   uint16_t param1, uint16_t param2 );
+  };
+
+
 }
 
 #endif

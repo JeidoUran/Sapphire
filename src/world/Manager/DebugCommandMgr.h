@@ -68,6 +68,8 @@ namespace Sapphire::World::Manager
 
     void instance( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
+    void publicContent( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
     void questBattle( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
     void housing( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command) ;

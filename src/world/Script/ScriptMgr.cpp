@@ -6,6 +6,7 @@
 #include "Territory/Zone.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
+#include "Territory/PublicContent.h"
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
 #include "ServerMgr.h"
@@ -503,6 +504,56 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( QuestBattlePtr in
                                                                uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance->getDirectorId() );
+  if( script )
+  {
+    script->onEnterTerritory( *instance, player, eventId, param1, param2 );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onPlayerSetup( PublicContent& instance, Entity::Player& player )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::PublicContentScript >( instance.getDirectorId() );
+  if( script )
+  {
+    script->onPlayerSetup( instance, player );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onInstanceInit( PublicContentPtr instance )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::PublicContentScript >( instance->getDirectorId() );
+  if( script )
+  {
+    script->onInit( *instance );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( PublicContentPtr instance, uint32_t currTime )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::PublicContentScript >( instance->getDirectorId() );
+
+  if( script )
+  {
+    script->onUpdate( *instance, currTime );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( PublicContentPtr instance, Entity::Player& player,
+                                                               uint32_t eventId, uint16_t param1, uint16_t param2 )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::PublicContentScript >( instance->getDirectorId() );
   if( script )
   {
     script->onEnterTerritory( *instance, player, eventId, param1, param2 );
