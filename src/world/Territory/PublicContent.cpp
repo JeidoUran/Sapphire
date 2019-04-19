@@ -92,7 +92,7 @@ void Sapphire::PublicContent::onLeaveTerritory( Entity::Player& player )
   clearDirector( player );
 }
 
-void Sapphire::PublicContent::onUpdate( uint32_t currTime )
+void Sapphire::PublicContent::onUpdate( uint64_t tickCount )
 {
   switch( m_state )
   {
@@ -152,7 +152,7 @@ void Sapphire::PublicContent::onUpdate( uint32_t currTime )
   }
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceUpdate( getAsPublicContent(), currTime );
+  pScriptMgr->onInstanceUpdate( getAsPublicContent(), tickCount );
 }
 
 void Sapphire::PublicContent::onFinishLoading( Entity::Player& player )

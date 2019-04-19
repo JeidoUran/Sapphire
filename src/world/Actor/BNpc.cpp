@@ -62,7 +62,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_bNpcNameId = pTemplate->getBNpcNameId();
   m_bNpcBaseId = pTemplate->getBNpcBaseId();
   m_enemyType = pTemplate->getEnemyType();
-  m_currentMount = pTemplate->getCurrentMount();
+  // m_currentMount = pTemplate->getCurrentMount();
   m_pos.x = posX;
   m_pos.y = posY;
   m_pos.z = posZ;

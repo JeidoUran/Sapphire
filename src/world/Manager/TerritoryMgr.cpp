@@ -388,7 +388,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createPublicContent( u
   pZone->init();
 
   m_instanceContentIdToInstanceMap[ publicContentId ][ pZone->getGuId() ] = pZone;
-  m_instanceIdToZonePtrMap[ pZone->getGuId() ] = pZone;
+  m_guIdToZonePtrMap[pZone->getGuId()] = pZone;
   m_instanceZoneSet.insert( pZone );
 
   return pZone;
