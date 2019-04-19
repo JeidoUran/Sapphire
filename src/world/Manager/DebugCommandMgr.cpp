@@ -68,7 +68,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "publiccontent", &DebugCommandMgr::publicContent, "PublicContent utilities", 1 );
   registerCommand( "pc", &DebugCommandMgr::publicContent, "PublicContent utilities", 1 );
   registerCommand( "questbattle", &DebugCommandMgr::questBattle, "QuestBattle utilities", 1 );
-  registerCommand( "qb", &DebugCommandMgr::questBattle, "Quest battle utilities", 1 );
+  registerCommand( "qb", &DebugCommandMgr::questBattle, "QuestBattle utilities", 1 );
   registerCommand( "housing", &DebugCommandMgr::housing, "Housing utilities", 1 );
   registerCommand( "status", &DebugCommandMgr::status, "StatusEffect management.", 1 );
   registerCommand( "random", &DebugCommandMgr::random, "Rolls a random number.", 1 );
@@ -77,7 +77,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "action", &DebugCommandMgr::action, "Displays an action's animation.", 1 );
   registerCommand( "rp", &DebugCommandMgr::rp, "RP management.", 1 );
   registerCommand( "rpevent", &DebugCommandMgr::rpevent, "Commands for specific RP events.", 1 );
-  registerCommand( "ely", &DebugCommandMgr::ely, "Oui c'est parcequ'en fait cette commande sert à rien.", 1 );
+  registerCommand( "ely", &DebugCommandMgr::ely, "Oui mais c'est parcequ'en fait cette commande sert à rien.", 1 );
 }
 
 // clear all loaded commands
