@@ -91,7 +91,6 @@ namespace Sapphire::Network::Packets::Server
       memset( m_data.discovery, 0xFF, sizeof( m_data.discovery ) );
       memset( m_data.howto, 0xFF, sizeof( m_data.howto ) );
       memset( m_data.minions, 0xFF, sizeof( m_data.minions ) );
-      memset( m_data.watchedCutscenes, 0xFF, sizeof( m_data.watchedCutscenes ) );
       memset( m_data.aetherCurrentMask, 0xFF, sizeof( m_data.aetherCurrentMask ) );
       memset( m_data.orchestrionMask, 0xFF, sizeof( m_data.orchestrionMask ) );
       memset( m_data.sightseeingMask, 0xFF, sizeof( m_data.sightseeingMask ) );
