@@ -77,6 +77,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "action", &DebugCommandMgr::action, "Displays an action's animation.", 1 );
   registerCommand( "rp", &DebugCommandMgr::rp, "RP management.", 1 );
   registerCommand( "rpevent", &DebugCommandMgr::rpevent, "Commands for specific RP events.", 1 );
+  registerCommand( "enemy", &DebugCommandMgr::enemy, "Commands to turn a player into an enemy.", 1 );
   registerCommand( "ely", &DebugCommandMgr::ely, "Oui mais c'est parcequ'en fait cette commande sert à rien.", 1 );
 }
 
@@ -401,15 +402,6 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     }
     player.sendNotice( 0, "Target player model set to {0}.", modelId );
   }
-  else if( subCommand == "modelequip" )
-  {
-  // auto equipPacket = std::make_shared< ModelEquipPacket >( player.getAsPlayer() );
-  // equipPacket->data().mainWeapon = 0xFD08010002007600;
-  // equipPacket->data().offWeapon = player.getModelSubWeapon();
-  // player.sendToInRangeSet( equipPacket, true );
-  player.setModelMainWeapon( 0x00650001003C05DD );
-  player.sendModel();
-  }
   else if( subCommand == "name" )
   {
     char name[34];
@@ -431,100 +423,6 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       player.sendToInRangeSet( makeActorControl142( player.getId(), 407, 140, 0, 0, 0, 32515 ), true );
     if( params == "2" )
       player.sendToInRangeSet( makeActorControl142( player.getId(), 407, 141, 0, 0, 0, 32515 ), true );
-  }
-  else if( subCommand == "enemy" )
-  {
-    if ( player.isActingAsEnemy() == false )
-    {
-      // player.isActingAsEnemy( true );
-      player.setModelType( 2 );
-      player.setSubType( 5 );
-      player.setEnemyType( 4 );
-      auto inRange = player.getInRangeActors( true );
-      for( auto actor : inRange )
-      {
-        if( actor->isPlayer() )
-        {
-          player.despawn( actor->getAsPlayer() );
-          player.spawn( actor->getAsPlayer() );
-        }
-      }
-      player.sendNotice( 0, "Player respawned as an enemy." );
-      return;
-    }
-    else
-    {
-      // player.isActingAsEnemy( false );
-      player.setModelType( 1 );
-      player.setSubType( 0 );
-      player.setEnemyType( 0 );
-      player.setbNPCName( 0 );
-      player.setbNPCBase( 0 );
-      auto inRange = player.getInRangeActors( true );
-      for( auto actor : inRange )
-      {
-        if( actor->isPlayer() )
-        {
-          player.despawn( actor->getAsPlayer() );
-          player.spawn( actor->getAsPlayer() );
-        }
-      }
-      player.sendNotice( 0, "Player respawned as a regular player." );
-      return;
-    }
-  }
-  else if( subCommand == "bnpcname" )
-  {
-    auto pExdData = framework()->get< Data::ExdDataGenerated >();
-    uint32_t nameId;
-    sscanf( params.c_str(), "%u", &nameId );
-    if ( !pExdData->get< Sapphire::Data::BNpcName > ( nameId ) )
-    {
-      player.sendUrgent ( "{0} is not a valid BNpcName ID.", nameId );
-      return;
-    }
-    player.setbNPCName( nameId );
-    auto inRange = player.getInRangeActors( true );
-    for( auto actor : inRange )
-    {
-      if( actor->isPlayer() )
-      {
-        player.despawn( actor->getAsPlayer() );
-        player.spawn( actor->getAsPlayer() );
-      }
-    }
-    player.sendNotice( 0, "BNPCName set to {0} ({1}).", nameId, pExdData->get< Sapphire::Data::BNpcName >( nameId )->singular );
-  }
-  
-  else if( subCommand == "bnpcbase" )
-  {
-    uint32_t baseId;
-    sscanf( params.c_str(), "%u", &baseId );
-    player.setbNPCBase( baseId );
-    auto inRange = player.getInRangeActors( true );
-    for( auto actor : inRange )
-    {
-      if( actor->isPlayer() )
-      {
-        player.despawn( actor->getAsPlayer() );
-        player.spawn( actor->getAsPlayer() );
-      }
-    }
-    player.sendNotice( 0, "BNPCBase set to {0}.", baseId );
-  }
-  
-  else if( subCommand == "odinbase" )
-  {
-    player.setbNPCBase( 882 );
-    auto inRange = player.getInRangeActors( true );
-    for( auto actor : inRange )
-    {
-      if( actor->isPlayer() )
-      {
-        player.despawn( actor->getAsPlayer() );
-        player.spawn( actor->getAsPlayer() );
-      }
-    }
   }
   
   else if( subCommand == "mount" )
@@ -2509,7 +2407,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
     else if ( params == "4r" )
       targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 2016247826, 33556, 4, 14, 0 ), true );
   }
-  if( subCommand == "adsglow" )
+  else if( subCommand == "adsglow" )
   {
     if ( params == "0" )
       player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 0, 32530 ), true );
@@ -2518,7 +2416,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
     else if ( params == "2" )
       player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 2, 0 ), true );
   }
-  if( subCommand == "afterimage" )
+  else if( subCommand == "afterimage" )
   {
     if ( params == "swap" )
     {
@@ -2549,13 +2447,228 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
     player.sendToInRangeSet( effectPacket, true );
     targetActor->getAsPlayer()->sendToInRangeSet( effectPacket2, true );
     }
-    else if ( params == "1" )
-      player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 1, 32530 ), true );
-    else if ( params == "2" )
-      player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 2, 0 ), true );
   }
-
+  else if( subCommand == "khowep" )
+  {
+    if ( params == "rdm" )
+    {
+      player.setModelMainWeapon( 0x00000001002008FD );
+      player.setModelSubWeapon( 0x000000010019092F );
+      player.sendModel();
+    }
+    else if ( params == "blu" )
+    {
+      player.setModelMainWeapon( 0x00000000100010961 );
+      player.setModelSubWeapon( 0 );
+      player.sendModel();
+    }
+  }
+  else
+  {
+    player.sendUrgent( "{0} is not a valid rpevent command.", subCommand );
+  }
 }
+
+
+void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+{
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto pTerriMgr = framework()->get< TerritoryMgr >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  std::string subCommand = "";
+  std::string params = "";
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+  std::size_t pos = tmpCommand.find_first_of( " " );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+  Logger::debug( "[{0}] Command: enemy subCommand: {1} params: {2}", player.getId(), subCommand, params );
+  if( subCommand == "set" )
+  {
+    if ( player.isActingAsEnemy() == false )
+    {
+      // player.isActingAsEnemy( true );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          player.despawn( actor->getAsPlayer() );
+          player.spawn( actor->getAsPlayer() );
+        }
+      }
+      player.sendNotice( 0, "Player respawned as an enemy." );
+      return;
+    }
+    else
+    {
+      // player.isActingAsEnemy( false );
+      player.setModelType( 1 );
+      player.setSubType( 0 );
+      player.setEnemyType( 0 );
+      player.setbNPCName( 0 );
+      player.setbNPCBase( 0 );
+      auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          player.despawn( actor->getAsPlayer() );
+          player.spawn( actor->getAsPlayer() );
+        }
+      }
+      player.sendNotice( 0, "Player respawned as a regular player." );
+      return;
+    }
+  }
+  if( subCommand == "friendly" )
+  {
+    if ( player.isActingAsEnemy() == false )
+    {
+      // player.isActingAsEnemy( true );
+      player.setModelType( 2 );
+      player.setSubType( 2 );
+      player.setEnemyType( 0 );
+      auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          player.despawn( actor->getAsPlayer() );
+          player.spawn( actor->getAsPlayer() );
+        }
+      }
+      player.sendNotice( 0, "Player respawned as an enemy." );
+      return;
+    }
+    else
+    {
+      // player.isActingAsEnemy( false );
+      player.setModelType( 1 );
+      player.setSubType( 0 );
+      player.setEnemyType( 0 );
+      player.setbNPCName( 0 );
+      player.setbNPCBase( 0 );
+      auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          player.despawn( actor->getAsPlayer() );
+          player.spawn( actor->getAsPlayer() );
+        }
+      }
+      player.sendNotice( 0, "Player respawned as a regular player." );
+      return;
+    }
+  }
+  else if( subCommand == "name" )
+  {
+    auto pExdData = framework()->get< Data::ExdDataGenerated >();
+    uint32_t nameId;
+    sscanf( params.c_str(), "%u", &nameId );
+    if ( !pExdData->get< Sapphire::Data::BNpcName > ( nameId ) )
+    {
+      player.sendUrgent ( "{0} is not a valid BNpcName ID.", nameId );
+      return;
+    }
+    player.setbNPCName( nameId );
+    auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        player.despawn( actor->getAsPlayer() );
+        player.spawn( actor->getAsPlayer() );
+      }
+    }
+    player.sendNotice( 0, "BNPCName set to {0} ({1}).", nameId, pExdData->get< Sapphire::Data::BNpcName >( nameId )->singular );
+  }
+  
+  else if( subCommand == "base" )
+  {
+    uint32_t baseId;
+    sscanf( params.c_str(), "%u", &baseId );
+    player.setbNPCBase( baseId );
+    auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        player.despawn( actor->getAsPlayer() );
+        player.spawn( actor->getAsPlayer() );
+      }
+    }
+    player.sendNotice( 0, "BNPCBase set to {0}.", baseId );
+  }
+  
+  else if( subCommand == "odinbase" )
+  {
+    player.setbNPCBase( 882 );
+    auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        player.despawn( actor->getAsPlayer() );
+        player.spawn( actor->getAsPlayer() );
+      }
+    }
+  }
+  else if( subCommand == "element" || subCommand == "elem" )
+  {
+    uint32_t element;
+    sscanf( params.c_str(), "%u", &element );
+    player.setElement( element );
+    auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        player.despawn( actor->getAsPlayer() );
+        player.spawn( actor->getAsPlayer() );
+      }
+    }
+    player.sendNotice( 0, "Element set to {0}.", element );
+  }
+  else if( subCommand == "elvl" )
+  {
+    uint32_t elementallevel;
+    sscanf( params.c_str(), "%u", &elementallevel );
+    player.setElementalLevel( elementallevel );
+    auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        player.despawn( actor->getAsPlayer() );
+        player.spawn( actor->getAsPlayer() );
+      }
+    }
+    player.sendNotice( 0, "Elemental Level set to {0}.", elementallevel );
+  }
+  else
+  {
+    player.sendUrgent( "{0} is not a valid enemy command.", subCommand );
+  }
+}
+
+
 
 void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
