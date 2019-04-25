@@ -1902,7 +1902,7 @@ void Sapphire::World::Manager::DebugCommandMgr::notice( char* data, Entity::Play
     {
       if( actor->isPlayer() )
       {
-        actor->getAsPlayer()->sendNotice( 4, "{0}", notice );
+        actor->getAsPlayer()->sendNotice( 5, "{0}", notice );
       }
     }
 
@@ -2463,6 +2463,73 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
       player.sendModel();
     }
   }
+  else if( subCommand == "batwin" )
+  {
+    if ( params == "art" )
+    {
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 9818 );
+      player.setbNPCName( 7968 );
+      player.setElementalLevel( 70 );
+      player.setElement( 4 );
+      auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          player.despawn( actor->getAsPlayer() );
+          player.spawn( actor->getAsPlayer() );
+        }
+      }
+      player.setModelMainWeapon( 0x0000000100041F49 );
+      player.sendModel();
+      return;
+    }
+    else if ( params == "owain" )
+    {
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 9821 );
+      player.setbNPCName( 7970 );
+      player.setElementalLevel( 70 );
+      player.setElement( 1 );
+      auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          player.despawn( actor->getAsPlayer() );
+          player.spawn( actor->getAsPlayer() );
+        }
+      }
+      player.setModelMainWeapon( 0x0000000200041F49 );
+      player.sendModel();
+      return;
+    }
+  }
+  else if( subCommand == "actionlearn" )
+  {
+    uint32_t action;
+    sscanf( params.c_str(), "%u", &action );
+    player.sendToInRangeSet( makeActorControl142( player.getId(), BluActionLearn, 0, 1, 0, 0, 0 ), true );
+    auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        actor->getAsPlayer()->sendNotice( 4, "{0} apprends {1} !", player.getName(), pExdData->get< Sapphire::Data::Action >( action )->name );
+      }
+    }
+    
+  }
+  else if( subCommand == "shinztk" )
+  {
+    player.setModelMainWeapon( 0x0000000100011F62 );
+    player.sendModel();
+  }
   else
   {
     player.sendUrgent( "{0} is not a valid rpevent command.", subCommand );
@@ -2542,7 +2609,7 @@ void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Playe
     {
       // player.isActingAsEnemy( true );
       player.setModelType( 2 );
-      player.setSubType( 2 );
+      player.setSubType( 5 );
       player.setEnemyType( 0 );
       auto inRange = player.getInRangeActors( true );
       for( auto actor : inRange )
