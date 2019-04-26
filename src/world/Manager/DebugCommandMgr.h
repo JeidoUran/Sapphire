@@ -90,6 +90,8 @@ namespace Sapphire::World::Manager
 
     void rpevent( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
+    void enemy( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
     void ely( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
 

@@ -80,6 +80,8 @@ Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
   m_modelType( 0 ),
   m_subtype( 0 ),
   m_enemyType( 0 ),
+  m_element( 0 ),
+  m_elementalLevel( 0 ),
   m_directorInitialized( false ),
   m_onEnterEventDone( false ),
   m_falling( false )
@@ -216,6 +218,26 @@ void Sapphire::Entity::Player::setEnemyType( uint8_t enemytype )
   m_enemyType = enemytype;
 }
 
+uint16_t Sapphire::Entity::Player::getElementalLevel() const
+{
+  return m_elementalLevel;
+}
+
+void Sapphire::Entity::Player::setElementalLevel( uint16_t elementallevel )
+{
+  m_elementalLevel = elementallevel;
+}
+
+uint16_t Sapphire::Entity::Player::getElement() const
+{
+  return m_element;
+}
+
+void Sapphire::Entity::Player::setElement( uint16_t element )
+{
+  m_element = element;
+}
+
 bool Sapphire::Entity::Player::getGmInvis() const
 {
   return m_gmInvis;
@@ -235,8 +257,8 @@ bool Sapphire::Entity::Player::isActingAsGm() const
 
 bool Sapphire::Entity::Player::isActingAsEnemy() const
 {
-  auto enemy = getEnemyType();
-  return enemy == 4;
+  auto enemy = getModelType();
+  return enemy == 2;
 }
 
 // bool Sapphire::Entity::Player::isActingAsEnemy() const

@@ -895,6 +895,14 @@ namespace Sapphire::Entity
 
     void setEnemyType( uint8_t enemyType );
 
+    uint16_t getElementalLevel() const;
+
+    void setElementalLevel( uint16_t elementalLevel );
+
+    uint16_t getElement() const;
+
+    void setElement( uint16_t element );
+
     void onMobAggro( BNpcPtr pBNpc );
     void onMobDeaggro( BNpcPtr pBNpc );
 
@@ -1126,6 +1134,8 @@ namespace Sapphire::Entity
     uint8_t m_modelType;
     uint8_t m_subtype;
     uint8_t m_enemyType;
+    uint16_t m_elementalLevel;
+    uint16_t m_element;
 
     uint8_t m_equipDisplayFlags;
 
