@@ -21,7 +21,9 @@ public:
   {
 //RP Added eobj
     instance.registerEObj( "chest", 2009530, 0, 4, { 586.147f, -692.278f, 59.6727f }, 1.000000f, 2.26487f ); 
+    instance.registerEObj( "chest2", 2009530, 0, 4, { 32.1438f, -477.505f, -390.341f }, 1.000000f, 0.296631f ); 
     instance.registerEObj( "baportal", 2009726, 0, 4, { 213.954f, 757.882f, -937.514f }, 1.000000f, -0.00524855f ); 
+    instance.registerEObj( "hook", 2009728, 0, 4, { 243.622f, 761.582f, -886.141f }, 1.000000f, -0.00524855f ); 
   }
 
   void onUpdate( PublicContent& instance, uint32_t currTime ) override
