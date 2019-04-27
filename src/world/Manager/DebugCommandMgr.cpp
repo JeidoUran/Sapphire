@@ -1886,26 +1886,53 @@ void Sapphire::World::Manager::DebugCommandMgr::tell( char* data, Entity::Player
 void Sapphire::World::Manager::DebugCommandMgr::notice( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
 {
-  std::string subCommand;
+  std::string subCommand = "";
+  std::string params = "";
 
   // check if the command has parameters
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-  std::size_t spos = tmpCommand.find_first_of( " " );
+
+  std::size_t pos = tmpCommand.find_first_of( " " );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
   
   Logger::debug( "[{0}] Command: notice params: {1}", player.getId(), tmpCommand );
-  
-  char notice [775] = "";
-  sscanf( tmpCommand.c_str(), "%[^\n]%*c", &notice );
+  if( subCommand == "4" )
+  {
+    char notice [775] = "";
+    sscanf( params.c_str(), "%[^\n]%*c", &notice );
 
-  auto inRange = player.getInRangeActors( true );
-    for( auto actor : inRange )
-    {
-      if( actor->isPlayer() )
+    auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
       {
-        actor->getAsPlayer()->sendNotice( 5, "{0}", notice );
+        if( actor->isPlayer() )
+        {
+          actor->getAsPlayer()->sendNotice( 4, "{0}", notice );
+        }
       }
-    }
+  }
+  else if( subCommand == "5" )
+  {
+    char notice [775] = "";
+    sscanf( params.c_str(), "%[^\n]%*c", &notice );
 
+    auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          actor->getAsPlayer()->sendNotice( 5, "{0}", notice );
+        }
+      }
+  }
   
 }
 
@@ -1916,19 +1943,28 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
   std::string subCommand;
 
   // check if the command has parameters
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
   std::size_t spos = tmpCommand.find_first_of( " " );
   
   Logger::debug( "[{0}] Command: action params: {1}", player.getId(), tmpCommand );
-  
   uint32_t actionId;
   sscanf( tmpCommand.c_str(), "%u", &actionId );
-  
-  auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), actionId );
-  effectPacket->setRotation( Util::floatToUInt16Rot( player.getRot() ) );
-  // effectPacket->addEffect( effectEntry );
 
-  player.sendToInRangeSet( effectPacket, true );
+  if ( !pExdData->get< Sapphire::Data::Action >( actionId ) )
+  {
+    player.sendUrgent ( "{0} is not a valid Action ID.", actionId );
+    return;
+  }
+  else
+  {
+    auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), actionId );
+    effectPacket->setRotation( Util::floatToUInt16Rot( player.getRot() ) );
+    Logger::debug( "[{0}] {1} uses {2}.", player.getId(), player.getName(), pExdData->get< Sapphire::Data::Action >( actionId )->name );
+    // effectPacket->addEffect( effectEntry );
+
+    player.sendToInRangeSet( effectPacket, true );
+  }
 
   
 }
@@ -2514,13 +2550,27 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
   {
     uint32_t action;
     sscanf( params.c_str(), "%u", &action );
-    player.sendToInRangeSet( makeActorControl142( player.getId(), BluActionLearn, 0, 1, 0, 0, 0 ), true );
+    // player.sendToInRangeSet( makeActorControl142( player.getId(), BluActionLearn, 0, 1, 0, 0, 0 ), true );
     auto inRange = player.getInRangeActors( true );
     for( auto actor : inRange )
     {
       if( actor->isPlayer() )
       {
-        actor->getAsPlayer()->sendNotice( 4, "{0} apprends {1} !", player.getName(), pExdData->get< Sapphire::Data::Action >( action )->name );
+        actor->getAsPlayer()->sendToInRangeSet( makeActorControl142( player.getId(), BluActionLearn, 0, 1, 0, 0, 0 ), true );
+        actor->getAsPlayer()->sendNotice( 5, "{0} apprends {1} !", player.getName(), pExdData->get< Sapphire::Data::Action >( action )->name );
+      }
+    }
+    
+  }
+  
+  else if( subCommand == "mount" )
+  {
+    auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        actor->getAsPlayer()->mount( 119 );
       }
     }
     
