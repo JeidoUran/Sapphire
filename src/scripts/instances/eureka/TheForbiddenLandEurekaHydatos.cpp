@@ -1,13 +1,22 @@
 #include <ScriptObject.h>
 #include <Territory/PublicContent.h>
+#include <Actor/Player.h>
 
 using namespace Sapphire;
 
 class TheForbiddenLandEurekaHydatos : public Sapphire::ScriptAPI::PublicContentScript
 {
 public:
-  TheForbiddenLandEurekaHydatos() : Sapphire::ScriptAPI::PublicContentScript( 16 )
+  TheForbiddenLandEurekaHydatos() : Sapphire::ScriptAPI::PublicContentScript( 639 )
   { }
+
+  void onPlayerSetup( Sapphire::PublicContent& instance, Entity::Player& player )
+  {
+    player.mount( 119 );
+    player.getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( 10 ) );
+    player.setRot( 1.96528 );
+    player.setPos( { -991.284f, 580f, -69.2263f } );
+  }
 
   void onInit( PublicContent& instance ) override
   {
