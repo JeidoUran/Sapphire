@@ -569,6 +569,7 @@ void Sapphire::Network::GameConnection::chatHandler( FrameworkPtr pFw,
     }
     default:
     {
+      Logger::debug( "[Chatlog] (Emote) {0} {1}", player.getName(), chatPacket->data().msg );
       player.getCurrentZone()->queuePacketForRange( player, 50, chatPacket );
       break;
     }

@@ -197,7 +197,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
         return;
 
       player.emote( emoteId, targetId, isSilent );
-
+      Logger::debug( "[{0}] {1} used the emote \"{2}\".", player.getId(), player.getName(), emoteData->name);
       bool isPersistent = emoteData->emoteMode != 0;
 
       if( isPersistent )
@@ -303,7 +303,10 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     case ClientTriggerType::RequestInstanceLeave:
     {
       // todo: apply cf penalty if applicable, make sure player isn't in combat
-      player.exitInstance();
+      if( player.getRPMode() == true )
+        player.sendUrgent( "Leaving an instance via client request is disabled during a RP session. To leave the instance, please use \"!instance ret\"." );
+      else
+        player.exitInstance();
       break;
     }
     case ClientTriggerType::AbandonQuest:

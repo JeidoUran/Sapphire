@@ -707,6 +707,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
     {
       auto pExdData = pFw->get< Data::ExdDataGenerated >();
       player.sendNotice( 0, "\nName: {0} (ID: {1})"
+                         "\nHomeWorld: Finis"
                          "\nHP: {2}/{3}, MP: {4}/{5}, TP: {6}/1000"
                          "\nClass: {7} (ID: {8})"
                          "\nLevel: {9}"
@@ -714,6 +715,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
                          "\nGC: {11} (ID: {12})"
                          "\nGil: {13}"
                          "\n"
+                         "\nCurrentWorld: Finis"
                          "\nZone: {14} (ID: {15})"
                          "\nGuId: {16}"
                          "\nPos: \nX: {17} \nY: {18} \nZ: {19} \nR: {20}"
@@ -727,7 +729,12 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
                          "\nModelChara: {26}"
                          "\nCurrentMount: {27} (ID: {28})"
                          "\nTarget: {29}"
-                         "\nRPMode: {30}",
+                         "\n"
+                         "\nRPMode: {30}"
+                         "\nisActingAsEnemy: {31}"
+                         "\nbNPCBase: {32}"
+                         "\nbNPCName: {33} (ID: {34})"
+                         "\nEnemyType: {35} (Subtype: {36})",
                          targetPlayer->getName(), targetPlayer->getId(),
                          targetPlayer->getHp(), targetPlayer->getMaxHp(), targetPlayer->getMp(), targetPlayer->getMaxMp(), targetPlayer->getTp(),
                          pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( targetPlayer->getClass() ))->name, static_cast< uint8_t >( targetPlayer->getClass() ),
@@ -746,7 +753,11 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
                          targetPlayer->getModelChara(),
                          pExdData->get< Sapphire::Data::Mount >( targetPlayer->getCurrentMount() )->singular, targetPlayer->getCurrentMount(),
                          targetPlayer->getTargetId(),
-                         targetPlayer->getRPMode() );
+                         targetPlayer->getRPMode(),
+                         targetPlayer->isActingAsEnemy(),
+                         targetPlayer->getbNPCBase(),
+                         pExdData->get< Sapphire::Data::BNpcName >( targetPlayer->getbNPCName() )->singular, targetPlayer->getbNPCName(),
+                         targetPlayer->getEnemyType(), targetPlayer->getSubType() );
       break;
     }
 
