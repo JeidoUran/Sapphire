@@ -2218,6 +2218,20 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         if( member->getAsPlayer() != player.getAsPlayer() )
         {
           //member->getAsPlayer()->setGmRank( 1 );
+          member->getAsPlayer()->setOnlineStatusMask( 0x0000000100400000 );
+
+          auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( member->getAsPlayer()->getId() );
+          statusPacket->data().onlineStatusFlags = 0x0000000100400000;
+          framework()->get< World::ServerMgr >()->getSession( member->getAsPlayer()->getId() )->getZoneConnection()->queueOutPacket( statusPacket );
+
+          auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( member->getAsPlayer()->getId() );
+          searchInfoPacket->data().onlineStatusFlags = 0x0000000100400000;
+          searchInfoPacket->data().selectRegion = member->getAsPlayer()->getSearchSelectRegion();
+          strcpy( searchInfoPacket->data().searchMessage, member->getAsPlayer()->getSearchMessage() );
+          member->getAsPlayer()->queuePacket( searchInfoPacket );
+
+          member->getAsPlayer()->sendToInRangeSet( makeActorControl142( member->getAsPlayer()->getId(), SetStatusIcon, static_cast< uint8_t >( member->getAsPlayer()->getOnlineStatus() ) ), true );
+
           member->getAsPlayer()->sendNotice( 5, "RP session started by {0}.", player.getName() );
         }
       }
@@ -2254,6 +2268,19 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         }
       }
       isRpStarted = true;
+       player.setOnlineStatusMask( 0x0000000100400000 );
+
+       auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( player.getId() );
+       statusPacket->data().onlineStatusFlags = 0x0000000100400000;
+       framework()->get< World::ServerMgr >()->getSession( player.getId() )->getZoneConnection()->queueOutPacket( statusPacket );
+
+       auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( player.getId() );
+       searchInfoPacket->data().onlineStatusFlags = 0x0000000100400000;
+       searchInfoPacket->data().selectRegion = player.getSearchSelectRegion();
+       strcpy( searchInfoPacket->data().searchMessage, player.getSearchMessage() );
+       player.queuePacket( searchInfoPacket );
+
+      player.sendToInRangeSet( makeActorControl142( player.getId(), SetStatusIcon, static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
       player.sendNotice( 5, "RP session started." );
     }
   }
