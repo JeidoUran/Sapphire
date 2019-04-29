@@ -19,7 +19,7 @@ public:
 
   void onInit( PublicContent& instance ) override
   {
-//RP Added eobj
+    //!RP Added eobj
     instance.registerEObj( "chest", 2009530, 0, 4, { 586.147f, -692.278f, 59.6727f }, 1.000000f, 2.26487f ); 
     instance.registerEObj( "chest2", 2009530, 0, 4, { 32.1438f, -477.505f, -390.341f }, 1.000000f, 0.296631f ); 
     instance.registerEObj( "baportal", 2009726, 0, 4, { 213.954f, 757.882f, -937.514f }, 1.000000f, -0.00524855f ); 
