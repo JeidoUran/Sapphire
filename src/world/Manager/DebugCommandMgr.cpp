@@ -2130,7 +2130,6 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       return;
     }
 
-    auto pExdData = framework()->get< Data::ExdDataGenerated >();
     sscanf( params.c_str(), "%d %d %d %d", &startzone, &startposx, &startposy, &startposz );
     auto pZone = pTerriMgr->getZoneByTerritoryTypeId( startzone );
     player.sendNotice( 0, "The starting zone of the RP session has been set to {0} (ID: {1}), X: {2}, Y: {3}, Z: {4}.", pZone->getName(),
@@ -2206,7 +2205,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         Logger::info( "Starting Zone: {0}", pZone->getName() );
       else
         Logger::info( "Starting Zone: None" );
-      if( strcmp (RpTheme,"") != 0)
+      if( strcmp ( RpTheme, "" ) != 0 )
         Logger::info( "Theme: {0}", RpTheme );
       else
         Logger::info( "Theme: None" );
@@ -2215,24 +2214,26 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       {
         Logger::info( "{0}", member->getAsPlayer()->getName() );
         member->getAsPlayer()->setRPMode( true );
+        //member->getAsPlayer()->setGmRank( 1 );
+        member->getAsPlayer()->setOnlineStatusMask( 0x0000000100400000 );
+
+        auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( member->getAsPlayer()->getId() );
+        statusPacket->data().onlineStatusFlags = 0x0000000100400000;
+        framework()->get< World::ServerMgr >()->getSession( member->getAsPlayer()->getId() )->getZoneConnection()->queueOutPacket( statusPacket );
+
+        auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( member->getAsPlayer()->getId() );
+        searchInfoPacket->data().onlineStatusFlags = 0x0000000100400000;
+        searchInfoPacket->data().selectRegion = member->getAsPlayer()->getSearchSelectRegion();
+        strcpy( searchInfoPacket->data().searchMessage, member->getAsPlayer()->getSearchMessage() );
+        member->getAsPlayer()->queuePacket( searchInfoPacket );
+
+        member->getAsPlayer()->sendToInRangeSet( makeActorControl142( member->getAsPlayer()->getId(), SetStatusIcon, static_cast< uint8_t >( member->getAsPlayer()->getOnlineStatus() ) ), true );
         if( member->getAsPlayer() != player.getAsPlayer() )
         {
-          //member->getAsPlayer()->setGmRank( 1 );
-          member->getAsPlayer()->setOnlineStatusMask( 0x0000000100400000 );
-
-          auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( member->getAsPlayer()->getId() );
-          statusPacket->data().onlineStatusFlags = 0x0000000100400000;
-          framework()->get< World::ServerMgr >()->getSession( member->getAsPlayer()->getId() )->getZoneConnection()->queueOutPacket( statusPacket );
-
-          auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( member->getAsPlayer()->getId() );
-          searchInfoPacket->data().onlineStatusFlags = 0x0000000100400000;
-          searchInfoPacket->data().selectRegion = member->getAsPlayer()->getSearchSelectRegion();
-          strcpy( searchInfoPacket->data().searchMessage, member->getAsPlayer()->getSearchMessage() );
-          member->getAsPlayer()->queuePacket( searchInfoPacket );
-
-          member->getAsPlayer()->sendToInRangeSet( makeActorControl142( member->getAsPlayer()->getId(), SetStatusIcon, static_cast< uint8_t >( member->getAsPlayer()->getOnlineStatus() ) ), true );
-
-          member->getAsPlayer()->sendNotice( 5, "RP session started by {0}.", player.getName() );
+          if( strcmp ( RpTheme, "" ) != 0 )
+            member->getAsPlayer()->sendNotice( 5, "The RP session \"{0}\" has been started by {1}.", RpTheme, player.getName() );
+          else
+            member->getAsPlayer()->sendNotice( 5, "RP session started by {0}.", player.getName() );
         }
       }
       Logger::info( "NPC: {0}", m_rpNPC.size() );
@@ -2268,19 +2269,6 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         }
       }
       isRpStarted = true;
-       player.setOnlineStatusMask( 0x0000000100400000 );
-
-       auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( player.getId() );
-       statusPacket->data().onlineStatusFlags = 0x0000000100400000;
-       framework()->get< World::ServerMgr >()->getSession( player.getId() )->getZoneConnection()->queueOutPacket( statusPacket );
-
-       auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( player.getId() );
-       searchInfoPacket->data().onlineStatusFlags = 0x0000000100400000;
-       searchInfoPacket->data().selectRegion = player.getSearchSelectRegion();
-       strcpy( searchInfoPacket->data().searchMessage, player.getSearchMessage() );
-       player.queuePacket( searchInfoPacket );
-
-      player.sendToInRangeSet( makeActorControl142( player.getId(), SetStatusIcon, static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
       player.sendNotice( 5, "RP session started." );
     }
   }
@@ -2378,7 +2366,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
   {
   }
   
-  else if( subCommand == "blackscreen" )
+  else if( subCommand == "loadscreen" )
   {
     if( isBlackScreen == false )
     {
