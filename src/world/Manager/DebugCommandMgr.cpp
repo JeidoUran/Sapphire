@@ -78,6 +78,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "rp", &DebugCommandMgr::rp, "RP management.", 1 );
   registerCommand( "rpevent", &DebugCommandMgr::rpevent, "Commands for specific RP events.", 1 );
   registerCommand( "enemy", &DebugCommandMgr::enemy, "Commands to turn a player into an enemy.", 1 );
+  registerCommand( "respawn", &DebugCommandMgr::respawn, "Command to respawn your character.", 1 );
   registerCommand( "ely", &DebugCommandMgr::ely, "Oui mais c'est parcequ'en fait cette commande sert à rien.", 1 );
 }
 
@@ -2800,7 +2801,20 @@ void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Playe
   }
 }
 
+void Sapphire::World::Manager::DebugCommandMgr::respawn( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
 
+{
+    auto inRange = player.getInRangeActors( true );
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        player.despawn( actor->getAsPlayer() );
+        player.spawn( actor->getAsPlayer() );
+      }
+    }
+}
 
 void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
