@@ -214,8 +214,8 @@ void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Pac
     auto itStr = m_zoneHandlerStrMap.find( opcode );
     std::string name = itStr != m_zoneHandlerStrMap.end() ? itStr->second : "unknown";
     // dont display packet notification if it is a ping or pos update, don't want the spam
-    if( opcode != PingHandler && opcode != UpdatePositionHandler )
-      Logger::debug( "[{0}] Handling Zone IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );
+    // if( opcode != PingHandler && opcode != UpdatePositionHandler )
+      // Logger::debug( "[{0}] Handling Zone IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );
 
     ( this->*( it->second ) )( m_pFw, pPacket, *m_pSession->getPlayer() );
   }
