@@ -303,10 +303,8 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     case ClientTriggerType::RequestInstanceLeave:
     {
       // todo: apply cf penalty if applicable, make sure player isn't in combat
-      if( player.getRPMode() == true )
-        player.sendUrgent( "Leaving an instance via client request is disabled during a RP session. To leave the instance, please use \"!instance ret\"." );
-      else
-        player.exitInstance();
+      player.sendUrgent( "Leaving an instance via client request has been disabled. To leave the instance, please use \"!instance ret\"." );
+      // player.exitInstance();
       break;
     }
     case ClientTriggerType::AbandonQuest:
