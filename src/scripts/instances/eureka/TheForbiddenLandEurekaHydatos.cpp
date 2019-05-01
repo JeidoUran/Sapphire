@@ -13,10 +13,46 @@ public:
 
   void onPlayerSetup( Sapphire::PublicContent& instance, Entity::Player& player )
   {
-    player.mount( 119 );
-    player.getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( 10 ) );
-    player.setRot( 1.96528f );
-    player.setPos( { -991.284f, 580.0f, -69.2263f } );
+    // Setup Art
+    if( player.getId() == 2097191 )
+    {
+      player.setRot( -0.00240898f );
+      player.setPos( { -129.009f, -10.01f, 747.943f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 9818 );
+      player.setbNPCName( 7968 );
+      player.setElementalLevel( 70 );
+      player.setElement( 4 );
+      player.setModelMainWeapon( 0x0000000100041F49 );
+      player.sendModel();
+      player.setGmInvis( true );
+    }
+    // Setup Owain
+    else if( player.getId() == 2097192 )
+    {
+      player.setRot( -0.00240898f );
+      player.setPos( { 129.009f, -10.01f, 747.943f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 9821 );
+      player.setbNPCName( 7970 );
+      player.setElementalLevel( 70 );
+      player.setElement( 1 );
+      player.setModelMainWeapon( 0x0000000200041F49 );
+      player.sendModel();
+      player.setGmInvis( true );
+    }
+    // Setup Players
+    else
+    {
+      player.mount( 119 );
+      player.getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( 10 ) );
+      player.setRot( 1.96528f );
+      player.setPos( { -991.284f, 580.0f, -69.2263f } );
+    }
 
     //Setup eobjs
 
