@@ -374,16 +374,16 @@ void Sapphire::Entity::Player::onTick()
     addTp = 60;
   }
 
-  if( m_hp < getMaxHp() )
-  {
+  // if( m_hp < getMaxHp() )
+  // {
 
-    if( m_hp + addHp < getMaxHp() )
-      m_hp += addHp;
-    else
-      m_hp = getMaxHp();
+    // if( m_hp + addHp < getMaxHp() )
+      // m_hp += addHp;
+    // else
+      // m_hp = getMaxHp();
 
-    sendUpdate = true;
-  }
+    // sendUpdate = true;
+  // }
 
   if( m_mp < getMaxMp() )
   {
