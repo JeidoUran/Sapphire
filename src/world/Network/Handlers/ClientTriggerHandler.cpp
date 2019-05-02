@@ -87,6 +87,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
   {
     case ClientTriggerType::ToggleSheathe:  // Toggle sheathe
     {
+      player.sendToInRangeSet( makeActorControl142( player.getId(), 0, param11, 1 ) );
       if( param11 == 1 )
         player.setStance( Common::Stance::Active );
       else
@@ -95,12 +96,11 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
         player.setAutoattack( false );
       }
 
-      player.sendToInRangeSet( makeActorControl142( player.getId(), 0, param11, 1 ) );
-
       break;
     }
     case ClientTriggerType::ToggleAutoAttack:  // Toggle auto-attack
     {
+      player.sendToInRangeSet( makeActorControl142( player.getId(), 0, param11, 1 ) );
       if( param11 == 1 )
       {
         player.setAutoattack( true );
@@ -108,9 +108,6 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
       }
       else
         player.setAutoattack( false );
-
-      player.sendToInRangeSet( makeActorControl142( player.getId(), 1, param11, 1 ) );
-
       break;
     }
     case ClientTriggerType::ChangeTarget: // Change target
@@ -245,8 +242,8 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     case ClientTriggerType::PoseCancel: // cancel pose
     {
       player.setPose( param12 );
-      auto pSetStatusPacket = makeActorControl142( player.getId(), SetPose, param11, param12 );
-      player.sendToInRangeSet( pSetStatusPacket, true );
+      // auto pSetStatusPacket = makeActorControl142( player.getId(), SetPose, param11, param12 );
+      // player.sendToInRangeSet( pSetStatusPacket, true );
       break;
     }
     case ClientTriggerType::Return: // return dead / accept raise
