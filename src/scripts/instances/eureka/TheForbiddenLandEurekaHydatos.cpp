@@ -13,6 +13,8 @@ public:
 
   void onPlayerSetup( Sapphire::PublicContent& instance, Entity::Player& player )
   {
+    // Setup Ovni
+
     // Setup Art
     if( player.getId() == 2097191 )
     {
@@ -45,6 +47,66 @@ public:
       player.sendModel();
       player.setGmInvis( true );
     }
+    // Setup ADS 01/GRUN
+    else if( player.getId() == 2097198 )
+    {
+      player.setRot( 0.0215154 );
+      player.setPos( { -0.209339f, 22.1594f, 579.866f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 882 );
+      player.setbNPCName( 1459 );
+      player.setElementalLevel( 70 );
+      player.setElement( 14 );
+      player.setModelMainWeapon( 0x0000000000000000 );
+      player.sendModel();
+    }
+    // Setup Allagan Bug
+    else if( player.getId() == 2097196 )
+    {
+      player.setRot( -0.0458374 );
+      player.setPos( { -4.15134f, 22.2563f, 584.298f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCName( 1474 );
+      player.setElementalLevel( 70 );
+      player.setElement( 14 );
+      player.setModelMainWeapon( 0x0000000000000000 );
+      player.sendModel();
+      player.setGmInvis( true );
+    }
+    // Setup Allagan Drone
+    else if( player.getId() == 2097197 )
+    {
+      player.setRot( -0.245784 );
+      player.setPos( { 4.13544f, 22.5489f, 585.469f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCName( 2885 );
+      player.setElementalLevel( 70 );
+      player.setElement( 14 );
+      player.setModelMainWeapon( 0x0000000000000000 );
+      player.sendModel();
+      player.setGmInvis( true );
+    }
+    // Setup ADS 01/RED
+    else if( player.getId() == 2097195 )
+    {
+      player.setRot( 0.0337155 );
+      player.setPos( { 111.94f, 56.0f, 427.917f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 882 );
+      player.setbNPCName( 1459 );
+      player.setElementalLevel( 70 );
+      player.setElement( 14 );
+      player.setModelMainWeapon( 0x0000000000000000 );
+      player.sendModel();
+    }
     // Setup Players
     else
     {
@@ -61,6 +123,7 @@ public:
     instance.getEObjByName( "baportal3" )->setAnimationFlag( 0, 1 );
     instance.getEObjByName( "baportal4" )->setAnimationFlag( 0, 1 );
     instance.getEObjByName( "baportal5" )->setAnimationFlag( 0, 1 );
+    instance.getEObjByName( "baportal6" )->setAnimationFlag( 0, 1 );
   }
 
   void onInit( PublicContent& instance ) override
@@ -90,18 +153,18 @@ public:
     // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     // instance.registerEObj( "unknown_6", 2009673, 0, 4, { -172.344406f, 81.999977f, 331.537994f }, 1.000000f, 0.000000f ); 
     // instance.registerEObj( "unknown_7", 2009674, 0, 4, { -169.445297f, 81.999969f, 335.805695f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "sgvf_z3r1_b1274", 2007457, 7739401, 4, { -162.300003f, 81.999977f, 301.299988f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "sgvf_z3r1_b1274_1", 2007457, 7739403, 4, { -160.800003f, 81.999977f, 293.500000f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "sgvf_z3r1_b1274_2", 2007457, 7739404, 4, { -154.500000f, 81.999977f, 299.600006f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "sgvf_z3r1_b1274_3", 2007457, 7739405, 4, { -187.750305f, 81.999977f, 326.700012f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "sgvf_z3r1_b1274_4", 2007457, 7739406, 4, { -189.399994f, 81.999977f, 334.399994f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "sgvf_z3r1_b1274_5", 2007457, 7739407, 4, { -195.600296f, 81.999977f, 328.299988f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "sgvf_z3r1_b1274_6", 2007457, 7739408, 4, { -162.300293f, 81.999969f, 326.600006f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "sgvf_z3r1_b1274_7", 2007457, 7739409, 4, { -154.600296f, 81.999969f, 328.200012f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "sgvf_z3r1_b1274_8", 2007457, 7739410, 4, { -160.600006f, 81.999969f, 334.500000f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "sgvf_z3r1_b1274_9", 2007457, 7739411, 4, { -187.699997f, 81.999977f, 301.299988f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "sgvf_z3r1_b1274_10", 2007457, 7739412, 4, { -195.500000f, 81.999977f, 299.799988f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "sgvf_z3r1_b1274_11", 2007457, 7739413, 4, { -189.399994f, 81.999977f, 293.600006f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "sgvf_z3r1_b1274", 2007457, 7739401, 4, { -162.300003f, 81.999977f, 301.299988f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "sgvf_z3r1_b1274_1", 2007457, 7739403, 4, { -160.800003f, 81.999977f, 293.500000f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "sgvf_z3r1_b1274_2", 2007457, 7739404, 4, { -154.500000f, 81.999977f, 299.600006f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "sgvf_z3r1_b1274_3", 2007457, 7739405, 4, { -187.750305f, 81.999977f, 326.700012f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "sgvf_z3r1_b1274_4", 2007457, 7739406, 4, { -189.399994f, 81.999977f, 334.399994f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "sgvf_z3r1_b1274_5", 2007457, 7739407, 4, { -195.600296f, 81.999977f, 328.299988f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "sgvf_z3r1_b1274_6", 2007457, 7739408, 4, { -162.300293f, 81.999969f, 326.600006f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "sgvf_z3r1_b1274_7", 2007457, 7739409, 4, { -154.600296f, 81.999969f, 328.200012f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "sgvf_z3r1_b1274_8", 2007457, 7739410, 4, { -160.600006f, 81.999969f, 334.500000f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "sgvf_z3r1_b1274_9", 2007457, 7739411, 4, { -187.699997f, 81.999977f, 301.299988f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "sgvf_z3r1_b1274_10", 2007457, 7739412, 4, { -195.500000f, 81.999977f, 299.799988f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "sgvf_z3r1_b1274_11", 2007457, 7739413, 4, { -189.399994f, 81.999977f, 293.600006f }, 1.000000f, 0.000000f ); 
     // instance.registerEObj( "unknown_8", 2002735, 0, 4, { -17.249100f, 107.999802f, 91.095901f }, 1.250000f, 0.000000f ); 
     // instance.registerEObj( "sgvf_w_lvd_b0118_8", 2007457, 7741873, 4, { -17.065720f, 107.999802f, 93.406097f }, 1.000000f, 0.000000f ); 
     // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
@@ -122,7 +185,7 @@ public:
     // instance.registerEObj( "unknown_10", 2009728, 0, 4, { 0.167785f, -46.000000f, 870.389771f }, 0.991760f, 0.000048f ); 
     // instance.registerEObj( "unknown_11", 2009729, 0, 4, { -2.578857f, -46.000000f, 870.267883f }, 0.991760f, 0.000048f ); 
     // instance.registerEObj( "unknown_12", 2009730, 0, 4, { 2.853394f, -46.000000f, 870.206726f }, 0.991760f, 0.000048f ); 
-    instance.registerEObj( "Headquartersentrance", 2009750, 0, 4, { 125.711800f, 500.150909f, 2.250822f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "Headquartersentrance", 2009750, 0, 4, { 125.711800f, 500.150909f, 2.250822f }, 1.000000f, 0.000000f ); 
     // instance.registerEObj( "Shortcut", 2000700, 0, 4, { -0.076182f, -46.000000f, 888.669983f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "unknown_13", 2007457, 7785080, 4, { -223.919098f, 48.999889f, 450.162415f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_14", 2007457, 7785077, 4, { -223.968994f, 48.999859f, 465.901489f }, 1.000000f, 0.000000f ); 
@@ -163,6 +226,15 @@ public:
     instance.registerEObj( "baportal3", 2009726, 0, 4, { -190.799f, 82.0f, 298.324f }, 1.000000f, 0.815023f ); 
     instance.registerEObj( "baportal4", 2009726, 0, 4, { -190.799f, 82.0f, 329.802f }, 1.000000f, 2.34205f ); 
     instance.registerEObj( "baportal5", 2009726, 0, 4, { -200.014f, 82.0f, 313.802f }, 1.000000f, 1.5689f ); 
+    // Small Rooms
+    instance.registerEObj( "key", 2007282, 0, 4, { -14.0436f, 80.2856f, 267.978f }, 1.000000f, -0.699677f ); // clé dans chambre anju
+    instance.registerEObj( "scatteredtomes", 2009689, 0, 4, { 34.164f, 80.0001f, 355.328f }, 1.000000f, 2.14483f ); 
+    instance.registerEObj( "scatteredtomes2", 2009689, 0, 4, { 39.8161f, 80.0f, 358.031f }, 1.000000f, -3.12194f ); 
+    // Board Room
+    instance.registerEObj( "baportal6", 2009726, 0, 4, { -64.019f, -56.0487f, 832.019f }, 1.000000f, 2.33615f ); 
+    instance.registerEObj( "scatteredtomes3", 2009689, 0, 4, { -45.4946f, -56.0487f, 842.088f }, 1.000000f, -2.99084f ); 
+    instance.registerEObj( "journal", 2005896, 0, 4, { -58.5239f, -55.175f, 835.819f }, 1.000000f, 2.80342f ); 
+
 
 
 
