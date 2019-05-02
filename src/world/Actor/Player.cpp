@@ -76,6 +76,7 @@ Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
   m_emoteMode( 0 ),
   m_bNPCBase ( 0 ),
   m_bNPCName ( 0 ),
+  m_displayFlags( 0 ),
   m_modelChara( 0 ),
   m_modelType( 0 ),
   m_subtype( 0 ),
@@ -176,6 +177,16 @@ uint32_t Sapphire::Entity::Player::getbNPCName() const
 void Sapphire::Entity::Player::setbNPCName( uint32_t bnpcname )
 {
   m_bNPCName = bnpcname;
+}
+
+uint32_t Sapphire::Entity::Player::getDisplayFlags() const
+{
+  return m_displayFlags;
+}
+
+void Sapphire::Entity::Player::setDisplayFlags( uint32_t displayflags )
+{
+  m_displayFlags = displayflags;
 }
 
 uint16_t Sapphire::Entity::Player::getModelChara() const
@@ -1468,9 +1479,17 @@ void Sapphire::Entity::Player::sendDebug( const std::string& message ) //Grey Te
   queuePacket( std::make_shared< ChatPacket >( *getAsPlayer(), ChatType::ServerDebug, message ) );
 }
 
-void Sapphire::Entity::Player::sendTell( const std::string& message ) //Grey Text
+void Sapphire::Entity::Player::respawn()
 {
-  queuePacket( std::make_shared< ChatPacket >( *getAsPlayer(), ChatType::TellReceive, message ) );
+  auto inRange = getInRangeActors( true );
+  for( auto actor : inRange )
+  {
+    if( actor->isPlayer() )
+    {
+      despawn( actor->getAsPlayer() );
+      spawn( actor->getAsPlayer() );
+    }
+  }
 }
 
 void Sapphire::Entity::Player::sendLogMessage( uint32_t messageId, uint32_t param2, uint32_t param3,

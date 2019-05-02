@@ -798,13 +798,7 @@ namespace Sapphire::Entity
       sendDebug( fmt::format( message, args... ) );
     }
 
-    void sendTell( const std::string& message );
-
-    template< typename... Args >
-    void sendTell( const std::string& message, const Args&... args )
-    {
-      sendTell( fmt::format( message, args... ) );
-    }
+    void respawn();
 
     void sendLogMessage( uint32_t messageId, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0, uint32_t param5 = 0, uint32_t param6 = 0 );
 
@@ -878,6 +872,10 @@ namespace Sapphire::Entity
     uint32_t getbNPCName() const;
 
     void setbNPCName( uint32_t bNPCName );
+
+    uint32_t getDisplayFlags() const;
+
+    void setDisplayFlags( uint32_t displayflags );
 
     uint16_t getModelChara() const;
 
@@ -1126,6 +1124,7 @@ namespace Sapphire::Entity
 
     uint32_t m_bNPCBase;
     uint32_t m_bNPCName;
+    uint32_t m_displayFlags;
 
     bool m_RPMode = false;
 
