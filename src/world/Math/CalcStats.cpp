@@ -146,17 +146,18 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pF
 
   // These values are not precise.
 
-  if( level >= 60 )
-    approxBaseHp = static_cast< float >( 2600 + ( level - 60 ) * 100 );
-  else if( level >= 50 )
-    approxBaseHp = 1700 + ( ( level - 50 ) * ( 1700 * 1.04325f ) );
-  else
-    approxBaseHp = paramGrowthInfo->mpModifier * 0.7667f;
+  // if( level >= 60 )
+    // approxBaseHp = static_cast< float >( 2600 + ( level - 60 ) * 100 );
+  // else if( level >= 50 )
+    // approxBaseHp = 1700 + ( ( level - 50 ) * ( 1700 * 1.04325f ) );
+  // else
+    // approxBaseHp = paramGrowthInfo->mpModifier * 0.7667f;
 
-  uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
-                                             floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
+  // uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
+                                             // floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
 
-  return result;
+  // return result;
+  return 100;
 }
 
 // Leggerless' MP Formula
