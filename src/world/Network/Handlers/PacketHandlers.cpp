@@ -516,15 +516,9 @@ void Sapphire::Network::GameConnection::chatHandler( FrameworkPtr pFw,
       if( player.isActingAsGm() ) 
       {
         chatPacket->data().chatType = ChatType::GMSay;
-        // if( player.getRPMode() == true )
-          // Logger::debug( "[RP Chatlog] (GMSay) {0}: {1}", player.getName(), chatPacket->data().msg );
-        // else
           Logger::debug( "[Chatlog] (GMSay) {0}: {1}", player.getName(), chatPacket->data().msg );
       }
       else
-        // if( player.getRPMode() == true )
-          // Logger::debug( "[RP Chatlog] (Say) {0}: {1}", player.getName(), chatPacket->data().msg );
-        // else
           Logger::debug( "[Chatlog] (Say) {0}: {1}", player.getName(), chatPacket->data().msg );
       player.getCurrentZone()->queuePacketForRange( player, 50, chatPacket );
       break;
@@ -534,15 +528,9 @@ void Sapphire::Network::GameConnection::chatHandler( FrameworkPtr pFw,
       if( player.isActingAsGm() )
       {
         chatPacket->data().chatType = ChatType::GMYell;
-        // if( player.getRPMode() == true )
-          // Logger::debug( "[RP Chatlog] (GMYell) {0}: {1}", player.getName(), chatPacket->data().msg );
-        // else
           Logger::debug( "[Chatlog] (GMYell) {0}: {1}", player.getName(), chatPacket->data().msg );
       }
       else
-        // if( player.getRPMode() == true )
-          // Logger::debug( "[RP Chatlog] (Yell) {0}: {1}", player.getName(), chatPacket->data().msg );
-        // else
           Logger::debug( "[Chatlog] (Yell) {0}: {1}", player.getName(), chatPacket->data().msg );
 
       player.getCurrentZone()->queuePacketForRange( player, 6000, chatPacket );
@@ -553,15 +541,9 @@ void Sapphire::Network::GameConnection::chatHandler( FrameworkPtr pFw,
       if( player.isActingAsGm() )
       {
         chatPacket->data().chatType = ChatType::GMShout;
-        // if( player.getRPMode() == true )
-          // Logger::debug( "[RP Chatlog] (GMShout) {0}: {1}", player.getName(), chatPacket->data().msg );
-        // else
           Logger::debug( "[Chatlog] (GMShout) {0}: {1}", player.getName(), chatPacket->data().msg );
       }
       else
-        // if( player.getRPMode() == true )
-          // Logger::debug( "[RP Chatlog] (Shout) {0}: {1}", player.getName(), chatPacket->data().msg );
-        // else
           Logger::debug( "[Chatlog] (Shout) {0}: {1}", player.getName(), chatPacket->data().msg );
 
       player.getCurrentZone()->queuePacketForRange( player, 6000, chatPacket );
@@ -645,15 +627,9 @@ void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
   if( player.isActingAsGm() )
   {
     tellPacket->data().flags |= TellFlags::GmTellMsg;
-    // if( player.getRPMode() == true )
-      // Logger::debug( "[RP Chatlog] (GMTell) {0} > {1}: {2}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
-    // else
       Logger::debug( "[Chatlog] (GMTell) {0} > {1}: {2}", player.getName(), packet.data().targetPCName, tellPacket->data().msg );
   }
   else
-    // if( player.getRPMode() == true )
-      // Logger::debug( "[RP Chatlog] (Tell) {0} > {1}: {2}", player.getId(), player.getName(), packet.data().targetPCName, tellPacket->data().msg );
-    // else
       Logger::debug( "[Chatlog] (Tell) {0} > {1}: {2}", player.getName(), packet.data().targetPCName, tellPacket->data().msg );
 
   pTargetPlayer->queueChatPacket( tellPacket );
