@@ -209,6 +209,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
+    setActorPosPacket->data().r16 = Util::floatToUInt16Rot( player.getRot() );
     player.queuePacket( setActorPosPacket );
 
   }
@@ -359,15 +360,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       return;
     }
     player.setModelChara( modelId );
-    auto inRange = player.getInRangeActors( true );
-    for( auto actor : inRange )
-    {
-      if( actor->isPlayer() )
-      {
-        player.despawn( actor->getAsPlayer() );
-        player.spawn( actor->getAsPlayer() );
-      }
-    }
+    player.respawn();
     player.sendNotice( 0, "Player model set to {0}.", modelId );
   }
   // TODO: Better name
@@ -408,15 +401,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     char name[34];
     sscanf( params.c_str(), "%[^\n]%*c", &name );
     player.setName( name );
-    auto inRange = player.getInRangeActors( true );
-    for( auto actor : inRange )
-    {
-      if( actor->isPlayer() )
-      {
-        player.despawn( actor->getAsPlayer() );
-        player.spawn( actor->getAsPlayer() );
-      }
-    }
+    player.respawn();
   }
   else if( subCommand == "sptp" )
   {
@@ -2526,15 +2511,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
       player.setbNPCName( 7968 );
       player.setElementalLevel( 70 );
       player.setElement( 4 );
-      auto inRange = player.getInRangeActors( true );
-      for( auto actor : inRange )
-      {
-        if( actor->isPlayer() )
-        {
-          player.despawn( actor->getAsPlayer() );
-          player.spawn( actor->getAsPlayer() );
-        }
-      }
+      player.respawn();
       player.setModelMainWeapon( 0x0000000100041F49 );
       player.sendModel();
       return;
@@ -2548,18 +2525,16 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
       player.setbNPCName( 7970 );
       player.setElementalLevel( 70 );
       player.setElement( 1 );
-      auto inRange = player.getInRangeActors( true );
-      for( auto actor : inRange )
-      {
-        if( actor->isPlayer() )
-        {
-          player.despawn( actor->getAsPlayer() );
-          player.spawn( actor->getAsPlayer() );
-        }
-      }
+      player.respawn();
       player.setModelMainWeapon( 0x0000000200041F49 );
       player.sendModel();
       return;
+    }
+
+    else if ( params == "swap" )
+    {
+      player.setRot( -0.00240898f );
+      player.setPos( { -129.009f, -10.01f, 747.943f } );
     }
   }
   else if( subCommand == "actionlearn" )
@@ -2636,15 +2611,7 @@ void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Playe
       player.setModelType( 2 );
       player.setSubType( 5 );
       player.setEnemyType( 4 );
-      auto inRange = player.getInRangeActors( true );
-      for( auto actor : inRange )
-      {
-        if( actor->isPlayer() )
-        {
-          player.despawn( actor->getAsPlayer() );
-          player.spawn( actor->getAsPlayer() );
-        }
-      }
+      player.respawn();
       player.sendNotice( 0, "Player respawned as an enemy." );
       return;
     }
@@ -2656,15 +2623,7 @@ void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Playe
       player.setEnemyType( 0 );
       player.setbNPCName( 0 );
       player.setbNPCBase( 0 );
-      auto inRange = player.getInRangeActors( true );
-      for( auto actor : inRange )
-      {
-        if( actor->isPlayer() )
-        {
-          player.despawn( actor->getAsPlayer() );
-          player.spawn( actor->getAsPlayer() );
-        }
-      }
+      player.respawn();
       player.sendNotice( 0, "Player respawned as a regular player." );
       return;
     }
@@ -2677,15 +2636,7 @@ void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Playe
       player.setModelType( 2 );
       player.setSubType( 5 );
       player.setEnemyType( 0 );
-      auto inRange = player.getInRangeActors( true );
-      for( auto actor : inRange )
-      {
-        if( actor->isPlayer() )
-        {
-          player.despawn( actor->getAsPlayer() );
-          player.spawn( actor->getAsPlayer() );
-        }
-      }
+      player.respawn();
       player.sendNotice( 0, "Player respawned as an enemy." );
       return;
     }
@@ -2697,15 +2648,7 @@ void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Playe
       player.setEnemyType( 0 );
       player.setbNPCName( 0 );
       player.setbNPCBase( 0 );
-      auto inRange = player.getInRangeActors( true );
-      for( auto actor : inRange )
-      {
-        if( actor->isPlayer() )
-        {
-          player.despawn( actor->getAsPlayer() );
-          player.spawn( actor->getAsPlayer() );
-        }
-      }
+      player.respawn();
       player.sendNotice( 0, "Player respawned as a regular player." );
       return;
     }
@@ -2721,15 +2664,7 @@ void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Playe
       return;
     }
     player.setbNPCName( nameId );
-    auto inRange = player.getInRangeActors( true );
-    for( auto actor : inRange )
-    {
-      if( actor->isPlayer() )
-      {
-        player.despawn( actor->getAsPlayer() );
-        player.spawn( actor->getAsPlayer() );
-      }
-    }
+    player.respawn();
     player.sendNotice( 0, "BNPCName set to {0} ({1}).", nameId, pExdData->get< Sapphire::Data::BNpcName >( nameId )->singular );
   }
   
@@ -2738,45 +2673,21 @@ void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Playe
     uint32_t baseId;
     sscanf( params.c_str(), "%u", &baseId );
     player.setbNPCBase( baseId );
-    auto inRange = player.getInRangeActors( true );
-    for( auto actor : inRange )
-    {
-      if( actor->isPlayer() )
-      {
-        player.despawn( actor->getAsPlayer() );
-        player.spawn( actor->getAsPlayer() );
-      }
-    }
+    player.respawn();
     player.sendNotice( 0, "BNPCBase set to {0}.", baseId );
   }
   
   else if( subCommand == "odinbase" )
   {
     player.setbNPCBase( 882 );
-    auto inRange = player.getInRangeActors( true );
-    for( auto actor : inRange )
-    {
-      if( actor->isPlayer() )
-      {
-        player.despawn( actor->getAsPlayer() );
-        player.spawn( actor->getAsPlayer() );
-      }
-    }
+    player.respawn();
   }
   else if( subCommand == "element" || subCommand == "elem" )
   {
     uint32_t element;
     sscanf( params.c_str(), "%u", &element );
     player.setElement( element );
-    auto inRange = player.getInRangeActors( true );
-    for( auto actor : inRange )
-    {
-      if( actor->isPlayer() )
-      {
-        player.despawn( actor->getAsPlayer() );
-        player.spawn( actor->getAsPlayer() );
-      }
-    }
+    player.respawn();
     player.sendNotice( 0, "Element set to {0}.", element );
   }
   else if( subCommand == "elvl" )
@@ -2784,16 +2695,21 @@ void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Playe
     uint32_t elementallevel;
     sscanf( params.c_str(), "%u", &elementallevel );
     player.setElementalLevel( elementallevel );
-    auto inRange = player.getInRangeActors( true );
-    for( auto actor : inRange )
-    {
-      if( actor->isPlayer() )
-      {
-        player.despawn( actor->getAsPlayer() );
-        player.spawn( actor->getAsPlayer() );
-      }
-    }
+    player.respawn();
     player.sendNotice( 0, "Elemental Level set to {0}.", elementallevel );
+  }
+  else if( subCommand == "flags" )
+  {
+    uint32_t displayflags;
+    sscanf( params.c_str(), "%u", &displayflags);
+    player.setDisplayFlags( displayflags );
+    player.respawn();
+    player.sendNotice( 0, "DisplayFlags set to {0}.", displayflags );
+  }
+  else if( subCommand == "odinflags" )
+  {
+    player.setDisplayFlags( 3 );
+    player.respawn();
   }
   else
   {
@@ -2805,15 +2721,7 @@ void Sapphire::World::Manager::DebugCommandMgr::respawn( char* data, Entity::Pla
                                                        std::shared_ptr< DebugCommand > command )
 
 {
-    auto inRange = player.getInRangeActors( true );
-    for( auto actor : inRange )
-    {
-      if( actor->isPlayer() )
-      {
-        player.despawn( actor->getAsPlayer() );
-        player.spawn( actor->getAsPlayer() );
-      }
-    }
+  player.respawn();
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player& player,
@@ -2872,15 +2780,7 @@ void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player&
   else if( elyexcuse == 10)
   {
       player.setModelChara( 2335 );
-      auto inRange = player.getInRangeActors( true );
-      for( auto actor : inRange )
-      {
-        if( actor->isPlayer() )
-        {
-          player.despawn( actor->getAsPlayer() );
-          player.spawn( actor->getAsPlayer() );
-        }
-      }
+      player.respawn();
   }
   else if( elyexcuse == 11)
   {
