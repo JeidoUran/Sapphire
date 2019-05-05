@@ -14,11 +14,58 @@ public:
   void onPlayerSetup( Sapphire::PublicContent& instance, Entity::Player& player )
   {
     // Setup Ovni
-
+    if( player.getId() == 2097194 )
+    {
+      player.setRot( -0.0118475 );
+      player.setPos( { -683.286f, 713.0f, -247.779f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 1575 );
+      player.setbNPCName( 8060 );
+      player.setElementalLevel( 70 );
+      player.setElement( 12 );
+      player.setModelMainWeapon( 0x0000000000000000 );
+      player.sendModel();
+      player.setGmInvis( true );
+    }
+    // Setup Louhi
+    else if( player.getId() == 2097200 )
+    {
+      player.setRot( -0.0626216 );
+      player.setPos( { -51.6689f, 507.982f, -382.459f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 10060 );
+      player.setbNPCName( 7529 );
+      player.setElementalLevel( 70 );
+      player.setElement( 8 );
+      player.setModelMainWeapon( 0x0000000000000000000 );
+      player.sendModel();
+      player.setGmInvis( true );
+    }
+    // Setup Penthesilea
+    else if( player.getId() == 2097199 )
+    {
+      player.setRot( -0.0118475 );
+      player.setPos( { 549.026f, 515.091f, -331.195f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 10060 );
+      player.setbNPCName( 7731 );
+      player.setElementalLevel( 70 );
+      player.setElement( 7 );
+      player.setModelMainWeapon( 0x0000000100051F49 );
+      player.sendModel();
+      player.setGmInvis( true );
+    }
     // Setup Art
-    if( player.getId() == 2097191 )
+    else if( player.getId() == 2097191 )
     {
       player.setRot( -0.00240898f );
+      // player.setPos( { -0.165468f, -81.0911f, 878.663f } );
       player.setPos( { -129.009f, -10.01f, 747.943f } );
       player.setModelType( 2 );
       player.setSubType( 5 );
@@ -35,6 +82,7 @@ public:
     else if( player.getId() == 2097192 )
     {
       player.setRot( -0.00240898f );
+      // player.setPos( { -0.165468f, -81.0911f, 878.663f } );
       player.setPos( { 129.009f, -10.01f, 747.943f } );
       player.setModelType( 2 );
       player.setSubType( 5 );
@@ -107,21 +155,38 @@ public:
       player.setModelMainWeapon( 0x0000000000000000 );
       player.sendModel();
     }
+    // Setup Neema
+    else if( player.getId() == 2097154 )
+    {
+      player.setRot( -2.76431 );
+      player.setPos( { -70.2228f, 80.0f, 349.287f } );
+    }
     // Setup Players
     else
     {
+      // 1st Session
       player.mount( 119 );
       player.getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( 10 ) );
       player.setRot( 1.96528f );
       player.setPos( { -991.284f, 580.0f, -69.2263f } );
+
+      // 2nd Session
+      // player.setRot(  0.0126879f );
+      // player.setPos( { 0.0360257f, -45.9304f, 857.436f } );
+
+      // 3rd Session
+
     }
 
     //Setup eobjs
 
-    instance.getEObjByName( "baportal1" )->setAnimationFlag( 0, 1 );
+    instance.getEObjByName( "bluportal" )->setAnimationFlag( 0, 1 );
+
+    instance.getEObjByName( "redportal2" )->setAnimationFlag( 0, 1 );
+    instance.getEObjByName( "baportal1" )->setAnimationFlag( 0, 5 );
     instance.getEObjByName( "baportal2" )->setAnimationFlag( 0, 1 );
     instance.getEObjByName( "baportal3" )->setAnimationFlag( 0, 1 );
-    instance.getEObjByName( "baportal4" )->setAnimationFlag( 0, 1 );
+    instance.getEObjByName( "baportal4" )->setAnimationFlag( 0, 5 );
     instance.getEObjByName( "baportal5" )->setAnimationFlag( 0, 1 );
     instance.getEObjByName( "baportal6" )->setAnimationFlag( 0, 1 );
   }
@@ -214,13 +279,34 @@ public:
     instance.registerEObj( "art_effect", 2007457, 7768488, 4, { -134.917297f, -10.010040f, 750.439819f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "raiden_lightning", 2007457, 7745394, 4, { -1.825981f, 50.002331f, 457.632202f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "raiden_ztk", 2007457, 7741260, 4, { 1.700844f, 50.002331f, 457.632202f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "av_dark_puddle", 2009673, 0, 4, { -172.344406f, 81.999977f, 331.537994f }, 1.000000f, 0.000000f );
-    instance.registerEObj( "av_light_puddle", 2009674, 0, 4, { -169.445297f, 81.999969f, 335.805695f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "bigtrap", 2009728, 0, 4, { 0.167785f, -46.000000f, 870.389771f }, 0.991760f, 0.000048f ); 
-    instance.registerEObj( "smalltrap", 2009730, 0, 4, { 2.853394f, -46.000000f, 870.206726f }, 0.991760f, 0.000048f ); 
+    // instance.registerEObj( "av_dark_puddle", 2009673, 0, 4, { -172.344406f, 81.999977f, 331.537994f }, 1.000000f, 0.000000f );
+    // instance.registerEObj( "av_light_puddle", 2009674, 0, 4, { -169.445297f, 81.999969f, 335.805695f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "bigtrap", 2009728, 0, 4, { 0.167785f, -46.000000f, 870.389771f }, 0.991760f, 0.000048f ); 
+    // instance.registerEObj( "smalltrap", 2009730, 0, 4, { 2.853394f, -46.000000f, 870.206726f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "portal", 2009729, 0, 4, { -2.578857f, -46.000000f, 870.267883f }, 0.991760f, 0.000048f ); 
 
     //! RP Added eobjs
+    // Hydatos
+    instance.registerEObj( "bluportal", 2009726, 0, 4, { 130.152f, 497.825f, -19.8034f }, 1.000000f, -0.180925f ); 
+    instance.registerEObj( "redportal", 2009727, 0, 4, { 130.152f, 497.825f, -19.8034f }, 1.000000f, -0.180925f ); 
+    // BA
+    instance.registerEObj( "redportal2", 2009727, 0, 4, { 0.0360257f, -45.9304f, 854.846f }, 1.000000f, 0.022356f ); 
+    instance.registerEObj( "barrier1", 2002735, 0, 4, { 17.8324f, -46.0f, 862.874f }, 1.500000f, 1.15027f ); 
+    instance.registerEObj( "barrier2", 2002735, 0, 4, { -17.8324f, -46.0f, 862.874f }, 1.500000f, -1.15027f); 
+    instance.registerEObj( "barrier3", 2002735, 0, 4, { 17.8324f, -46.0f, 893.874f }, 1.500000f, -1.15027f ); 
+    instance.registerEObj( "barrier4", 2002735, 0, 4, { -17.8324f, -46.0f, 893.874f }, 1.500000f, 1.15027f ); 
+    instance.registerEObj( "shiny1", 2009481, 0, 1, { 17.8324f, -46.0f, 862.874f }, 2.000000f, 1.15027f ); 
+    instance.registerEObj( "shiny2", 2009481, 0, 4, { 19.1835f, -46.0f, 859.856f }, 2.000000f, -1.15027f ); 
+    instance.registerEObj( "shiny3", 2009481, 0, 4, { 16.4835f, -46.0f, 866.0f }, 2.000000f, -1.15027f ); 
+    instance.registerEObj( "shiny4", 2009481, 0, 4, { -17.8324f, -46.0f, 862.874f }, 2.000000f, 1.15027f ); 
+    instance.registerEObj( "shiny5", 2009481, 0, 4, { -19.1835f, -46.0f, 859.856f }, 2.000000f, -1.15027f ); 
+    instance.registerEObj( "shiny6", 2009481, 0, 4, { -16.4835f, -46.0f, 866.0f }, 2.000000f, -1.15027f ); 
+    instance.registerEObj( "shiny7", 2009481, 0, 4, { 17.8324f, -46.0f, 893.874f }, 2.000000f, 1.15027f ); 
+    instance.registerEObj( "shiny8", 2009481, 0, 4, { 16.4835f, -46.0f, 890.856f }, 2.000000f, -1.15027f ); 
+    instance.registerEObj( "shiny9", 2009481, 0, 4, { 19.1835f, -46.0f, 897.314f }, 2.000000f, -1.15027f ); 
+    instance.registerEObj( "shiny10", 2009481, 0, 4, { -17.8324f, -46.0f, 893.874f }, 2.000000f, 1.15027f ); 
+    instance.registerEObj( "shiny11", 2009481, 0, 4, { -16.4835f, -46.0f, 890.856f }, 2.000000f, -1.15027f ); 
+    instance.registerEObj( "shiny12", 2009481, 0, 4, { -19.1835f, -46.0f, 897.314f }, 2.000000f, -1.15027f ); 
     instance.registerEObj( "baportal1", 2009726, 0, 4, { -159.044f, 82.0f, 298.113f }, 1.000000f, -0.738496f ); 
     instance.registerEObj( "baportal2", 2009726, 0, 4, { -159.044f, 82.0f, 329.806f }, 1.000000f, -2.33055f ); 
     instance.registerEObj( "baportal3", 2009726, 0, 4, { -190.799f, 82.0f, 298.324f }, 1.000000f, 0.815023f ); 
@@ -231,6 +317,7 @@ public:
     instance.registerEObj( "scatteredtomes", 2009689, 0, 4, { 34.164f, 80.0001f, 355.328f }, 1.000000f, 2.14483f ); 
     instance.registerEObj( "scatteredtomes2", 2009689, 0, 4, { 39.8161f, 80.0f, 358.031f }, 1.000000f, -3.12194f ); 
     // Board Room
+    instance.registerEObj( "fuck_off_krile", 2002558, 0, 4, { -61.3397f, -56.0487f, 823.553f }, 1.750f, -2.35f ); 
     instance.registerEObj( "baportal6", 2009726, 0, 4, { -64.019f, -56.0487f, 832.019f }, 1.000000f, 2.33615f ); 
     instance.registerEObj( "scatteredtomes3", 2009689, 0, 4, { -45.4946f, -56.0487f, 842.088f }, 1.000000f, -2.99084f ); 
     instance.registerEObj( "journal", 2005896, 0, 4, { -58.5239f, -55.175f, 835.819f }, 1.000000f, 2.80342f ); 
