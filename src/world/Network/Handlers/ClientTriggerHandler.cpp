@@ -194,7 +194,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
         return;
 
       player.emote( emoteId, targetId, isSilent );
-      Logger::debug( "[{0}] {1} used the emote \"{2}\".", player.getId(), player.getName(), emoteData->name);
+      Logger::debug( "[Emote] {1} used the emote \"{2}\".", player.getId(), player.getName(), emoteData->name);
       bool isPersistent = emoteData->emoteMode != 0;
 
       if( isPersistent )

@@ -1686,7 +1686,7 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
 
   auto randomnumber = uni(rng);
 
-  Logger::debug( "[{0}] {1} rolled 1d{2}. Result: {3}", player.getId(), player.getName(), maxnumber, randomnumber );
+  Logger::debug( "[Random] {1} rolled 1d{2}. Result: {3}", player.getId(), player.getName(), maxnumber, randomnumber );
 
   auto inRange = player.getInRangeActors( false );
     for( auto actor : inRange )
