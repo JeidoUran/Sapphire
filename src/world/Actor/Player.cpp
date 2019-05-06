@@ -1718,7 +1718,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     entry.value = damage;
     entry.effectType = Common::ActionEffectType::Damage;
     entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
-    entry.param = variation;
+    entry.param = 0x72;
 
     effectPacket->addEffect( entry );
 
@@ -1733,6 +1733,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     entry.value = damage;
     entry.effectType = Common::ActionEffectType::Damage;
     entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+    entry.param = 0x73;
 
     effectPacket->addEffect( entry );
 

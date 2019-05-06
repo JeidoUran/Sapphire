@@ -40,15 +40,13 @@ namespace Sapphire::Network::Packets::Server
       m_data.hPMax = player.getMaxHp();
       m_data.mPMax = player.getMaxMp();
 
-      // m_data.tPMax = 3000;
+      //m_data.tPMax = 3000;
       m_data.level = player.getLevel();
       m_data.gmRank = player.getGmRank();
       m_data.pose = player.getPose();
 
       m_data.bNPCBase = player.getbNPCBase();
       m_data.bNPCName = player.getbNPCName();
-
-      m_data.displayFlags = player.getDisplayFlags();
 
       m_data.modelChara = player.getModelChara();
 
