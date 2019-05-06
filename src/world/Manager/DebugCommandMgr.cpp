@@ -2541,6 +2541,11 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
   {
     uint32_t action;
     sscanf( params.c_str(), "%u", &action );
+    if ( !pExdData->get< Sapphire::Data::Action >( action ) )
+    {
+      player.sendUrgent ( "{0} is not a valid Action ID.", action );
+      return;
+    }
     // player.sendToInRangeSet( makeActorControl142( player.getId(), BluActionLearn, 0, 1, 0, 0, 0 ), true );
     auto inRange = player.getInRangeActors( true );
     for( auto actor : inRange )
