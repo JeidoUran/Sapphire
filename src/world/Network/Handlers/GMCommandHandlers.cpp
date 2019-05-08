@@ -225,7 +225,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       player.setGmInvis( !player.getGmInvis() );
       player.sendNotice( 0, "Invisibility flag for {0} was toggled to {1}", player.getName(), player.getGmInvis() );
 
-      for( auto actor : player.getInRangeActors( true ) )
+      for( auto actor : player.getInRangeActors() )
       {
         if( actor->isPlayer() )
         {

@@ -1949,7 +1949,7 @@ Sapphire::Entity::Player::sendZoneInPackets( uint32_t param1, uint32_t param2 = 
   auto SetStatusPacket = makeActorControl142( getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
 
   if( !getGmInvis() )
-    sendToInRangeSet( zoneInPacket, true );
+    sendToInRangeSet( zoneInPacket );
 
   if( shouldSetStatus )
     sendToInRangeSet( SetStatusPacket, true );
