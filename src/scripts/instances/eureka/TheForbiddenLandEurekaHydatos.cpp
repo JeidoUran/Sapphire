@@ -110,36 +110,6 @@ public:
       player.setModelMainWeapon( 0x0000000000000000 );
       player.sendModel();
     }
-    // Setup Allagan Bug
-    else if( player.getId() == 2097196 )
-    {
-      player.setRot( -0.0458374 );
-      player.setPos( { -4.15134f, 22.2563f, 584.298f } );
-      player.setModelType( 2 );
-      player.setSubType( 5 );
-      player.setEnemyType( 4 );
-      player.setbNPCName( 1474 );
-      player.setElementalLevel( 70 );
-      player.setElement( 14 );
-      player.setModelMainWeapon( 0x0000000000000000 );
-      player.sendModel();
-      player.setGmInvis( true );
-    }
-    // Setup Allagan Drone
-    else if( player.getId() == 2097197 )
-    {
-      player.setRot( -0.245784 );
-      player.setPos( { 4.13544f, 22.5489f, 585.469f } );
-      player.setModelType( 2 );
-      player.setSubType( 5 );
-      player.setEnemyType( 4 );
-      player.setbNPCName( 2885 );
-      player.setElementalLevel( 70 );
-      player.setElement( 14 );
-      player.setModelMainWeapon( 0x0000000000000000 );
-      player.sendModel();
-      player.setGmInvis( true );
-    }
     // Setup ADS 01/RED
     else if( player.getId() == 2097195 )
     {
@@ -154,6 +124,36 @@ public:
       player.setElement( 14 );
       player.setModelMainWeapon( 0x0000000000000000 );
       player.sendModel();
+    }
+    // Setup Allagan Bug
+    else if( player.getId() == 2097196 )
+    {
+      player.setRot( 0.202267f );
+      player.setPos( { 108.091f, 56.0f, 431.162f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCName( 1474 );
+      player.setElementalLevel( 70 );
+      player.setElement( 14 );
+      player.setModelMainWeapon( 0x0000000000000000 );
+      player.sendModel();
+      player.setGmInvis( true );
+    }
+    // Setup Allagan Drone
+    else if( player.getId() == 2097197 )
+    {
+      player.setRot( -0.419972f );
+      player.setPos( { 116.259f, 56.0f, 431.884f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCName( 2885 );
+      player.setElementalLevel( 70 );
+      player.setElement( 14 );
+      player.setModelMainWeapon( 0x0000000000000000 );
+      player.sendModel();
+      player.setGmInvis( true );
     }
     // Setup Neema
     else if( player.getId() == 2097154 )
