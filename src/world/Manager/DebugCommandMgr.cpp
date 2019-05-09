@@ -2500,6 +2500,21 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
       player.sendModel();
     }
   }
+  else if( subCommand == "edenwep" )
+  {
+    if ( params == "brd" )
+    {
+      player.setModelMainWeapon( 0x0000000100010265 );
+      player.setModelSubWeapon( 0x00000001004602BA );
+      player.sendModel();
+    }
+    else if ( params == "drk" )
+    {
+      player.setModelMainWeapon( 0x00000001000805DD );
+      player.setModelSubWeapon( 0 );
+      player.sendModel();
+    }
+  }
   else if( subCommand == "batwin" )
   {
     if ( params == "art" )
@@ -2530,12 +2545,6 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
       player.sendModel();
       return;
     }
-
-    else if ( params == "swap" )
-    {
-      player.setRot( -0.00240898f );
-      player.setPos( { -129.009f, -10.01f, 747.943f } );
-    }
   }
   else if( subCommand == "actionlearn" )
   {
@@ -2561,12 +2570,27 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
   
   else if( subCommand == "mount" )
   {
+    auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( player.getId() );
+    initZonePacket->data().zoneId = player.getCurrentZone()->getTerritoryTypeId();
+    initZonePacket->data().weatherId = static_cast< uint8_t >( player.getCurrentZone()->getCurrentWeather() );
+    initZonePacket->data().bitmask = 0x1;
+    initZonePacket->data().bitmask1 = 16;
+    initZonePacket->data().unknown5 = 0x2A;
+    initZonePacket->data().festivalId = player.getCurrentZone()->getCurrentFestival().first;
+    initZonePacket->data().additionalFestivalId = player.getCurrentZone()->getCurrentFestival().second;
+    initZonePacket->data().pos.x = player.getPos().x;
+    initZonePacket->data().pos.y = player.getPos().y;
+    initZonePacket->data().pos.z = player.getPos().z;
+
+    player.queuePacket( initZonePacket );
     auto inRange = player.getInRangeActors( true );
     for( auto actor : inRange )
     {
       if( actor->isPlayer() )
       {
         actor->getAsPlayer()->mount( 119 );
+        actor->getAsPlayer()->queuePacket( initZonePacket );
+        actor->getAsPlayer()->respawn();
       }
     }
     
@@ -2575,6 +2599,40 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
   {
     player.setModelMainWeapon( 0x0000000100011F62 );
     player.sendModel();
+  }
+  
+  else if( subCommand == "flashback" )
+  {
+  {
+    if( isFlashBack == false )
+    {
+      auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          actor->getAsPlayer()->setGmInvis( true );
+          actor->getAsPlayer()->queuePacket( makeActorControl143( actor->getAsPlayer()->getId(), Flee, -1 ) );
+          actor->getAsPlayer()->respawn();
+        }
+      }
+      isFlashBack = true;
+    }
+    else if( isFlashBack == true )
+    {
+      auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          actor->getAsPlayer()->setGmInvis( false );
+          actor->getAsPlayer()->queuePacket( makeActorControl143( actor->getAsPlayer()->getId(), Flee, 0 ) );
+          actor->getAsPlayer()->respawn();
+        }
+      }
+      isFlashBack = false;
+    }
+  }
   }
   else
   {
@@ -2642,7 +2700,7 @@ void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Playe
       player.setSubType( 5 );
       player.setEnemyType( 0 );
       player.respawn();
-      player.sendNotice( 0, "Player respawned as an enemy." );
+      player.sendNotice( 0, "Player respawned as a friendly NPC." );
       return;
     }
     else
@@ -2710,11 +2768,6 @@ void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Playe
     player.setDisplayFlags( displayflags );
     player.respawn();
     player.sendNotice( 0, "DisplayFlags set to {0}.", displayflags );
-  }
-  else if( subCommand == "odinflags" )
-  {
-    player.setDisplayFlags( 3 );
-    player.respawn();
   }
   else
   {
