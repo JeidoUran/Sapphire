@@ -164,8 +164,8 @@ void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
 
   if( headerResult == Malformed )
   {
-    Logger::info( "Dropping connection due to malformed packet header." );
-    disconnect();
+    Logger::warn( "[{0}] Malformed packet header detected.", m_pSession->getId() );
+    // disconnect();
     return;
   }
 
@@ -177,10 +177,10 @@ void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
   if( packetResult == Incomplete )
     return;
 
-  if( packetResult == Malformed )
+  if( headerResult == Malformed )
   {
-    Logger::info( "Dropping connection due to malformed packets." );
-    disconnect();
+    Logger::warn( "[{0}] Malformed packet header detected.", m_pSession->getId() );
+    // disconnect();
     return;
   }
 
