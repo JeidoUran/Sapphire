@@ -2278,11 +2278,19 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       player.sendUrgent( "You need to prepare a RP session before using this command. Use \"!rp prepare\".");
       return;
     }
+
     for( auto member : m_rpMembers )
     {
+      auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( member->getAsPlayer()->getId() );
+      preparePacket->data().targetZone = player.getZoneId();
+      preparePacket->data().fadeOutTime = 3;
+      preparePacket->data().animation = 0;
+      preparePacket->data().fadeOut = true;
+      preparePacket->data().unknown = 9;
       if( member->getAsPlayer() != player.getAsPlayer() )
       {
-        member->getAsPlayer()->prepareZoning( player.getZoneId(), true, 1, 0 );
+        // member->getAsPlayer()->prepareZoning( player.getZoneId(), true, 1, 0 );
+        member->getAsPlayer()->queuePacket( preparePacket );
         if( member->getAsPlayer()->getCurrentInstance() )
         {
           member->getAsPlayer()->exitInstance();
@@ -2606,7 +2614,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
   {
     if( isFlashBack == false )
     {
-      auto inRange = player.getInRangeActors( true );
+      auto inRange = player.getInRangeActors( false );
       for( auto actor : inRange )
       {
         if( actor->isPlayer() )
@@ -2620,7 +2628,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
     }
     else if( isFlashBack == true )
     {
-      auto inRange = player.getInRangeActors( true );
+      auto inRange = player.getInRangeActors( false );
       for( auto actor : inRange )
       {
         if( actor->isPlayer() )
