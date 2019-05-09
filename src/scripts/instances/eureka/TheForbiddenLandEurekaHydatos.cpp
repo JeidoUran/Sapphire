@@ -161,18 +161,20 @@ public:
       player.setRot( -2.76431 );
       player.setPos( { -70.2228f, 80.0f, 349.287f } );
     }
+    // Setup Anjudo's Group
+
     // Setup Players
     else
     {
       // 1st Session
-      player.mount( 119 );
-      player.getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( 10 ) );
-      player.setRot( 1.96528f );
-      player.setPos( { -991.284f, 580.0f, -69.2263f } );
+      // player.mount( 119 );
+      // player.getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( 10 ) );
+      // player.setRot( 1.96528f );
+      // player.setPos( { -991.284f, 580.0f, -69.2263f } );
 
       // 2nd Session
-      // player.setRot(  0.0126879f );
-      // player.setPos( { 0.0360257f, -45.9304f, 857.436f } );
+      player.setRot(  0.0126879f );
+      player.setPos( { 0.0360257f, -45.9304f, 857.436f } );
 
       // 3rd Session
 
