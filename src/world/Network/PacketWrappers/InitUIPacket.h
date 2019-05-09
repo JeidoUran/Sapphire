@@ -85,6 +85,7 @@ namespace Sapphire::Network::Packets::Server
       memset( m_data.unlockedRaids, 0xFF, sizeof( m_data.unlockedRaids ) );
       memset( m_data.unlockedTrials, 0xFF, sizeof( m_data.unlockedTrials ) );
 
+      memset( m_data.mountGuideMask, 0xFF, sizeof( m_data.watchedCutscenes ) );
       memset( m_data.mountGuideMask, 0xFF, sizeof( m_data.mountGuideMask ) );
       memset( m_data.unlockBitmask, 0xFF, sizeof( m_data.unlockBitmask ) );
       memset( m_data.aetheryte, 0xFF, sizeof( m_data.aetheryte ) );
