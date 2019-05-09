@@ -358,6 +358,9 @@ namespace Sapphire::Entity
     /*! return the equipment model in a specified equipment slot */
     uint32_t getModelForSlot( Common::GearModelSlot slot );
 
+    /*! set the equipment model in a specified equipment slot */
+    void setModelForSlot( Common::GearModelSlot slot, uint32_t val );
+
     /*! add amount to the currency of type */
     void addCurrency( Common::CurrencyType type, uint32_t amount );
 
