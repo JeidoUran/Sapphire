@@ -410,7 +410,18 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     if( params == "2" )
       player.sendToInRangeSet( makeActorControl142( player.getId(), 407, 141, 0, 0, 0, 32515 ), true );
   }
-  
+
+  else if ( subCommand == "gearmodel" )
+  {
+    uint32_t slot;
+    uint32_t val;
+    sscanf( params.c_str(), "%d %d", &slot, &val );
+
+    player.setModelForSlot( static_cast< Common::GearModelSlot >( slot ), val );
+    player.sendModel();
+    player.sendDebug( "Model updated" );
+  }
+
   else if( subCommand == "mount" )
   {
     auto pExdData = framework()->get< Data::ExdDataGenerated >();

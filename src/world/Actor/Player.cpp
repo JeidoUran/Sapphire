@@ -983,6 +983,12 @@ uint32_t Sapphire::Entity::Player::getModelForSlot( Common::GearModelSlot slot )
   return m_modelEquip[ slot ];
 }
 
+void Sapphire::Entity::Player::setModelForSlot( Common::GearModelSlot slot, uint32_t val )
+{
+  m_modelEquip[slot] = val;
+}
+
+
 uint64_t Sapphire::Entity::Player::getModelMainWeapon() const
 {
   return m_modelMainWeapon;
