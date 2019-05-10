@@ -126,7 +126,7 @@ void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
   if( !pTarget->isObjSpawnIndexValid( spawnIndex ) )
     return;
 
-  Logger::debug( "[{0}] Spawning EObj: id#{1} name={2}", pTarget->getId(), getId(), getName() );
+  // Logger::debug( "[{0}] Spawning EObj: id#{1} name={2}", pTarget->getId(), getId(), getName() );
 
   auto eobjStatePacket = makeZonePacket< FFXIVIpcObjectSpawn >( getId(), pTarget->getId() );
   eobjStatePacket->data().spawnIndex = spawnIndex;
@@ -146,7 +146,7 @@ void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
 
 void Sapphire::Entity::EventObject::despawn( Sapphire::Entity::PlayerPtr pTarget )
 {
-  Logger::debug( "[{0}] despawn eobj#{1}", pTarget->getId(), getId() );
+  // Logger::debug( "[{0}] despawn eobj#{1}", pTarget->getId(), getId() );
 
   pTarget->freeObjSpawnIndexForActorId( getId() );
 }
