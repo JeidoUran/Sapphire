@@ -116,6 +116,28 @@ public:
       player.sendModel();
     }
 
+    //! Setup Small Rooms Mobs
+    else if( player.getId() == 2097180 || player.getId() == 2097181 || player.getId() == 2097182 )
+    {
+      player.setRot( 0.0337155 );
+      player.setPos( { -95.5791f, 48.0f, 457.621f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 6015 );
+      if( player.getId() == 2097180 )
+        player.setbNPCName( 7985 );
+      if( player.getId() == 2097181 )
+        player.setbNPCName( 7986 );
+      if( player.getId() == 2097182 )
+        player.setbNPCName( 7987 );
+      player.setElementalLevel( 70 );
+      player.setElement( 14 );
+      player.setModelMainWeapon( 0x0000000000000000 );
+      player.sendModel();
+      player.setGmInvis( true );
+    }
+
     //! Setup ADS 01/RED
     else if( player.getId() == 2097195 )
     {
@@ -336,7 +358,7 @@ public:
     // instance.registerEObj( "unknown_29", 2007457, 7844636, 4, { -38.071289f, 50.034302f, 457.968994f }, 0.991760f, 0.000048f ); 
 
     //! RP Renamed eobjs
-    instance.registerEObj( "art_effect", 2007457, 7768488, 4, { -134.917297f, -10.010040f, 750.439819f }, 1.000000f, 0.000000f ); 
+    // instance.registerEObj( "art_effect", 2007457, 7768488, 4, { -134.917297f, -10.010040f, 750.439819f }, 1.000000f, 0.000000f ); 
     // instance.registerEObj( "raiden_lightning", 2007457, 7745394, 4, { -1.825981f, 50.002331f, 457.632202f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "raiden_ztk", 2007457, 7741260, 4, { 1.700844f, 50.002331f, 457.632202f }, 1.000000f, 0.000000f ); 
     // instance.registerEObj( "av_dark_puddle", 2009673, 0, 4, { -172.344406f, 81.999977f, 331.537994f }, 1.000000f, 0.000000f );
@@ -365,8 +387,10 @@ public:
     instance.registerEObj( "door6_collision", 2007457, 7788880, 4, { -175.036301f, 80.979607f, 253.559097f }, 0.991760f, 0.000048f ); // REMAINS CLOSED
     // instance.registerEObj( "doorozma_collision", 2007457, 7788882, 4, { -16.647579f, 108.995102f, 108.171097f }, 0.991760f, 0.000048f ); // UNUSED
     // instance.registerEObj( "raiden_path", 2007457, 7844636, 4, { -38.071289f, 50.034302f, 457.968994f }, 0.991760f, 0.000048f ); // UNUSED
-    instance.registerEObj( "Leatherboundjournal", 2005180, 0, 4, { 10.215350f, -46.000000f, 868.765320f }, 0.991760f, 0.000048f ); 
-    instance.registerEObj( "Leatherboundjournal_1", 2005180, 0, 4, { -10.306930f, -46.000000f, 868.765320f }, 0.991760f, 0.000048f ); 
+
+    //! RP Altered eobjs
+    instance.registerEObj( "Leatherboundjournal", 2005180, 0, 4, { 10.215350f, -46.000000f, 888.765320f }, 0.991760f, 0.000048f ); 
+    instance.registerEObj( "Leatherboundjournal_1", 2005180, 0, 4, { -10.306930f, -46.000000f, 888.765320f }, 0.991760f, 0.500048f ); 
     instance.registerEObj( "Leatherboundjournal_2", 2005180, 0, 4, { 132.798294f, -15.999980f, 860.287476f }, 0.991760f, 0.785458f ); 
     instance.registerEObj( "Leatherboundjournal_3", 2005180, 0, 4, { -132.577606f, -16.000031f, 860.005371f }, 0.991760f, 0.785458f ); 
 
@@ -394,6 +418,7 @@ public:
     instance.registerEObj( "shiny10", 2009481, 0, 4, { -17.8324f, -46.0f, 893.874f }, 2.000000f, 1.15027f ); 
     instance.registerEObj( "shiny11", 2009481, 0, 4, { -16.4835f, -46.0f, 890.856f }, 2.000000f, -1.15027f ); 
     instance.registerEObj( "shiny12", 2009481, 0, 4, { -19.1835f, -46.0f, 897.314f }, 2.000000f, -1.15027f ); 
+    instance.registerEObj( "Leatherboundjournal_4", 2005180, 0, 4, { 1.8686f, -46.0f, 870.188f }, 0.991760f, 0.377131f ); 
     // Shin-Zantetsuken and Lance of Virtue Containment Units
     instance.registerEObj( "journalztk", 2005180, 0, 4, { -2.05479f, 50.0023f, 451.499f }, 1.000000f, 0.0175188f ); 
     instance.registerEObj( "timegate1", 2007468, 0, 4, { -19.7907f, 50.0768f, 477.796f }, 1.000000f, 0.0175188f ); 

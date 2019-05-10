@@ -2294,7 +2294,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
     {
       auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( member->getAsPlayer()->getId() );
       preparePacket->data().targetZone = player.getZoneId();
-      preparePacket->data().fadeOutTime = 3;
+      preparePacket->data().fadeOutTime = 1;
       preparePacket->data().animation = 0;
       preparePacket->data().fadeOut = true;
       preparePacket->data().unknown = 9;
