@@ -533,6 +533,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::Kick:
     {
       // todo: this doesn't kill their session straight away, should do this properly but its good for when you get stuck for now
+      targetPlayer->sendUrgent( "Packets malformés détectés. Vous allez être déconnecté sous 15 secondes." );
       targetPlayer->setMarkedForRemoval();
 
       player.sendNotice( 0, "Kicked {0}", targetPlayer->getName() );
