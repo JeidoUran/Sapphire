@@ -1674,7 +1674,7 @@ void Sapphire::World::Manager::DebugCommandMgr::housing( char* data, Entity::Pla
 }
 void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
-  {
+{
   std::string subCommand;
 
   // check if the command has parameters
@@ -1686,29 +1686,68 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
   uint32_t maxnumber( 100 );
   sscanf( tmpCommand.c_str(), "%u", &maxnumber );
 
-  if( maxnumber > 1000000 )
+  if( maxnumber > 1000000 || maxnumber == 0 )
   {
-    player.sendUrgent( "Input a number between 0 and 1000000." );
+    player.sendUrgent( "Input a number between 1 and 1000000." );
     return;
   }
   std::random_device rd;     // only used once to initialise (seed) engine
   std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
-  std::uniform_int_distribution<int> uni(0, ( maxnumber )); // guaranteed unbiased
+  std::uniform_int_distribution<int> uni( 1, ( maxnumber )); // guaranteed unbiased
 
   auto randomnumber = uni(rng);
-
-  Logger::debug( "[Random] {1} rolled 1d{2}. Result: {3}", player.getId(), player.getName(), maxnumber, randomnumber );
+  Logger::debug( "[Random] {0} rolled 1d{1}. Result: {2}", player.getName(), maxnumber, randomnumber );
 
   auto inRange = player.getInRangeActors( false );
+  if( randomnumber == 1 )
+  {
     for( auto actor : inRange )
     {
       if( actor->isPlayer() )
       {
-        actor->getAsPlayer()->sendNotice( 0, "{0} rolls 1d{1}. Result: {2}.", player.getName(), maxnumber, randomnumber  );
+        actor->getAsPlayer()->sendNotice( 0, "[Random] {0} rolled 1d{1}. Result: 1...", player.getName(), maxnumber );
       }
     }
-  player.sendNotice( 0, "You roll 1d{0}. Result: {1}.", maxnumber, randomnumber );
   }
+  else if( randomnumber == 69 )
+  {
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        actor->getAsPlayer()->sendNotice( 0, "[Random] {0} rolled 1d{1}. Result: 69 OwO", player.getName(), maxnumber );
+      }
+    }
+  }
+  else if( randomnumber == maxnumber )
+  {
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        actor->getAsPlayer()->sendNotice( 0, "[Random] {0} rolled 1d{1}. Result: {2}!!", player.getName(), maxnumber, randomnumber );
+      }
+    }
+  }
+  else
+  {
+    for( auto actor : inRange )
+    {
+      if( actor->isPlayer() )
+      {
+        actor->getAsPlayer()->sendNotice( 0, "{0} rolls 1d{1}. Result: {2}.", player.getName(), maxnumber, randomnumber );
+      }
+    }
+  }
+  if( randomnumber == 1 )
+    player.sendNotice( 0, "You roll 1d{0}. Result: 1...", maxnumber );  
+  else if( randomnumber == 69 )
+    player.sendNotice( 0, "You roll 1d{0}. Result: 69 OwO", maxnumber );
+  else if( randomnumber == maxnumber )
+    player.sendNotice( 0, "You roll 1d{0}. Result: {1}!!", maxnumber, randomnumber );
+  else
+    player.sendNotice( 0, "You roll 1d{0}. Result: {1}.", maxnumber, randomnumber );
+}
 
 
 void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Player& player,
@@ -2799,6 +2838,7 @@ void Sapphire::World::Manager::DebugCommandMgr::respawn( char* data, Entity::Pla
 
 {
   player.respawn();
+  player.sendNotice( 0, "Player respawned." );
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player& player,
