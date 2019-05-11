@@ -187,46 +187,46 @@ public:
     }
 
     //! Setup Neema
-    // 2nd Session (Flashback)
     else if( player.getId() == 2097154 )
     {
-      player.setRot( -0.538333f );
-      player.setPos( { 134.835f, 497.699f, -29.7634f } );
+      // 2nd Session (Flashback)
+      // player.setRot( -0.538333f );
+      // player.setPos( { 134.835f, 497.699f, -29.7634f } );
 
     // 3rd Session
-      // player.setRot( 3.12456f );
-      // player.setPos( { 50.1586f, 590.0f, 644.67f } );
-      // player.setGmInvis( true );
+      player.setRot( 3.12456f );
+      player.setPos( { 50.1586f, 590.0f, 644.67f } );
+      player.setGmInvis( true );
 
     }
 
     //! Setup Anjudo (Flashback)
-    else if( player.getId() == 2097157 )
-    {
-      player.setRot( -0.538333f );
-      player.setPos( { 134.835f, 497.699f, -29.7634f } );
-    }
+    // else if( player.getId() == 2097157 )
+    // {
+      // player.setRot( -0.538333f );
+      // player.setPos( { 134.835f, 497.699f, -29.7634f } );
+    // }
 
     //! Setup Khojin (Flashback)
-    else if( player.getId() == 2097157 )
-    {
-      player.setRot( -0.538333f );
-      player.setPos( { 134.835f, 497.699f, -29.7634f } );
-    }
+    // else if( player.getId() == 2097155 )
+    // {
+      // player.setRot( -0.538333f );
+      // player.setPos( { 134.835f, 497.699f, -29.7634f } );
+    // }
 
     //! Setup Cyrus (Flashback)
-    else if( player.getId() == 2097158 )
-    {
-      player.setRot( -2.17353f );
-      player.setPos( { -75.1413f, 80.0f, 349.121f } );
-    }
+    // else if( player.getId() == 2097158 )
+    // {
+      // player.setRot( -2.17353f );
+      // player.setPos( { -75.1413f, 80.0f, 349.121f } );
+    // }
 
     //! Setup Anjudo's Group (3rd Session)
-    // else if( player.getId() == 2097157 || player.getId() == 2097155 || player.getId() == 2097158 || player.getId() == 2097159 )
-    // {
-      // player.setRot( 3.12456f );
-      // player.setPos( { 50.1586f, 590.0f, 644.67f } );
-    // }
+    else if( player.getId() == 2097157 || player.getId() == 2097155 || player.getId() == 2097158 || player.getId() == 2097159 )
+    {
+      player.setRot( 3.12456f );
+      player.setPos( { 50.1586f, 590.0f, 644.67f } );
+    }
 
     //! Setup Players
     else
@@ -238,12 +238,14 @@ public:
       // player.setPos( { -991.284f, 580.0f, -69.2263f } );
 
       // 2nd Session
-      player.getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( 10 ) );
-      player.setRot(  0.0126879f );
-      player.setPos( { 0.0360257f, -45.9304f, 857.436f } );
+      // player.getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( 10 ) );
+      // player.setRot(  0.0126879f );
+      // player.setPos( { 0.0360257f, -45.9304f, 857.436f } );
 
       // 3rd Session
-      // Start in Board Room?
+      player.getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( 10 ) );
+      player.setRot(  -1.58417f );
+      player.setPos( { -136.526f, 80.1581f, 314.09f } );
     }
 
     //! Setup eobjs
