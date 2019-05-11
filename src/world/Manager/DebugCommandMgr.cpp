@@ -2830,6 +2830,7 @@ void Sapphire::World::Manager::DebugCommandMgr::respawn( char* data, Entity::Pla
 
 {
   player.respawn();
+  player.sendNotice( 0, "Player respawned." );
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player& player,
