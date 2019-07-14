@@ -64,6 +64,7 @@ namespace Sapphire
     std::vector< Entity::SpawnGroup > m_spawnGroups;
 
     uint32_t m_effectCounter;
+    std::shared_ptr< World::Navi::NaviProvider > m_pNaviProvider;
 
   public:
     Zone();
@@ -174,6 +175,8 @@ namespace Sapphire
     void updateSpawnPoints();
 
     uint32_t getNextEffectSequence();
+
+    std::shared_ptr< World::Navi::NaviProvider > getNaviProvider();
   };
 
 }

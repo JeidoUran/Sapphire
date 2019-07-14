@@ -48,6 +48,9 @@ Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle
 
 bool Sapphire::QuestBattle::init()
 {
+  if( !Zone::init() )
+    return false;
+
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onInstanceInit( getAsQuestBattle() );
 
@@ -156,6 +159,8 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onInstanceUpdate( getAsQuestBattle(), tickCount );
+
+  m_lastUpdate = tickCount;
 }
 
 void Sapphire::QuestBattle::onFinishLoading( Entity::Player& player )
@@ -380,7 +385,7 @@ uint32_t Sapphire::QuestBattle::getQuestId() const
 uint32_t Sapphire::QuestBattle::getCountEnemyBNpc()
 {
   uint32_t count = 0;
-  for( auto bnpcIt : m_bNpcMap )
+  for( const auto& bnpcIt : m_bNpcMap )
   {
     if( bnpcIt.second->getEnemyType() == 4 && bnpcIt.second->isAlive() )
       count++;

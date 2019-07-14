@@ -54,6 +54,19 @@ namespace Sapphire::Network::Packets::Server
 
   /**
   * Structural representation of the packet sent by the server
+  * to show a list of worlds for world visit
+  */
+  struct FFXIVIpcWorldVisitList : FFXIVIpcBasePacket< WorldVisitList >
+  {
+    struct worldEntry
+    {
+      uint16_t id; // this is the id of the world from lobby
+      uint16_t status; // 1 = available (this is what retail sends) | 2+ = unavailable (this will need to be checked with retail if it's exactly 2 or not since it does not actually lock the option)
+    } world[16];
+  };
+
+  /**
+  * Structural representation of the packet sent by the server
   * carrying chat messages
   */
   struct FFXIVIpcLogout : FFXIVIpcBasePacket< Logout >
@@ -292,7 +305,7 @@ namespace Sapphire::Network::Packets::Server
   * Structural representation of the packet sent by the server
   * add a status effect
   */
-  struct FFXIVIpcAddStatusEffect : FFXIVIpcBasePacket< AddStatusEffect >
+  struct FFXIVIpcEffectResult : FFXIVIpcBasePacket< EffectResult >
   {
     uint32_t unknown;
     uint32_t actor_id;
@@ -709,6 +722,17 @@ namespace Sapphire::Network::Packets::Server
     uint32_t padding;
   };
 
+  struct FFXIVIpcHateRank : FFXIVIpcBasePacket< HateRank >
+  {
+    uint32_t numEntries;
+    struct
+    {
+      uint32_t actorId;
+      uint32_t hateAmount;
+    } entry[32];
+    uint32_t padding;
+  };
+
   struct FFXIVIpcUpdateClassInfo : FFXIVIpcBasePacket< UpdateClassInfo >
   {
     uint8_t classId;
@@ -772,7 +796,7 @@ namespace Sapphire::Network::Packets::Server
   * Structural representation of the packet sent by the server to initialize
   * the client UI upon initial connection.
   */
-  struct FFXIVIpcInitUI : FFXIVIpcBasePacket< InitUI >
+  struct FFXIVIpcPlayerSetup : FFXIVIpcBasePacket< PlayerSetup >
   {
     // plain C types for a bit until the packet is actually fixed.
     // makes conversion between different editors easier.
@@ -814,6 +838,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned char race;
     unsigned char tribe;
     unsigned char gender;
+    unsigned char unknown7A;
     unsigned char currentJob;
     unsigned char currentClass;
     unsigned char deity;
@@ -821,7 +846,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned char namedayDay;
     unsigned char cityState;
     unsigned char homepoint;
-    unsigned char unknown81;
+    unsigned char unknown82;
     unsigned char petHotBar;
     unsigned char companionRank;
     unsigned char companionStars;
@@ -835,16 +860,16 @@ namespace Sapphire::Network::Packets::Server
     unsigned char relicBookId;
     unsigned char unknown90[4];
     unsigned char craftingMasterMask;
-    unsigned char unknown95[10];
+    unsigned char unknown95[9];
     unsigned char unknown9F[2];
     unsigned char unknownA1[3];
-    unsigned int exp[26];
+    unsigned int exp[28];
     unsigned int unknown108;
     unsigned int pvpTotalExp;
     unsigned int unknownPvp110;
     unsigned int pvpExp;
     unsigned int pvpFrontlineOverallRanks[3];
-    unsigned short levels[26];
+    unsigned short levels[28];
     unsigned short unknown15C[9];
     unsigned short u1;
     unsigned short u2;
@@ -859,32 +884,32 @@ namespace Sapphire::Network::Packets::Server
     unsigned char companionAttRank;
     unsigned char companionHealRank;
     unsigned char u19[2];
-    unsigned char mountGuideMask[17];
+    unsigned char mountGuideMask[19];
     char name[32];
     unsigned char unknownOword[16];
     unsigned char unknownOw;
     unsigned char unlockBitmask[64];
-    unsigned char aetheryte[17];
-    unsigned char discovery[421];
+    unsigned char aetheryte[21];
+    unsigned char discovery[445];
     unsigned char howto[34];
-    unsigned char minions[42];
-    unsigned char chocoboTaxiMask[8];
-    unsigned char watchedCutscenes[118];
-    unsigned char companionBardingMask[9];
+    unsigned char minions[45];
+    unsigned char chocoboTaxiMask[10];
+    unsigned char watchedCutscenes[124];
+    unsigned char companionBardingMask[10];
     unsigned char companionEquippedHead;
     unsigned char companionEquippedBody;
     unsigned char companionEquippedLegs;
     unsigned char unknown52A[4];
     unsigned char unknownMask52E[11];
-    unsigned char fishingGuideMask[89];
-    unsigned char fishingSpotVisited[25];
-    unsigned char unknown59A[15];
-    unsigned char unknown5A9[5];
+    unsigned char fishingGuideMask[105];
+    unsigned char fishingSpotVisited[31];
+    unsigned char unknown59A[27];
+    unsigned char unknown5A9[7];
     unsigned char beastRank[11];
     unsigned char unknownPvp5AB[11];
     unsigned char unknown5B9[5];
-    unsigned char unknown5B91;
     unsigned char pose;
+    unsigned char unknown5B91;
     unsigned char challengeLogComplete[9];
     unsigned char weaponPose;
     unsigned char unknownMask673[10];

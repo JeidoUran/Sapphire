@@ -604,3 +604,8 @@ CREATE TABLE `charamonsternote` (
   `UPDATE_DATE` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY(`CharacterId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `__Migration` (
+   `MigrationName` VARCHAR(250) NOT NULL,
+   PRIMARY KEY (`MigrationName`)
+) ENGINE=InnoDB;

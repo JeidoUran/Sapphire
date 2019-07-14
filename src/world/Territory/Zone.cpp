@@ -20,6 +20,7 @@
 #include "QuestBattle.h"
 #include "PublicContent.h"
 #include "Manager/TerritoryMgr.h"
+#include "Navi/NaviProvider.h"
 
 #include "Session.h"
 #include "Actor/Chara.h"
@@ -42,7 +43,8 @@
 #include "Zone.h"
 #include "Framework.h"
 
-#include <Manager/RNGMgr.h>
+#include "Manager/RNGMgr.h"
+#include "Manager/NaviMgr.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -128,6 +130,16 @@ bool Sapphire::Zone::init()
   if( pScriptMgr->onZoneInit( shared_from_this() ) )
   {
     // all good
+  }
+
+  auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
+  pNaviMgr->setupTerritory( m_territoryTypeInfo->bg );
+
+  m_pNaviProvider = pNaviMgr->getNaviProvider( m_territoryTypeInfo->bg );
+
+  if( !m_pNaviProvider )
+  {
+    Logger::warn( "No navmesh found for TerritoryType#{}", getTerritoryTypeId() );
   }
 
   return true;
@@ -232,9 +244,15 @@ void Sapphire::Zone::pushActor( Entity::ActorPtr pActor )
     }
   }
 
+  int32_t agentId = -1;
+
   if( pActor->isPlayer() )
   {
     auto pPlayer = pActor->getAsPlayer();
+
+    if( m_pNaviProvider )
+      agentId = m_pNaviProvider->addAgent( *pPlayer );
+    pPlayer->setAgentId( agentId );
 
     auto pServerZone = m_pFw->get< World::ServerMgr >();
     m_playerMap[ pPlayer->getId() ] = pPlayer;
@@ -243,6 +261,10 @@ void Sapphire::Zone::pushActor( Entity::ActorPtr pActor )
   else if( pActor->isBattleNpc() )
   {
     auto pBNpc = pActor->getAsBNpc();
+
+    if( m_pNaviProvider )
+      agentId = m_pNaviProvider->addAgent( *pBNpc );
+    pBNpc->setAgentId( agentId );
 
     m_bNpcMap[ pBNpc->getId() ] = pBNpc;
     updateCellActivity( cx, cy, 2 );
@@ -264,6 +286,9 @@ void Sapphire::Zone::removeActor( Entity::ActorPtr pActor )
   if( pActor->isPlayer() )
   {
 
+    if( m_pNaviProvider )
+      m_pNaviProvider->removeAgent( *pActor->getAsChara() );
+
     // If it's a player and he's inside boundaries - update his nearby cells
     if( pActor->getPos().x <= _maxX && pActor->getPos().x >= _minX &&
         pActor->getPos().z <= _maxY && pActor->getPos().z >= _minY )
@@ -279,6 +304,8 @@ void Sapphire::Zone::removeActor( Entity::ActorPtr pActor )
   }
   else if( pActor->isBattleNpc() )
   {
+    if( m_pNaviProvider )
+      m_pNaviProvider->removeAgent( *pActor->getAsChara() );
     m_bNpcMap.erase( pActor->getId() );
   }
 
@@ -393,7 +420,7 @@ void Sapphire::Zone::updateBNpcs( uint64_t tickCount )
     return;
 
   m_lastMobUpdate = tickCount;
-  uint64_t currTime = Sapphire::Util::getTimeSeconds();
+  uint64_t currTime = Common::Util::getTimeSeconds();
 
   for( const auto& entry : m_bNpcMap )
   {
@@ -452,13 +479,20 @@ bool Sapphire::Zone::update( uint64_t tickCount )
   //TODO: this should be moved to a updateWeather call and pulled out of updateSessions
   bool changedWeather = checkWeather();
 
+  auto dt = std::difftime( tickCount, m_lastUpdate ) / 1000.f;
+
+  if( m_pNaviProvider )
+    m_pNaviProvider->updateCrowd( dt );
+
   updateSessions( tickCount, changedWeather );
   onUpdate( tickCount );
 
   updateSpawnPoints();
 
-  if( m_playerMap.size() > 0 )
+  if( !m_playerMap.empty() )
     m_lastActivityTime = tickCount;
+
+  m_lastUpdate = tickCount;
 
   return true;
 }
@@ -483,8 +517,6 @@ void Sapphire::Zone::updateSessions( uint64_t tickCount, bool changedWeather )
       removeActor( pPlayer );
       return;
     }
-
-    m_lastUpdate = tickCount;
 
     if( changedWeather )
     {
@@ -988,4 +1020,9 @@ Sapphire::Entity::BNpcPtr Sapphire::Zone::getActiveBNpcByLevelId( uint32_t level
       return bnpcIt.second;
   }
   return nullptr;
+}
+
+std::shared_ptr< Sapphire::World::Navi::NaviProvider > Sapphire::Zone::getNaviProvider()
+{
+  return m_pNaviProvider;
 }

@@ -4,10 +4,8 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 
-namespace Sapphire {
-namespace Network {
-namespace Packets {
-namespace Server {
+namespace Sapphire::Network::Packets::Server
+{
 
 /**
 * Structural representation of the packet sent by the server as response
@@ -40,10 +38,7 @@ struct FFXIVIpcTellErrNotFound : FFXIVIpcBasePacket< TellErrNotFound >
   char receipientName[32];
 };
 
-} /* Server */
-} /* Packets */
-} /* Network */
-} /* Sapphire */
+} /* Sapphire::Common::Network::Packets::Server */
 
 
 

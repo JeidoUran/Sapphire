@@ -25,7 +25,7 @@
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
-#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ChatPacket.h"
 #include "Network/PacketWrappers/ModelEquipPacket.h"
@@ -93,6 +93,7 @@ Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
   m_queuedZoneing = nullptr;
   m_status = ActorStatus::Idle;
   m_invincibilityType = InvincibilityType::InvincibilityNone;
+  m_radius = 1.f;
 
   memset( m_questTracking, 0, sizeof( m_questTracking ) );
   memset( m_name, 0, sizeof( m_name ) );
@@ -380,7 +381,7 @@ void Sapphire::Entity::Player::calculateStats()
   auto tribeInfo = pExdData->get< Sapphire::Data::Tribe >( tribe );
   auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( level );
 
-  float base = Math::CalcStats::calculateBaseStat( getAsPlayer() );
+  float base = Math::CalcStats::calculateBaseStat( *this );
 
   m_baseStats.str = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierStrength ) / 100 ) +
                                              tribeInfo->sTR );
@@ -409,7 +410,7 @@ void Sapphire::Entity::Player::calculateStats()
   m_baseStats.attackPotMagic = m_baseStats.inte;
   m_baseStats.healingPotMagic = m_baseStats.mnd;
 
-  m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer(), m_pFw );
+  m_baseStats.max_mp = 10000;
 
   m_baseStats.max_hp = Math::CalcStats::calculateMaxHp( getAsPlayer(), m_pFw );
 
@@ -437,28 +438,28 @@ void Sapphire::Entity::Player::sendStats()
 {
 
   auto statPacket = makeZonePacket< FFXIVIpcPlayerStats >( getId() );
-  statPacket->data().strength = m_baseStats.str + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Strength ) ];
-  statPacket->data().dexterity = m_baseStats.dex + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Dexterity ) ];
-  statPacket->data().vitality = m_baseStats.vit + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Vitality ) ];
-  statPacket->data().intelligence = m_baseStats.inte + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Intelligence ) ];
-  statPacket->data().mind = m_baseStats.mnd + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Mind ) ];
-  statPacket->data().piety = m_baseStats.pie + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Piety ) ];
-  statPacket->data().determination = m_baseStats.determination + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Determination ) ];
-  statPacket->data().hp = m_baseStats.max_hp + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::HP ) ];
-  statPacket->data().mp = m_baseStats.max_mp + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::MP ) ];
+  statPacket->data().strength = getStatValue( Common::BaseParam::Strength );
+  statPacket->data().dexterity = getStatValue( Common::BaseParam::Dexterity );
+  statPacket->data().vitality = getStatValue( Common::BaseParam::Vitality );
+  statPacket->data().intelligence = getStatValue( Common::BaseParam::Intelligence );
+  statPacket->data().mind = getStatValue( Common::BaseParam::Mind );
+  statPacket->data().piety = getStatValue( Common::BaseParam::Piety );
+  statPacket->data().determination = getStatValue( Common::BaseParam::Determination );
+  statPacket->data().hp = getStatValue( Common::BaseParam::HP );
+  statPacket->data().mp = getStatValue( Common::BaseParam::MP );
   statPacket->data().accuracy = m_baseStats.accuracy;
-  statPacket->data().attack = m_baseStats.attack + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::AttackPower ) ];
-  statPacket->data().attackMagicPotency = m_baseStats.attackPotMagic + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::AttackMagicPotency ) ];
-  statPacket->data().healingMagicPotency = m_baseStats.healingPotMagic + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::HealingMagicPotency ) ];
-  statPacket->data().skillSpeed = m_baseStats.skillSpeed + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::SkillSpeed ) ];
-  statPacket->data().spellSpeed = m_baseStats.spellSpeed + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::SpellSpeed ) ];
-  statPacket->data().spellSpeed1 = m_baseStats.spellSpeed + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::SpellSpeed ) ];
+  statPacket->data().attack = getStatValue( Common::BaseParam::AttackPower );
+  statPacket->data().attackMagicPotency = getStatValue( Common::BaseParam::AttackMagicPotency );
+  statPacket->data().healingMagicPotency = getStatValue( Common::BaseParam::HealingMagicPotency );
+  statPacket->data().skillSpeed = getStatValue( Common::BaseParam::SkillSpeed );
+  statPacket->data().spellSpeed = getStatValue( Common::BaseParam::SpellSpeed );
+  statPacket->data().spellSpeed1 = getStatValue( Common::BaseParam::SpellSpeed );
   statPacket->data().spellSpeedMod = 100;
 
-  statPacket->data().criticalHitRate = m_baseStats.critHitRate + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::CriticalHit ) ];
-  statPacket->data().defense = m_baseStats.defense + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Defense ) ];
-  statPacket->data().magicDefense = m_baseStats.magicDefense + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::MagicDefense ) ];
-  statPacket->data().tenacity = m_baseStats.tenacity + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Tenacity ) ];
+  statPacket->data().criticalHitRate = getStatValue( Common::BaseParam::CriticalHit );
+  statPacket->data().defense = getStatValue( Common::BaseParam::Defense );
+  statPacket->data().magicDefense = getStatValue( Common::BaseParam::MagicDefense );
+  statPacket->data().tenacity = getStatValue( Common::BaseParam::Tenacity );
 
   queuePacket( statPacket );
 }
@@ -554,7 +555,7 @@ bool Sapphire::Entity::Player::setInstance( uint32_t instanceContentId )
   m_onEnterEventDone = false;
   auto pTeriMgr = m_pFw->get< TerritoryMgr >();
 
-  auto instance = pTeriMgr->getInstanceZonePtr( instanceContentId );
+  auto instance = pTeriMgr->getTerritoryByGuId( instanceContentId );
   if( !instance )
     return false;
 
@@ -819,7 +820,7 @@ void Sapphire::Entity::Player::gainExp( uint32_t amount )
 
   queuePacket( makeActorControl143( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
 
-  if( level >= 70 ) // temporary fix for leveling over levelcap
+  if( level >= Common::MAX_PLAYER_LEVEL ) // temporary fix for leveling over levelcap
   {
     queuePacket( makeActorControl143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
     return;
@@ -1245,9 +1246,10 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
       {
         if( actor->getId() == m_targetId && actor->getAsChara()->isAlive() && mainWeap )
         {
+          auto chara = actor->getAsChara();
+
           // default autoattack range
-          // TODO make this dependant on bnpc size
-          uint32_t range = 7;
+          float range = 3.f + chara->getRadius();
 
           // default autoattack range for ranged classes
           if( getClass() == ClassJob::Machinist ||
@@ -1564,12 +1566,19 @@ void Sapphire::Entity::Player::sendHateList()
 {
   auto hateListPacket = makeZonePacket< FFXIVIpcHateList >( getId() );
   hateListPacket->data().numEntries = m_actorIdTohateSlotMap.size();
+  auto hateRankPacket = makeZonePacket< FFXIVIpcHateRank >( getId() );
+  hateRankPacket->data().numEntries = m_actorIdTohateSlotMap.size();
   auto it = m_actorIdTohateSlotMap.begin();
   for( int32_t i = 0; it != m_actorIdTohateSlotMap.end(); ++it, i++ )
   {
+    // TODO: get actual hate values for these
     hateListPacket->data().entry[ i ].actorId = it->first;
     hateListPacket->data().entry[ i ].hatePercent = 100;
+
+    hateRankPacket->data().entry[ i ].actorId = it->first;
+    hateRankPacket->data().entry[ i ].hateAmount = 1;
   }
+  queuePacket( hateRankPacket );
   queuePacket( hateListPacket );
 }
 
@@ -1712,8 +1721,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
   auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
   auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 0, 3 ).next() );
 
-  auto damage = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( static_cast< uint32_t > ( getLevel() * 1.5f ),
-                                         getLevel() + static_cast< uint32_t >( mainWeap->getAutoAttackDmg() * 2 ) ).next() );
+  auto damage = Math::CalcStats::calculateAutoAttackDamage( *this );
 
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
@@ -1767,7 +1775,7 @@ void Sapphire::Entity::Player::setCFPenaltyTimestamp( uint32_t timestamp )
 
 uint32_t Sapphire::Entity::Player::getCFPenaltyMinutes() const
 {
-  auto currentTimestamp = Sapphire::Util::getTimeSeconds();
+  auto currentTimestamp = Common::Util::getTimeSeconds();
   auto endTimestamp = getCFPenaltyTimestamp();
 
   // check if penalty timestamp already passed current time
@@ -1780,7 +1788,7 @@ uint32_t Sapphire::Entity::Player::getCFPenaltyMinutes() const
 
 void Sapphire::Entity::Player::setCFPenaltyMinutes( uint32_t minutes )
 {
-  auto currentTimestamp = Sapphire::Util::getTimeSeconds();
+  auto currentTimestamp = Common::Util::getTimeSeconds();
   setCFPenaltyTimestamp( currentTimestamp + minutes * 60 );
 }
 
@@ -1863,7 +1871,7 @@ void Sapphire::Entity::Player::sendZonePackets()
     }
     queuePacket( contentFinderList );
 
-    queuePacket( std::make_shared< InitUIPacket >( *this ) );
+    queuePacket( std::make_shared< PlayerSetupPacket >( *this ) );
 
     auto classInfoPacket = makeZonePacket< FFXIVIpcPlayerClassInfo >( getId() );
     classInfoPacket->data().classId = static_cast< uint8_t >( getClass() );
@@ -2271,3 +2279,13 @@ Sapphire::World::SessionPtr Sapphire::Entity::Player::getSession()
   return m_pSession;
 }
 
+void Sapphire::Entity::Player::setActiveLand( uint8_t land, uint8_t ward )
+{
+  m_activeLand.plot = land;
+  m_activeLand.ward = ward;
+}
+
+Sapphire::Common::ActiveLand Sapphire::Entity::Player::getActiveLand() const
+{
+  return m_activeLand;
+}

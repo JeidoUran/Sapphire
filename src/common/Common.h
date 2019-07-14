@@ -21,6 +21,9 @@ namespace Sapphire::Common
   const int32_t INVALID_GAME_OBJECT_ID = 0xE0000000;
   const uint64_t INVALID_GAME_OBJECT_ID64 = 0xE0000000;
 
+  const uint16_t MAX_PLAYER_LEVEL = 80;
+  const uint8_t CURRENT_EXPANSION_ID = 3;
+
   /*!
    * @brief The maximum length (in ms) of a combo before it is canceled/voided.
    *
@@ -968,8 +971,6 @@ namespace Sapphire::Common
 
   enum LevelTableEntry : uint8_t
   {
-    PIE,
-    MP,
     MAIN,
     SUB,
     DIV,
@@ -983,6 +984,7 @@ namespace Sapphire::Common
     SingleTarget = 1,
     CircularAOE = 2,
     RectangularAOE = 4,
+    CircularAoEPlaced = 7
   };
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;

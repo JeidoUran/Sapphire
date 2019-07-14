@@ -10,14 +10,14 @@ namespace Sapphire::Network::Packets::Server
 {
 
   /**
-  * @brief The Client UI Initialization packet. This must be sent to the client
+  * @brief The Client Player Initialization packet. This must be sent to the client
   * once upon connection to configure the UI.
   */
-  class InitUIPacket : public ZoneChannelPacket< FFXIVIpcInitUI >
+  class PlayerSetupPacket : public ZoneChannelPacket< FFXIVIpcPlayerSetup >
   {
   public:
-    InitUIPacket( Entity::Player& player ) :
-      ZoneChannelPacket< FFXIVIpcInitUI >( player.getId(), player.getId() )
+    PlayerSetupPacket( Entity::Player& player ) :
+      ZoneChannelPacket< FFXIVIpcPlayerSetup >( player.getId(), player.getId() )
     {
       initialize( player );
     };
@@ -48,7 +48,6 @@ namespace Sapphire::Network::Packets::Server
       m_data.pose = player.getPose();
 
       memset( &m_data.name[ 0 ], 0, sizeof( m_data.name ) );
-
       strcpy( &m_data.name[ 0 ], player.getName().c_str() );
 
       memcpy( m_data.aetheryte, player.getAetheryteArray(), sizeof( m_data.aetheryte ) );
@@ -71,8 +70,8 @@ namespace Sapphire::Network::Packets::Server
       memcpy( m_data.howto, player.getHowToArray(), sizeof( m_data.howto ) );
 
       // possibly max level or current level
-      m_data.maxLevel = 0x46;
-      m_data.expansion = 2;
+      m_data.maxLevel = Common::MAX_PLAYER_LEVEL;
+      m_data.expansion = Common::CURRENT_EXPANSION_ID;
 
       // df stuff
       // todo: actually do this properly

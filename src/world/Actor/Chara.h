@@ -102,7 +102,7 @@ namespace Sapphire::Entity
     /*! Id of the currently selected target actor */
     uint64_t m_targetId;
     /*! Ptr to a queued action */
-    Action::ActionPtr m_pCurrentAction;
+    World::Action::ActionPtr m_pCurrentAction;
     /*! id of the director this chara is assigned to */
     uint32_t m_directorId;
 
@@ -127,6 +127,12 @@ namespace Sapphire::Entity
     std::vector< std::pair< uint8_t, uint32_t > > m_statusEffectList;
     std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
     FrameworkPtr m_pFw;
+
+    /*! Detour Crowd AgentId */
+    uint32_t m_agentId;
+
+    /*! Detour Crowd actor scale */
+    float m_radius;
 
   public:
     Chara( Common::ObjKind type, FrameworkPtr pFw );
@@ -186,6 +192,8 @@ namespace Sapphire::Entity
     void setStance( Common::Stance stance );
 
     ActorStats getStats() const;
+
+    uint32_t getStatValue( Common::BaseParam baseParam ) const;
 
     uint32_t getHp() const;
 
@@ -259,9 +267,9 @@ namespace Sapphire::Entity
 
     virtual void update( uint64_t tickCount );
 
-    Action::ActionPtr getCurrentAction() const;
+    World::Action::ActionPtr getCurrentAction() const;
 
-    void setCurrentAction( Action::ActionPtr pAction );
+    void setCurrentAction( World::Action::ActionPtr pAction );
 
     uint32_t getLastComboActionId() const;
     void setLastComboActionId( uint32_t actionId );
@@ -270,6 +278,13 @@ namespace Sapphire::Entity
 
     uint32_t getDirectorId() const;
     void setDirectorId( uint32_t directorId );
+
+    uint32_t getAgentId() const;
+    void setAgentId( uint32_t agentId );
+
+    float getRadius() const;
+
+    Common::BaseParam getPrimaryStat() const;
 
   };
 

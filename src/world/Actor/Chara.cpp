@@ -21,7 +21,7 @@
 #include "Action/Action.h"
 #include "ServerMgr.h"
 #include "Session.h"
-#include "Math/CalcBattle.h"
+#include "Math/CalcStats.h"
 #include "Chara.h"
 #include "Player.h"
 #include "Manager/TerritoryMgr.h"
@@ -38,7 +38,8 @@ Sapphire::Entity::Chara::Chara( ObjKind type, FrameworkPtr pFw ) :
   m_pose( 0 ),
   m_targetId( INVALID_GAME_OBJECT_ID64 ),
   m_pFw( std::move( std::move( pFw ) ) ),
-  m_directorId( 0 )
+  m_directorId( 0 ),
+  m_radius( 1.f )
 {
 
   m_lastTickTime = 0;
@@ -394,13 +395,13 @@ void Sapphire::Entity::Chara::sendStatusUpdate()
 }
 
 /*! \return ActionPtr of the currently registered action, or nullptr */
-Sapphire::Action::ActionPtr Sapphire::Entity::Chara::getCurrentAction() const
+Sapphire::World::Action::ActionPtr Sapphire::Entity::Chara::getCurrentAction() const
 {
   return m_pCurrentAction;
 }
 
 /*! \param ActionPtr of the action to be registered */
-void Sapphire::Entity::Chara::setCurrentAction( Sapphire::Action::ActionPtr pAction )
+void Sapphire::Entity::Chara::setCurrentAction( Sapphire::World::Action::ActionPtr pAction )
 {
   m_pCurrentAction = std::move( pAction );
 }
@@ -460,7 +461,7 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   pEffect->applyStatus();
   m_statusEffectMap[ nextSlot ] = pEffect;
 
-  auto statusEffectAdd = makeZonePacket< FFXIVIpcAddStatusEffect >( getId() );
+  auto statusEffectAdd = makeZonePacket< FFXIVIpcEffectResult >( getId() );
 
   statusEffectAdd->data().actor_id = pEffect->getTargetActorId();
   statusEffectAdd->data().actor_id1 = pEffect->getSrcActorId();
@@ -706,4 +707,166 @@ uint32_t Sapphire::Entity::Chara::getDirectorId() const
 void Sapphire::Entity::Chara::setDirectorId( uint32_t directorId )
 {
   m_directorId = directorId;
+}
+
+uint32_t Sapphire::Entity::Chara::getAgentId() const
+{
+  return m_agentId;
+}
+
+void Sapphire::Entity::Chara::setAgentId( uint32_t agentId )
+{
+  m_agentId = agentId;
+}
+
+
+float Sapphire::Entity::Chara::getRadius() const
+{
+  return m_radius;
+}
+
+Sapphire::Common::BaseParam Sapphire::Entity::Chara::getPrimaryStat() const
+{
+  auto exdData = m_pFw->get< Data::ExdDataGenerated >();
+  assert( exdData );
+
+  auto classJob = exdData->get< Data::ClassJob >( static_cast< uint16_t >( getClass() ) );
+  assert( classJob );
+
+  return static_cast< Sapphire::Common::BaseParam >( classJob->primaryStat );
+}
+
+uint32_t Sapphire::Entity::Chara::getStatValue( Sapphire::Common::BaseParam baseParam ) const
+{
+  uint32_t value = 0;
+
+  switch( baseParam )
+  {
+    case Common::BaseParam::Strength:
+    {
+      value = m_baseStats.str;
+      break;
+    }
+
+    case Common::BaseParam::Dexterity:
+    {
+      value = m_baseStats.dex;
+      break;
+    }
+
+    case Common::BaseParam::Vitality:
+    {
+      value = m_baseStats.vit;
+      break;
+    }
+
+    case Common::BaseParam::Intelligence:
+    {
+      value = m_baseStats.inte;
+      break;
+    }
+
+    case Common::BaseParam::Mind:
+    {
+      value = m_baseStats.mnd;
+      break;
+    }
+
+    case Common::BaseParam::Piety:
+    {
+      value = m_baseStats.pie;
+      break;
+    }
+
+    case Common::BaseParam::Determination:
+    {
+      value = m_baseStats.determination;
+      break;
+    }
+
+    case Common::BaseParam::HP:
+    {
+      value = m_baseStats.max_hp;
+      break;
+    }
+
+    case Common::BaseParam::MP:
+    {
+      value = m_baseStats.max_mp;
+      break;
+    }
+
+    case Common::BaseParam::AttackPower:
+    {
+      auto primaryStat = getPrimaryStat();
+
+      // everything else uses str for atk power except for brd/rogue/etc who use dex
+      if( primaryStat == Common::BaseParam::Dexterity )
+      {
+        return getStatValue( primaryStat );
+      }
+
+      return getStatValue( Common::BaseParam::Strength );
+    }
+
+    case Common::BaseParam::AttackMagicPotency:
+    {
+      value = m_baseStats.attackPotMagic;
+      break;
+    }
+
+    case Common::BaseParam::HealingMagicPotency:
+    {
+      value = m_baseStats.healingPotMagic;
+      break;
+    }
+
+    case Common::BaseParam::SkillSpeed:
+    {
+      value = m_baseStats.skillSpeed;
+      break;
+    }
+
+    case Common::BaseParam::SpellSpeed:
+    {
+      value = m_baseStats.spellSpeed;
+      break;
+    }
+
+    case Common::BaseParam::CriticalHit:
+    {
+      value = m_baseStats.critHitRate;
+      break;
+    }
+
+    case Common::BaseParam::Defense:
+    {
+      value = m_baseStats.defense;
+      break;
+    }
+
+    case Common::BaseParam::MagicDefense:
+    {
+      value = m_baseStats.magicDefense;
+      break;
+    }
+
+    case Common::BaseParam::Tenacity:
+    {
+      value = m_baseStats.tenacity;
+      break;
+    }
+
+    // todo: not sure if this is right?
+    case Common::BaseParam::DirectHitRate:
+    {
+      value = m_baseStats.accuracy;
+      break;
+    }
+
+    default:
+      break;
+  }
+
+  return value + getBonusStat( baseParam );
 }

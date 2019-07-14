@@ -21,6 +21,7 @@
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/ModelEquipPacket.h"
+#include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
 #include "Network/PacketWrappers/EffectPacket.h"
 #include "Network/GameConnection.h"
@@ -262,7 +263,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   else if( subCommand == "discovery_reset" )
   {
     player.resetDiscovery();
-    player.queuePacket( std::make_shared< InitUIPacket >( player ) );
+    player.queuePacket( std::make_shared< PlayerSetupPacket >( player ) );
   }
   else if( subCommand == "classjob" )
   {
@@ -717,6 +718,29 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     sscanf( params.c_str(), "%d", &id );
     player.learnAction( id );
   }
+  else if ( subCommand == "effect")
+  {
+    uint16_t param1;
+    sscanf( params.c_str(), "%hu", &param1 );
+
+    auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), param1 );
+    effectPacket->setRotation( Common::Util::floatToUInt16Rot( player.getRot() ) );
+
+    Common::EffectEntry entry{};
+    entry.value = param1;
+    entry.effectType = Common::ActionEffectType::Damage;
+    entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+
+    effectPacket->addEffect( entry );
+
+    auto sequence = player.getCurrentZone()->getNextEffectSequence();
+    effectPacket->setSequence( sequence );
+
+//    effectPacket->setAnimationId( param1 );
+//    effectPacket->setEffectFlags( 0 );
+
+    player.queuePacket( effectPacket );
+  }
   else
   {
     player.sendUrgent( "{0} is not a valid ADD command.", subCommand );
@@ -884,7 +908,7 @@ void Sapphire::World::Manager::DebugCommandMgr::nudge( char* data, Entity::Playe
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
-    setActorPosPacket->data().r16 = Util::floatToUInt16Rot( player.getRot() );
+    setActorPosPacket->data().r16 = Common::Util::floatToUInt16Rot( player.getRot() );
     player.queuePacket( setActorPosPacket );
   }
 }
@@ -1025,17 +1049,21 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     uint32_t instanceId;
     sscanf( params.c_str(), "%d", &instanceId );
 
-    auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
-    if( instance && instance->getAsInstanceContent() )
+    auto terri = pTeriMgr->getTerritoryByGuId( instanceId );
+    if( terri )
     {
-      auto pInstanceContent = instance->getAsInstanceContent();
+      auto pInstanceContent = terri->getAsInstanceContent();
+      if( !pInstanceContent )
+      {
+        player.sendDebug( "Instance id#{} is not an InstanceContent territory.", instanceId );
+        return;
+      }
+
       pInstanceContent->bindPlayer( player.getId() );
       player.sendDebug(
         "Now bound to instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
         " -> " + pInstanceContent->getName() );
     }
-    else if( instance )
-      player.sendUrgent( instance->getName() + " is a Zone or a PublicContent and do not require binding." );
     else
       player.sendDebug( "Unknown instance with id#{0}", instanceId );
   }
@@ -1070,7 +1098,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     uint32_t instanceId;
     sscanf( params.c_str(), "%d", &instanceId );
 
-    auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
+    auto instance = pTeriMgr->getTerritoryByGuId( instanceId );
     if( !instance )
     {
       player.sendDebug( "Unknown instance with id#{0} ", instanceId );

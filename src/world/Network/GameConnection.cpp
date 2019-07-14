@@ -10,7 +10,7 @@
 
 #include "Territory/Zone.h"
 
-#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/PlayerSetupPacket.h"
 
 #include "Manager/DebugCommandMgr.h"
 
@@ -73,7 +73,7 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::DiscoveryHandler, "DiscoveryHandler", &GameConnection::discoveryHandler );
 
   setZoneHandler( ClientZoneIpcType::SkillHandler, "ActionHandler", &GameConnection::actionHandler );
-  setZoneHandler( ClientZoneIpcType::AoESkillHandler, "AoESkillHandler", &GameConnection::aoeActionHandler );
+  setZoneHandler( ClientZoneIpcType::AoESkillHandler, "AoESkillHandler", &GameConnection::placedActionHandler );
 
   setZoneHandler( ClientZoneIpcType::GMCommand1, "GMCommand1", &GameConnection::gm1Handler );
   setZoneHandler( ClientZoneIpcType::GMCommand2, "GMCommand2", &GameConnection::gm2Handler );
@@ -424,7 +424,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
 
         auto pe = std::make_shared< FFXIVRawPacket >( 0x07, 0x18, 0, 0 );
         *( unsigned int* ) ( &pe->data()[ 0 ] ) = 0xE0037603;
-        *( unsigned int* ) ( &pe->data()[ 4 ] ) = Sapphire::Util::getTimeSeconds();
+        *( unsigned int* ) ( &pe->data()[ 4 ] ) = Common::Util::getTimeSeconds();
         sendSinglePacket( pe );
 
         // main connection, assinging it to the session

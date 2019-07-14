@@ -72,14 +72,13 @@ namespace Sapphire::Entity
 
     uint8_t getAggressionMode() const;
 
-    float getScale() const;
+
     float getNaviTargetReachedDistance() const;
 
     // return true if it reached the position
     bool moveTo( const Common::FFXIVARR_POSITION3& pos );
 
-    // processes movement
-    void step();
+    bool moveTo( const Entity::Chara& targetChara );
 
     void sendPositionUpdate();
 
@@ -112,8 +111,6 @@ namespace Sapphire::Entity
 
     void checkAggro();
 
-    void pushNearbyBNpcs();
-
     void setOwner( CharaPtr m_pChara );
 
     void setLevelId( uint32_t levelId );
@@ -121,6 +118,8 @@ namespace Sapphire::Entity
 
     bool hasFlag( uint32_t flag ) const;
     void setFlag( uint32_t flags );
+
+    void calculateStats() override;
 
   private:
     uint32_t m_bNpcBaseId;
@@ -139,7 +138,6 @@ namespace Sapphire::Entity
 
     uint32_t m_flags;
 
-    float m_scale;
     float m_naviTargetReachedDistance;
 
     uint32_t m_timeOfDeath;

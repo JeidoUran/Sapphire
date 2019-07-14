@@ -21,7 +21,7 @@
 #include "Territory/ZonePosition.h"
 #include "Territory/House.h"
 
-#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
 #include "Network/PacketWrappers/ChatPacket.h"
@@ -393,7 +393,7 @@ void Sapphire::Network::GameConnection::pingHandler( FrameworkPtr pFw,
 
   queueOutPacket( std::make_shared< Server::PingPacket >( player, packet.data().timestamp ) );
 
-  player.setLastPing( Sapphire::Util::getTimeSeconds() );
+  player.setLastPing( Common::Util::getTimeSeconds() );
 }
 
 
