@@ -1705,7 +1705,7 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
     {
       if( actor->isPlayer() )
       {
-        actor->getAsPlayer()->sendNotice( 0, "[Random] {0} rolled 1d{1}. Result: 1...", player.getName(), maxnumber );
+        actor->getAsPlayer()->sendNotice( 0, "{0} rolled 1d{1}. Result: 1...", player.getName(), maxnumber );
       }
     }
   }
@@ -1715,7 +1715,7 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
     {
       if( actor->isPlayer() )
       {
-        actor->getAsPlayer()->sendNotice( 0, "[Random] {0} rolled 1d{1}. Result: 69 OwO", player.getName(), maxnumber );
+        actor->getAsPlayer()->sendNotice( 0, "{0} rolled 1d{1}. Result: 69 :x", player.getName(), maxnumber );
       }
     }
   }
@@ -1725,7 +1725,7 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
     {
       if( actor->isPlayer() )
       {
-        actor->getAsPlayer()->sendNotice( 0, "[Random] {0} rolled 1d{1}. Result: {2}!!", player.getName(), maxnumber, randomnumber );
+        actor->getAsPlayer()->sendNotice( 0, "{0} rolled 1d{1}. Result: {2}!!", player.getName(), maxnumber, randomnumber );
       }
     }
   }
@@ -1742,7 +1742,7 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
   if( randomnumber == 1 )
     player.sendNotice( 0, "You roll 1d{0}. Result: 1...", maxnumber );  
   else if( randomnumber == 69 )
-    player.sendNotice( 0, "You roll 1d{0}. Result: 69 OwO", maxnumber );
+    player.sendNotice( 0, "You roll 1d{0}. Result: 69 :x", maxnumber );
   else if( randomnumber == maxnumber )
     player.sendNotice( 0, "You roll 1d{0}. Result: {1}!!", maxnumber, randomnumber );
   else
@@ -1969,6 +1969,7 @@ void Sapphire::World::Manager::DebugCommandMgr::notice( char* data, Entity::Play
         }
       }
   }
+  Logger::debug( "[Notice] {0}", params);
   
 }
 
@@ -1996,7 +1997,7 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
   {
     auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), actionId );
     effectPacket->setRotation( Util::floatToUInt16Rot( player.getRot() ) );
-    Logger::debug( "[{0}] {1} uses {2}.", player.getId(), player.getName(), pExdData->get< Sapphire::Data::Action >( actionId )->name );
+    Logger::debug( "[Action] {0} uses {1}.", player.getName(), pExdData->get< Sapphire::Data::Action >( actionId )->name );
     // effectPacket->addEffect( effectEntry );
 
     player.sendToInRangeSet( effectPacket, true );
@@ -2348,9 +2349,9 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         }
         member->getAsPlayer()->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
         member->getAsPlayer()->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
-        player.sendNotice( 0, "Calling all players registered to the RP session." );
       }
     }
+    player.sendNotice( 0, "Calling all players registered to the RP session." );
   }
   else if( subCommand == "remove" || subCommand == "rm" )
   {
