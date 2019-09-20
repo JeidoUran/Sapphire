@@ -180,7 +180,7 @@ void Lobby::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, uint32_t t
     // TODO: Eventually move to account info storage
     if( i == 3 )
     {
-      charListPacket->data().entitledExpansion = 2;
+      charListPacket->data().entitledExpansion = Common::CURRENT_EXPANSION_ID;
       charListPacket->data().maxCharOnWorld = 8;
       charListPacket->data().unknown8 = 8;
       charListPacket->data().veteranRank = 12;

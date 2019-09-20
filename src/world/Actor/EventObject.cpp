@@ -110,12 +110,12 @@ uint8_t Sapphire::Entity::EventObject::getFlag() const
   return m_flag;
 }
 
-void Sapphire::Entity::EventObject::setParentInstance( Sapphire::ZonePtr instance )
+void Sapphire::Entity::EventObject::setParentInstance( Sapphire::TerritoryPtr instance )
 {
   m_parentInstance = instance;
 }
 
-Sapphire::ZonePtr Sapphire::Entity::EventObject::getParentInstance() const
+Sapphire::TerritoryPtr Sapphire::Entity::EventObject::getParentInstance() const
 {
   return m_parentInstance;
 }

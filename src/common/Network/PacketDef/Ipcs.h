@@ -81,6 +81,7 @@ namespace Sapphire::Network::Packets
 
     SocialList = 0x010D, // updated 5.0
 
+    ExamineSearchInfo = 0x010F, // added 5.0
     UpdateSearchInfo = 0x0110, // updated 5.0
     InitSearchInfo = 0x0111, // updated 5.0
     ExamineSearchComment = 0x0102, // updated 4.1
@@ -99,13 +100,14 @@ namespace Sapphire::Network::Packets
     LinkshellList = 0x012A, // updated 5.0
 
     MailDeleteRequest = 0x012B, // updated 5.0
+
     // 12D - 137 - constant gap between 4.5x -> 5.0
     ReqMoogleMailList = 0x0138, // updated 5.0
     ReqMoogleMailLetter = 0x0139, // updated 5.0
     MailLetterNotification = 0x013A, // updated 5.0
 
-    MarketBoardItemListingCount = 0x0125, // updated 4.5
-    MarketBoardItemListing = 0x0126, // updated 4.5
+    MarketBoardItemListingCount = 0x013B, // updated 5.0
+    MarketBoardItemListing = 0x013C, // updated 5.0
     MarketBoardItemListingHistory = 0x012A, // updated 4.5
     MarketBoardSearchResult = 0x0139, // updated 4.5
 
@@ -113,6 +115,8 @@ namespace Sapphire::Network::Packets
     FreeCompanyBoardMsg = 0x013C, // updated 4.5
     FreeCompanyInfo = 0x013D, // updated 4.5
     ExamineFreeCompanyInfo = 0x013E, // updated 4.5
+
+    FreeCompanyUpdateShortMessage = 0x0157, // added 5.0
 
     StatusEffectList = 0x015B, // updated 5.0
     EurekaStatusEffectList = 0x015C, // updated 5.0
@@ -132,7 +136,9 @@ namespace Sapphire::Network::Packets
 
     ActorSetPos = 0x0184, // updated 5.0
 
-    ActorCast = 0x0187, // updated 5.0
+    ActorCast = 0x0186, // updated 5.0
+
+    SomeCustomiseChangePacketProbably = 0x0187, // added 5.0
 
     PartyList = 0x0188, // updated 5.0
     HateRank = 0x0189, // updated 5.0
@@ -303,19 +309,20 @@ namespace Sapphire::Network::Packets
 
     FcInfoReqHandler = 0x011A, // updated 4.2
 
+    FreeCompanyUpdateShortMessageHandler = 0x0123, // added 5.0
+
     ReqMarketWishList = 0x012C, // updated 4.3
 
     ReqJoinNoviceNetwork = 0x0129, // updated 4.2
 
-    ReqCountdownInitiate = 0x0133, // updated 4.5
-    ReqCountdownCancel = 0x0134, // updated 4.5
-    ClearWaymarks = 0x0135, // updated 4.5
+    ReqCountdownInitiate = 0x0135, // updated 5.0
+    ReqCountdownCancel = 0x0136, // updated 5.0
 
     ZoneLineHandler = 0x0139, // updated 5.0
     ClientTrigger = 0x013A, // updated 5.0
     DiscoveryHandler = 0x013B, // updated 5.0
 
-    AddWaymark = 0x013A, // updated 4.5
+    PlaceFieldMarker = 0x013C, // updated 5.0
 
     SkillHandler = 0x013D, // updated 5.0
     GMCommand1 = 0x013E, // updated 5.0
@@ -323,9 +330,9 @@ namespace Sapphire::Network::Packets
     AoESkillHandler = 0x140, // updated 5.0
 
     UpdatePositionHandler = 0x0141, // updated 5.0
-    UpdatePositionInstance = 0x0183, // updated 4.3
 
     InventoryModifyHandler = 0x0148, // updated 5.0
+    InventoryEquipRecommendedItems = 0x0149, // updated 5.0
 
     ReqPlaceHousingItem = 0x014B, // updated 5.0
     BuildPresetHandler = 0x014F, // updated 5.0
@@ -351,6 +358,8 @@ namespace Sapphire::Network::Packets
 
     SetSharedEstateSettings = 0x017B, // updated 5.0
 
+    UpdatePositionInstance = 0x0180, // updated 5.0
+
     PerformNoteHandler = 0x029B, // updated 4.3
 
 
@@ -367,6 +376,8 @@ namespace Sapphire::Network::Packets
     Tell = 0x0064, // updated for sb
     EurekaTell = 0x00FB,
     TellErrNotFound = 0x0066,
+
+    FreeCompanyEvent = 0x012C, // added 5.0
   };
 
   /**

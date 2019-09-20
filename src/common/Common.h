@@ -24,6 +24,9 @@ namespace Sapphire::Common
   const uint16_t MAX_PLAYER_LEVEL = 80;
   const uint8_t CURRENT_EXPANSION_ID = 3;
 
+  const uint8_t CLASSJOB_TOTAL = 38;
+  const uint8_t CLASSJOB_SLOTS = 28;
+
   /*!
    * @brief The maximum length (in ms) of a combo before it is canceled/voided.
    *
@@ -207,7 +210,7 @@ namespace Sapphire::Common
     Currency = 2000,
     Crystal = 2001,
     //UNKNOWN_0 = 2003,
-      KeyItem = 2004,
+    KeyItem = 2004,
     HandIn = 2005,
     DamagedGear = 2007,
     //UNKNOWN_1 = 2008,
@@ -226,6 +229,9 @@ namespace Sapphire::Common
 
     ArmorySoulCrystal = 3400,
     ArmoryMain = 3500,
+    
+    SaddleBag0 = 4000,
+    SaddleBag1 = 4001,
 
     RetainerBag0 = 10000,
     RetainerBag1 = 10001,
@@ -985,6 +991,18 @@ namespace Sapphire::Common
     CircularAOE = 2,
     RectangularAOE = 4,
     CircularAoEPlaced = 7
+  };
+
+  enum class Role : uint8_t
+  {
+    None,
+    Tank,
+    Healer,
+    RangedPhysical,
+    RangedMagical,
+    Melee,
+    Crafter,
+    Gatherer
   };
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;

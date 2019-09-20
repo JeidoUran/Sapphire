@@ -13,8 +13,8 @@
 namespace Sapphire::Network::ActorControl
 {
 
-enum ActorControlType : uint16_t
-{
+  enum ActorControlType : uint16_t
+  {
     /*! Toggles weapon status -> Sheathed/UnSheathed
         \param param1 status 0|1 */
     ToggleWeapon = 0x00,
@@ -97,6 +97,8 @@ enum ActorControlType : uint16_t
     ActionLearnMsg1 = 0x87,
 
     FreeEventPos = 0x8A,
+
+    DailyQuestSeed = 0x90, // param1 = the daily quest seed
 
     SetBGM = 0xA1,
 
@@ -224,6 +226,14 @@ enum ActorControlType : uint16_t
     SetFestival = 0x386, // param1: festival.exd index
 
     ToggleOrchestrionUnlock = 0x396,
+
+    /*!
+    * param1 = mountSpeed
+    * Retail sends 12 for mount speed star 1 unlocked and 15 for mount speed star 2 unlocked
+    * This also has to be sent before mounting finishes for it to take effect
+    */
+    SetMountSpeed = 0x39F,
+
     Dismount = 0x3A1, // updated 4.5
 
     // Duty Recorder
@@ -316,7 +326,7 @@ enum ActorControlType : uint16_t
     UpdatedSeenHowTos = 0x133,
     AllotAttribute = 0x135,
 
-    ClearWaymarks = 0x13A,
+    ClearFieldMarkers = 0x13A,
     CameraMode = 0x13B, // param12, 1 = camera mode enable, 0 = disable
     CharaNameReq = 0x13D, // requests character name by content id
     HuntingLogDetails = 0x194,
