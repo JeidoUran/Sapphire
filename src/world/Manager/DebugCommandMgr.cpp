@@ -19,7 +19,7 @@
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/ModelEquipPacket.h"
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
@@ -210,7 +210,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
-    setActorPosPacket->data().r16 = Util::floatToUInt16Rot( player.getRot() );
+    setActorPosPacket->data().r16 = Common::Util::floatToUInt16Rot( player.getRot() );
     player.queuePacket( setActorPosPacket );
 
   }
@@ -303,13 +303,13 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   {
     // TODO: Less ghetto way, current implementation isn't ideal in multiplayer.
     auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( player.getId() );
-    initZonePacket->data().zoneId = player.getCurrentZone()->getTerritoryTypeId();
-    initZonePacket->data().weatherId = static_cast< uint8_t >( player.getCurrentZone()->getCurrentWeather() );
+    initZonePacket->data().zoneId = player.getCurrentTerritory()->getTerritoryTypeId();
+    initZonePacket->data().weatherId = static_cast< uint8_t >( player.getCurrentTerritory()->getCurrentWeather() );
     initZonePacket->data().bitmask = 0x1;
     initZonePacket->data().bitmask1 = 16;
     initZonePacket->data().unknown5 = 0x2A;
-    initZonePacket->data().festivalId = player.getCurrentZone()->getCurrentFestival().first;
-    initZonePacket->data().additionalFestivalId = player.getCurrentZone()->getCurrentFestival().second;
+    initZonePacket->data().festivalId = player.getCurrentTerritory()->getCurrentFestival().first;
+    initZonePacket->data().additionalFestivalId = player.getCurrentTerritory()->getCurrentFestival().second;
     initZonePacket->data().pos.x = player.getPos().x;
     initZonePacket->data().pos.y = player.getPos().y;
     initZonePacket->data().pos.z = player.getPos().z;
@@ -1073,10 +1073,10 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     uint32_t instanceId;
     sscanf( params.c_str(), "%d", &instanceId );
 
-    auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
-    if( instance )
+    auto terri = pTeriMgr->getTerritoryByGuId(instanceId);
+    if ( terri )
     {
-      auto pInstanceContent = instance->getAsInstanceContent();
+      auto pInstanceContent = terri->getAsInstanceContent();
       auto inRange = player.getInRangeActors( true );
       for( auto actor : inRange )
       {
@@ -1310,10 +1310,10 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
     uint32_t instanceId;
     sscanf( params.c_str(), "%d", &instanceId );
 
-    auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
-    if( instance && instance->getAsPublicContent() )
+    auto terri = pTeriMgr->getTerritoryByGuId(instanceId);
+    if( terri && terri->getAsPublicContent() )
     {
-      auto pPublicContent = instance->getAsPublicContent();
+      auto pPublicContent = terri->getAsPublicContent();
       pPublicContent->bindPlayer( player.getId() );
       player.sendDebug(
         "Now bound to instance with id: " + std::to_string( pPublicContent->getGuId() ) +
@@ -1341,7 +1341,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
     sscanf( params.c_str(), "%d %d", &index, &value );
 
 
-    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1354,7 +1354,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
 
     sscanf( params.c_str(), "%s %hhu", objName, &state );
 
-    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1372,7 +1372,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
 
     sscanf( params.c_str(), "%s %i %i", objName, &state1, &state2 );
 
-    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1391,7 +1391,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
 
     sscanf( params.c_str(), "%hhu", &seq );
 
-    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1403,7 +1403,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
 
     sscanf( params.c_str(), "%hhu", &branch );
 
-    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1411,7 +1411,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
   }
   else if( subCommand == "qte_start" )
   {
-    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1420,7 +1420,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
   }
   else if( subCommand == "event_start" )
   {
-    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1429,7 +1429,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
   }
   else if( subCommand == "event_end" )
   {
-    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -2024,7 +2024,7 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
   else
   {
     auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), actionId );
-    effectPacket->setRotation( Util::floatToUInt16Rot( player.getRot() ) );
+    effectPacket->setRotation( Common::Util::floatToUInt16Rot( player.getRot() ) );
     Logger::debug( "[Action] {0} uses {1}.", player.getName(), pExdData->get< Sapphire::Data::Action >( actionId )->name );
     // effectPacket->addEffect( effectEntry );
 
@@ -2366,14 +2366,14 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         {
           member->getAsPlayer()->exitInstance();
         }
-        if( member->getAsPlayer()->getCurrentZone()->getGuId() != player.getCurrentZone()->getGuId() )
+        if( member->getAsPlayer()->getCurrentTerritory()->getGuId() != player.getCurrentTerritory()->getGuId() )
         {
           if( player.getCurrentInstance() )
           {
             auto pInstanceContent = player.getCurrentInstance()->getAsInstanceContent();
             pInstanceContent->bindPlayer( member->getAsPlayer()->getId() );
           }
-          member->getAsPlayer()->setInstance( player.getCurrentZone()->getGuId() );
+          member->getAsPlayer()->setInstance( player.getCurrentTerritory()->getGuId() );
         }
         member->getAsPlayer()->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
         member->getAsPlayer()->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
@@ -2650,13 +2650,13 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
   else if( subCommand == "mount" )
   {
     auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( player.getId() );
-    initZonePacket->data().zoneId = player.getCurrentZone()->getTerritoryTypeId();
-    initZonePacket->data().weatherId = static_cast< uint8_t >( player.getCurrentZone()->getCurrentWeather() );
+    initZonePacket->data().zoneId = player.getCurrentTerritory()->getTerritoryTypeId();
+    initZonePacket->data().weatherId = static_cast< uint8_t >( player.getCurrentTerritory()->getCurrentWeather() );
     initZonePacket->data().bitmask = 0x1;
     initZonePacket->data().bitmask1 = 16;
     initZonePacket->data().unknown5 = 0x2A;
-    initZonePacket->data().festivalId = player.getCurrentZone()->getCurrentFestival().first;
-    initZonePacket->data().additionalFestivalId = player.getCurrentZone()->getCurrentFestival().second;
+    initZonePacket->data().festivalId = player.getCurrentTerritory()->getCurrentFestival().first;
+    initZonePacket->data().additionalFestivalId = player.getCurrentTerritory()->getCurrentFestival().second;
     initZonePacket->data().pos.x = player.getPos().x;
     initZonePacket->data().pos.y = player.getPos().y;
     initZonePacket->data().pos.z = player.getPos().z;

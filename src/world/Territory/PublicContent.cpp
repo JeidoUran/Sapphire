@@ -34,7 +34,7 @@ Sapphire::PublicContent::PublicContent( std::shared_ptr< Sapphire::Data::PublicC
                                             const std::string& contentName,
                                             uint32_t publicContentId,
                                             FrameworkPtr pFw ) :
-  Zone( static_cast< uint16_t >( territoryType ), guId, internalName, contentName, pFw ),
+  Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName, pFw ),
   Director( Event::Director::PublicContent, publicContentId ),
   m_zoneConfiguration( pZoneConfiguration ),
   m_publicContentId( publicContentId ),

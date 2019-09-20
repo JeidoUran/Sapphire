@@ -201,7 +201,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::Weather:
     {
       targetPlayer->getCurrentTerritory()->setWeatherOverride( static_cast< Common::Weather >( param1 ) );
-      player.sendNotice( "Weather in Territory \"{0}\" of {1} set in range.",
+      player.sendNotice( 0, "Weather in Territory \"{0}\" of {1} set in range.",
                          targetPlayer->getCurrentTerritory()->getName(), targetPlayer->getName() );
       break;
     }
@@ -542,6 +542,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::TeriInfo:
     {
       auto pCurrentZone = player.getCurrentTerritory();
+      auto pExdData = pFw->get< Data::ExdDataGenerated >();
       player.sendNotice( 0, "ZoneId: {0}"
                          "\nName: {1}"
                          "\nInternalName: {2}"
@@ -561,9 +562,9 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
                          static_cast< uint8_t >( pCurrentZone->getCurrentWeather() ),
                          pExdData->get< Sapphire::Data::Weather >( static_cast< uint8_t >( pCurrentZone->getNextWeather() ) )->name,
                          static_cast< uint8_t >( pCurrentZone->getNextWeather() ),
-                         pExdData->get< Sapphire::Data::Festival >( player.getCurrentZone()->getCurrentFestival().first )->name,
+                         pExdData->get< Sapphire::Data::Festival >( player.getCurrentTerritory()->getCurrentFestival().first )->name,
                          pCurrentZone->getCurrentFestival().first,
-                         pExdData->get< Sapphire::Data::Festival >( player.getCurrentZone()->getCurrentFestival().second )->name,
+                         pExdData->get< Sapphire::Data::Festival >( player.getCurrentTerritory()->getCurrentFestival().second )->name,
                          pCurrentZone->getCurrentFestival().second );
       break;
     }
@@ -695,7 +696,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
           // Not sure if GMs actually get bound to an instance they jump to on retail. It's mostly here to avoid a crash for now
           pInstanceContent->bindPlayer( targetPlayer->getId() );
         }
-        targetPlayer->setInstance( player.getCurrentZone()->getGuId() );
+        targetPlayer->setInstance( player.getCurrentTerritory()->getGuId() );
       }
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       targetPlayer->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
@@ -741,8 +742,8 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
                          targetPlayer->getExp(),
                          pExdData->get< Sapphire::Data::GrandCompany >( targetPlayer->getGc() )->name, targetPlayer->getGc(),
                          targetPlayer->getCurrency( CurrencyType::Gil ),
-                         targetPlayer->getCurrentZone()->getName(), targetPlayer->getZoneId(),
-                         targetPlayer->getCurrentZone()->getGuId(),
+                         targetPlayer->getCurrentTerritory()->getName(), targetPlayer->getZoneId(),
+                         targetPlayer->getCurrentTerritory()->getGuId(),
                          targetPlayer->getPos().x, targetPlayer->getPos().y, targetPlayer->getPos().z, targetPlayer->getRot(),
                          targetPlayer->getGmRank(),
                          targetPlayer->isActingAsGm(),

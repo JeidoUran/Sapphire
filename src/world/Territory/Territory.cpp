@@ -794,7 +794,7 @@ Sapphire::QuestBattlePtr Sapphire::Territory::getAsQuestBattle()
 
 Sapphire::PublicContentPtr Sapphire::Territory::getAsPublicContent()
 {
-  return std::dynamic_pointer_cast< PublicContent, Zone >( shared_from_this() );
+  return std::dynamic_pointer_cast< PublicContent, Territory >( shared_from_this() );
 }
 
 uint32_t Sapphire::Territory::getNextEObjId()

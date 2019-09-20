@@ -362,7 +362,7 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createInstanceCon
   return pZone;
 }
 
-Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createPublicContent( uint32_t contentFinderConditionId )
+Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createPublicContent( uint32_t contentFinderConditionId )
 {
 
   auto pExdData = framework()->get< Data::ExdDataGenerated >();
@@ -390,7 +390,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createPublicContent( u
   pZone->init();
 
   m_instanceContentIdToInstanceMap[ publicContentId ][ pZone->getGuId() ] = pZone;
-  m_guIdToZonePtrMap[pZone->getGuId()] = pZone;
+  m_guIdToTerritoryPtrMap[pZone->getGuId()] = pZone;
   m_instanceZoneSet.insert( pZone );
 
   return pZone;
