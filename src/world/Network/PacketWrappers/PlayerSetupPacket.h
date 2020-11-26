@@ -83,6 +83,7 @@ namespace Sapphire::Network::Packets::Server
       memset( m_data.unlockedPvp, 0xFF, sizeof( m_data.unlockedPvp ) );
       memset( m_data.unlockedRaids, 0xFF, sizeof( m_data.unlockedRaids ) );
       memset( m_data.unlockedTrials, 0xFF, sizeof( m_data.unlockedTrials ) );
+      memset( m_data.unlockedPvp, 0xFF, sizeof( m_data.unlockedPvp ));
 
       memset( m_data.mountGuideMask, 0xFF, sizeof( m_data.mountGuideMask ) );
       memset( m_data.unlockBitmask, 0xFF, sizeof( m_data.unlockBitmask ) );
@@ -90,11 +91,14 @@ namespace Sapphire::Network::Packets::Server
       memset( m_data.discovery, 0xFF, sizeof( m_data.discovery ) );
       memset( m_data.howto, 0xFF, sizeof( m_data.howto ) );
       memset( m_data.minions, 0xFF, sizeof( m_data.minions ) );
-      memset( m_data.aetherCurrentMask, 0xFF, sizeof( m_data.aetherCurrentMask ) );
+      //memset( m_data.aetherCurrentMask, 0xFF, sizeof( m_data.aetherCurrentMask ) );
       memset( m_data.orchestrionMask, 0xFF, sizeof( m_data.orchestrionMask ) );
-      memset( m_data.sightseeingMask, 0xFF, sizeof( m_data.sightseeingMask ) );
-      memset( m_data.tripleTriadCards, 0xFF, sizeof( m_data.tripleTriadCards ) );
+      //memset( m_data.sightseeingMask, 0xFF, sizeof( m_data.sightseeingMask ) );
+      //memset( m_data.tripleTriadCards, 0xFF, sizeof( m_data.tripleTriadCards ) );
       memset( m_data.clearedRaids, 0xFF, sizeof( m_data.clearedRaids ) );
+      memset( m_data.clearedTrials, 0xFF, sizeof( m_data.clearedTrials ));
+      memset( m_data.clearedPvp, 0xFF, sizeof( m_data.clearedPvp ));
+      memset( m_data.clearedDungeons, 0xFF, sizeof( m_data.clearedDungeons ));
 
     };
   };

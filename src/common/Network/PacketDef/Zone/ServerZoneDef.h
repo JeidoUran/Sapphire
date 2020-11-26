@@ -699,10 +699,12 @@ namespace Sapphire::Network::Packets::Server
     uint8_t mountFeet;
     uint8_t mountColor;
     uint8_t scale;
-    uint8_t elementalLevel; // Eureka
-    uint8_t element; // Eureka
-    uint16_t unk;
-    uint32_t u30b;
+    //uint32_t elementalLevel; one of these two field changed to 16bit
+    //uint32_t element;
+    uint8_t elementData[6];
+    //uint8_t elementalLevel; // Eureka
+    //uint8_t element; // Eureka
+    //uint16_t unk;
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
@@ -775,10 +777,12 @@ namespace Sapphire::Network::Packets::Server
     uint8_t mountFeet;
     uint8_t mountColor;
     uint8_t scale;
-    uint8_t elementalLevel; // Eureka
-    uint8_t element; // Eureka
-    uint16_t unk;
-    uint32_t u30b;
+    uint16_t elementalLevel; // Eureka
+    uint16_t element; // Eureka
+    //uint8_t elementalLevel; // Eureka
+    //uint8_t element; // Eureka
+    //uint16_t unk;
+    //uint32_t u30b;
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];

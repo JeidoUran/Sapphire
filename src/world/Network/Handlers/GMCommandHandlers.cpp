@@ -550,7 +550,7 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
     case GmCommand::TeriInfo:
     {
       auto pCurrentZone = player.getCurrentTerritory();
-      auto pExdData = pFw->get< Data::ExdDataGenerated >();
+      auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
       player.sendNotice( 0, "ZoneId: {0}"
                          "\nName: {1}"
                          "\nInternalName: {2}"
@@ -566,13 +566,13 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
                          pCurrentZone->getInternalName(),
                          pCurrentZone->getGuId(),
                          pCurrentZone->getPopCount(),
-                         pExdData->get< Sapphire::Data::Weather >( static_cast< uint8_t >( pCurrentZone->getCurrentWeather() ) )->name,
+                         exdData.get< Sapphire::Data::Weather >( static_cast< uint8_t >( pCurrentZone->getCurrentWeather() ) )->name,
                          static_cast< uint8_t >( pCurrentZone->getCurrentWeather() ),
-                         pExdData->get< Sapphire::Data::Weather >( static_cast< uint8_t >( pCurrentZone->getNextWeather() ) )->name,
+                         exdData.get< Sapphire::Data::Weather >( static_cast< uint8_t >( pCurrentZone->getNextWeather() ) )->name,
                          static_cast< uint8_t >( pCurrentZone->getNextWeather() ),
-                         pExdData->get< Sapphire::Data::Festival >( player.getCurrentTerritory()->getCurrentFestival().first )->name,
+                         exdData.get< Sapphire::Data::Festival >( player.getCurrentTerritory()->getCurrentFestival().first )->name,
                          pCurrentZone->getCurrentFestival().first,
-                         pExdData->get< Sapphire::Data::Festival >( player.getCurrentTerritory()->getCurrentFestival().second )->name,
+                         exdData.get< Sapphire::Data::Festival >( player.getCurrentTerritory()->getCurrentFestival().second )->name,
                          pCurrentZone->getCurrentFestival().second );
       break;
     }
@@ -712,7 +712,7 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
     }
     case GmCommand::Inspect:
     {
-      auto pExdData = pFw->get< Data::ExdDataGenerated >();
+      auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
       player.sendNotice( 0, "\nName: {0} (ID: {1})"
                          "\nHomeWorld: Finis"
                          "\nHP: {2}/{3}, MP: {4}/{5}, TP: {6}/1000"
@@ -744,10 +744,10 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
                          "\nEnemyType: {35} (Subtype: {36})",
                          targetPlayer->getName(), targetPlayer->getId(),
                          targetPlayer->getHp(), targetPlayer->getMaxHp(), targetPlayer->getMp(), targetPlayer->getMaxMp(), targetPlayer->getTp(),
-                         pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( targetPlayer->getClass() ))->name, static_cast< uint8_t >( targetPlayer->getClass() ),
+                         exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( targetPlayer->getClass() ))->name, static_cast< uint8_t >( targetPlayer->getClass() ),
                          targetPlayer->getLevel(),
                          targetPlayer->getExp(),
-                         pExdData->get< Sapphire::Data::GrandCompany >( targetPlayer->getGc() )->name, targetPlayer->getGc(),
+                         exdData.get< Sapphire::Data::GrandCompany >( targetPlayer->getGc() )->name, targetPlayer->getGc(),
                          targetPlayer->getCurrency( CurrencyType::Gil ),
                          targetPlayer->getCurrentTerritory()->getName(), targetPlayer->getZoneId(),
                          targetPlayer->getCurrentTerritory()->getGuId(),
@@ -758,12 +758,12 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
                          targetPlayer->getSearchMessage(),
                          targetPlayer->getPlayTime(),
                          targetPlayer->getModelChara(),
-                         pExdData->get< Sapphire::Data::Mount >( targetPlayer->getCurrentMount() )->singular, targetPlayer->getCurrentMount(),
+                         exdData.get< Sapphire::Data::Mount >( targetPlayer->getCurrentMount() )->singular, targetPlayer->getCurrentMount(),
                          targetPlayer->getTargetId(),
                          targetPlayer->getRPMode(),
                          targetPlayer->isActingAsEnemy(),
                          targetPlayer->getbNPCBase(),
-                         pExdData->get< Sapphire::Data::BNpcName >( targetPlayer->getbNPCName() )->singular, targetPlayer->getbNPCName(),
+                         exdData.get< Sapphire::Data::BNpcName >( targetPlayer->getbNPCName() )->singular, targetPlayer->getbNPCName(),
                          targetPlayer->getEnemyType(), targetPlayer->getSubType() );
       break;
     }

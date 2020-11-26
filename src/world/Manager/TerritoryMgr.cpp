@@ -364,13 +364,13 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createInstanceCon
 Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createPublicContent( uint32_t contentFinderConditionId )
 {
 
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
-  auto pContentFinderCondition = pExdData->get< Sapphire::Data::ContentFinderCondition >( contentFinderConditionId );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto pContentFinderCondition = exdData.get< Sapphire::Data::ContentFinderCondition >( contentFinderConditionId );
   if( !pContentFinderCondition )
     return nullptr;
   auto publicContentId = pContentFinderCondition->content;
 
-  auto pPublicContent = pExdData->get< Sapphire::Data::PublicContent >( publicContentId );
+  auto pPublicContent = exdData.get< Sapphire::Data::PublicContent >( publicContentId );
   if( !pPublicContent )
     return nullptr;
 
@@ -385,7 +385,7 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createPublicConte
   Logger::debug( "Starting instance for PublicContent id: {0} ({1})", publicContentId, pPublicContent->name );
 
   auto pZone = make_PublicContent( pPublicContent, pContentFinderCondition->territoryType, getNextInstanceId(),
-                                     pTeri->name, pPublicContent->name, publicContentId, framework() );
+                                     pTeri->name, pPublicContent->name, publicContentId );
   pZone->init();
 
   m_instanceContentIdToInstanceMap[ publicContentId ][ pZone->getGuId() ] = pZone;

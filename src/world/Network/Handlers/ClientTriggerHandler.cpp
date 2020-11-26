@@ -87,7 +87,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
   {
     case ClientTriggerType::ToggleSheathe:  // Toggle sheathe
     {
-      player.sendToInRangeSet( makeActorControl142( player.getId(), 0, param11, 1 ) );
+      player.sendToInRangeSet( makeActorControl( player.getId(), 0, param11, 1 ) );
       if( param11 == 1 )
         player.setStance( Common::Stance::Active );
       else
@@ -101,7 +101,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::ToggleAutoAttack:  // Toggle auto-attack
     {
-      player.sendToInRangeSet( makeActorControl142( player.getId(), 0, param11, 1 ) );
+      player.sendToInRangeSet( makeActorControl( player.getId(), 0, param11, 1 ) );
       if( param11 == 1 )
       {
         player.setAutoattack( true );

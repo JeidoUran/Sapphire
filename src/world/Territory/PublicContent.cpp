@@ -5,6 +5,7 @@
 #include <Util/UtilMath.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonActorControl.h>
+#include <Service.h>
 
 #include "Event/Director.h"
 #include "Event/EventDefs.h"
@@ -13,14 +14,13 @@
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
 
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 
 
 #include "Event/EventHandler.h"
 
 #include "PublicContent.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -28,13 +28,12 @@ using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
 Sapphire::PublicContent::PublicContent( std::shared_ptr< Sapphire::Data::PublicContent > pZoneConfiguration,
-                                            uint16_t territoryType,
-                                            uint32_t guId,
-                                            const std::string& internalName,
-                                            const std::string& contentName,
-                                            uint32_t publicContentId,
-                                            FrameworkPtr pFw ) :
-  Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName, pFw ),
+                                       uint16_t territoryType,
+                                       uint32_t guId,
+                                       const std::string& internalName,
+                                       const std::string& contentName,
+                                       uint32_t publicContentId ) :
+  Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName ),
   Director( Event::Director::PublicContent, publicContentId ),
   m_zoneConfiguration( pZoneConfiguration ),
   m_publicContentId( publicContentId ),
@@ -47,8 +46,11 @@ Sapphire::PublicContent::PublicContent( std::shared_ptr< Sapphire::Data::PublicC
 
 bool Sapphire::PublicContent::init()
 {
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceInit( getAsPublicContent() );
+  if (!Territory::init())
+    return false;
+
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceInit(getAsInstanceContent());
 
   return true;
 }
@@ -126,7 +128,7 @@ void Sapphire::PublicContent::onUpdate( uint64_t tickCount )
       for( const auto& playerIt : m_playerMap )
       {
         auto pPlayer = playerIt.second;
-        pPlayer->queuePacket( makeActorControl143( pPlayer->getId(), DirectorUpdate,
+        pPlayer->queuePacket( makeActorControlSelf( pPlayer->getId(), DirectorUpdate,
                                                    getDirectorId(), 0x40000001,
                                                    m_zoneConfiguration->timeLimit * 60u ) );
       }
@@ -151,8 +153,8 @@ void Sapphire::PublicContent::onUpdate( uint64_t tickCount )
       break;
   }
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceUpdate( getAsPublicContent(), tickCount );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceUpdate( getAsPublicContent(), tickCount );
 }
 
 void Sapphire::PublicContent::onFinishLoading( Entity::Player& player )
@@ -168,7 +170,7 @@ void Sapphire::PublicContent::onInitDirector( Entity::Player& player )
 
 void Sapphire::PublicContent::onDirectorSync( Entity::Player& player )
 {
-  player.queuePacket( makeActorControl143( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
+  player.queuePacket( makeActorControlSelf( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
 }
 
 
@@ -274,7 +276,7 @@ void Sapphire::PublicContent::startQte()
   for( const auto& playerIt : m_playerMap )
   {
     auto player = playerIt.second;
-    player->queuePacket( makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
+    player->queuePacket( makeActorControlSelf( player->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
   }
 }
 
@@ -284,7 +286,7 @@ void Sapphire::PublicContent::startEventCutscene()
   for( const auto& playerIt : m_playerMap )
   {
     auto player = playerIt.second;
-    player->queuePacket( makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
+    player->queuePacket( makeActorControlSelf( player->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
   }
 }
 
@@ -293,7 +295,7 @@ void Sapphire::PublicContent::endEventCutscene()
   for( const auto& playerIt : m_playerMap )
   {
     auto player = playerIt.second;
-    player->queuePacket( makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
+    player->queuePacket( makeActorControlSelf( player->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
   }
 }
 
@@ -302,8 +304,8 @@ void Sapphire::PublicContent::onRegisterEObj( Entity::EventObjectPtr object )
   if( object->getName() != "none" )
     m_eventObjectMap[ object->getName() ] = object;
 
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  auto objData = pExdData->get< Sapphire::Data::EObj >( object->getObjectId() );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto objData = exdData.get< Sapphire::Data::EObj >( object->getObjectId() );
   if( objData )
     // todo: data should be renamed to eventId
     m_eventIdToObjectMap[ objData->data ] = object;
@@ -328,8 +330,8 @@ void Sapphire::PublicContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& pl
 {
   player.setRot( PI );
   player.setPos( { 0.f, 0.f, 0.f } );
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onPlayerSetup( *this, player );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onPlayerSetup( *this, player );
 
   player.resetObjSpawnIndex();
 }
@@ -361,8 +363,8 @@ void Sapphire::PublicContent::onTalk( Sapphire::Entity::Player& player, uint32_t
 void
 Sapphire::PublicContent::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceEnterTerritory( getAsPublicContent(), player, eventId, param1, param2 );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceEnterTerritory( getAsPublicContent(), player, eventId, param1, param2 );
   m_spawnedPlayers.insert( player.getId() );
   player.directorPlayScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
                                                 HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
@@ -382,13 +384,13 @@ void Sapphire::PublicContent::setCurrentBGM( uint16_t bgmIndex )
     // also do note that this code can't control the bgm granularly. (i.e. per player for WoD submap.) oops.
     // player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, 1 ) );
     player->queuePacket(
-      makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmIndex ) );
+      makeActorControlSelf( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmIndex ) );
   }
 }
 
 void Sapphire::PublicContent::setPlayerBGM( Sapphire::Entity::Player& player, uint16_t bgmId )
 {
-  player.queuePacket( makeActorControl143( player.getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmId ) );
+  player.queuePacket( makeActorControlSelf( player.getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmId ) );
 }
 
 uint16_t Sapphire::PublicContent::getCurrentBGM() const

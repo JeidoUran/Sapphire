@@ -50,8 +50,8 @@ namespace Sapphire::Network::Packets::Server
 
       m_data.subtype = player.getSubType();
       m_data.enemyType = player.getEnemyType();
-      m_data.elementalLevel = player.getElementalLevel();
-      m_data.element = player.getElement();
+      //m_data.elementalLevel = player.getElementalLevel();
+      //m_data.element = player.getElement();
 
       memcpy( m_data.look, player.getLookArray(), sizeof( m_data.look ) );
 

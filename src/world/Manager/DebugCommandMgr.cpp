@@ -236,7 +236,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   {
     uint16_t bgmId;
     sscanf( params.c_str(), "%hd", &bgmId );
-    player.sendToInRangeSet( makeActorControl143( player.getId(), SetBGM, bgmId, 0, 0, 0, 0 ), true );
+    player.sendToInRangeSet( makeActorControlSelf( player.getId(), SetBGM, bgmId, 0, 0, 0, 0 ), true );
   }
 
   else if( subCommand == "discovery_reset" )
@@ -246,10 +246,10 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   }
   else if( subCommand == "classjob" )
   {
-    auto pExdData = framework()->get< Data::ExdDataGenerated >();
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
     int32_t id;
     sscanf( params.c_str(), "%d", &id );
-    if ( !pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( id ) ) )
+    if ( !exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( id ) ) )
     {
       player.sendUrgent ( "{0} is not a valid ClassJob ID.", id );
       return;
@@ -261,7 +261,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     }
     else
       player.setClassJob( static_cast< Common::ClassJob > ( id ) );
-    player.sendNotice( 0, "Class set to {0} ({1}).", id, pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( id ) )->name );
+    player.sendNotice( 0, "Class set to {0} ({1}).", id, exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( id ) )->name );
   }
   else if( subCommand == "cfpenalty" )
   {
@@ -331,10 +331,10 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   }
   else if( subCommand == "model" )
   {
-    auto pExdData = framework()->get< Data::ExdDataGenerated >();
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
     uint32_t modelId;
     sscanf( params.c_str(), "%u", &modelId );
-    if ( !pExdData->get< Sapphire::Data::ModelChara > ( modelId ) )
+    if ( !exdData.get< Sapphire::Data::ModelChara > ( modelId ) )
     {
       player.sendUrgent ( "{0} is not a valid ModelChara ID.", modelId );
       return;
@@ -346,10 +346,10 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   // TODO: Better name
   else if( subCommand == "targetmodel" || subCommand == "tmodel" )
   {
-    auto pExdData = framework()->get< Data::ExdDataGenerated >();
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
     uint32_t modelId;
     sscanf( params.c_str(), "%u", &modelId );
-    if ( !pExdData->get< Sapphire::Data::ModelChara > ( modelId ) )
+    if ( !exdData.get< Sapphire::Data::ModelChara > ( modelId ) )
     {
       player.sendUrgent ( "{0} is not a valid ModelChara ID.", modelId );
       return;
@@ -386,9 +386,9 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   else if( subCommand == "sptp" )
   {
     if( params == "1" )
-      player.sendToInRangeSet( makeActorControl142( player.getId(), 407, 140, 0, 0, 0, 32515 ), true );
+      player.sendToInRangeSet( makeActorControl( player.getId(), 407, 140, 0, 0, 0, 32515 ), true );
     if( params == "2" )
-      player.sendToInRangeSet( makeActorControl142( player.getId(), 407, 141, 0, 0, 0, 32515 ), true );
+      player.sendToInRangeSet( makeActorControl( player.getId(), 407, 141, 0, 0, 0, 32515 ), true );
   }
 
   else if ( subCommand == "gearmodel" )
@@ -404,18 +404,18 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
 
   else if( subCommand == "mount" )
   {
-    auto pExdData = framework()->get< Data::ExdDataGenerated >();
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
     int32_t id;
     sscanf( params.c_str(), "%d", &id );
 
-    if ( !pExdData->get< Sapphire::Data::Mount >( id ) || pExdData->get< Sapphire::Data::Mount >( id )->modelChara == 0 )
+    if ( !exdData.get< Sapphire::Data::Mount >( id ) || exdData.get< Sapphire::Data::Mount >( id )->modelChara == 0 )
     {
       player.sendUrgent ( "{0} is not a valid Mount ID.", id );
       return;
     }
     player.dismount();
     player.mount( static_cast< uint32_t >( id ) );
-    player.sendNotice( 0, "Riding mount #{0} ({1}).", id, pExdData->get< Sapphire::Data::Mount >( id )->singular );
+    player.sendNotice( 0, "Riding mount #{0} ({1}).", id, exdData.get< Sapphire::Data::Mount >( id )->singular );
   }
   else if( subCommand == "msqguide" )
   {
@@ -449,31 +449,31 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   }
   else if( subCommand == "festival" )
   {
-    auto pExdData = framework()->get< Data::ExdDataGenerated >();
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
     uint16_t festivalId;
     uint16_t additionalId;
     sscanf( params.c_str(), "%hu %hu", &festivalId, &additionalId );
 
-    if ( !pExdData->get< Sapphire::Data::Festival >( festivalId ) )
+    if ( !exdData.get< Sapphire::Data::Festival >( festivalId ) )
     {
       player.sendUrgent ( "{0} is not a valid Festival ID.", festivalId );
-      player.sendNotice( 0, "Additional festival set to {0} ({1}).", additionalId, pExdData->get< Sapphire::Data::Festival >( additionalId )->name );
+      player.sendNotice( 0, "Additional festival set to {0} ({1}).", additionalId, exdData.get< Sapphire::Data::Festival >( additionalId )->name );
       return;
     }
-    else if ( !pExdData->get< Sapphire::Data::Festival >( additionalId ) )
+    else if ( !exdData.get< Sapphire::Data::Festival >( additionalId ) )
     {
       player.sendUrgent ( "{0} is not a valid Festival ID.", additionalId );
-      player.sendNotice( 0, "Festival set to {0} ({1}).", festivalId, pExdData->get< Sapphire::Data::Festival >( festivalId )->name );
+      player.sendNotice( 0, "Festival set to {0} ({1}).", festivalId, exdData.get< Sapphire::Data::Festival >( festivalId )->name );
       return;
     }
-    else if ( !pExdData->get< Sapphire::Data::Festival >( festivalId ) || !pExdData->get< Sapphire::Data::Festival >( additionalId ) )
+    else if ( !exdData.get< Sapphire::Data::Festival >( festivalId ) || !exdData.get< Sapphire::Data::Festival >( additionalId ) )
     {
       player.sendUrgent ( "{0} and {1} are not valid Festival IDs.", festivalId, additionalId );
       return;
     }
 
-    player.sendNotice( 0, "Festival set to {0} ({1}). Additional festival set to {2} ({3}).", festivalId, pExdData->get< Sapphire::Data::Festival >( festivalId )->name,
-    additionalId, pExdData->get< Sapphire::Data::Festival >( additionalId )->name );
+    player.sendNotice( 0, "Festival set to {0} ({1}). Additional festival set to {2} ({3}).", festivalId, exdData.get< Sapphire::Data::Festival >( festivalId )->name,
+    additionalId, exdData.get< Sapphire::Data::Festival >( additionalId )->name );
 
     terriMgr.setCurrentFestival( festivalId, additionalId );
   }
@@ -551,7 +551,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     int32_t step;
     sscanf( params.c_str(), "%d", &step );
 
-    player.sendToInRangeSet( makeActorControl143( player.getId(), EurekaStep, step, 0x3C, 0xFFFFE3, 0, 0 ), true );
+    player.sendToInRangeSet( makeActorControlSelf( player.getId(), EurekaStep, step, 0x3C, 0xFFFFE3, 0, 0 ), true );
   }
   else if( subCommand == "gauge" )
   {
@@ -795,7 +795,7 @@ void Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity
   {
     if( actor->isPlayer() )
     {
-      auto pSession = pServerZone->getSession( actor->getId() );
+      auto pSession = serverMgr.getSession( actor->getId() );
       if( pSession )
       pSession->getZoneConnection()->injectPacket( data + 7, player );
     }
@@ -1073,7 +1073,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     uint32_t instanceId;
     sscanf( params.c_str(), "%d", &instanceId );
 
-    auto terri = pTeriMgr->getTerritoryByGuId(instanceId);
+    auto terri = terriMgr.getTerritoryByGuId(instanceId);
     if ( terri )
     {
       auto pInstanceContent = terri->getAsInstanceContent();
@@ -1132,7 +1132,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     uint32_t instanceContentId;
     sscanf( params.c_str(), "%d", &instanceContentId );
 
-    auto instance = pTeriMgr->createInstanceContent( instanceContentId );
+    auto instance = terriMgr.createInstanceContent( instanceContentId );
     if( instance )
     {
       auto pInstanceContent = instance->getAsInstanceContent();
@@ -1275,7 +1275,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
 void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entity::Player& player,
                                                              std::shared_ptr< DebugCommand > command )
 {
-  auto pTeriMgr = framework()->get< TerritoryMgr >();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   std::string cmd( data ), params, subCommand;
   auto cmdPos = cmd.find_first_of( ' ' );
 
@@ -1299,7 +1299,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
     uint32_t contentFinderConditionId;
     sscanf( params.c_str(), "%d", &contentFinderConditionId );
 
-    auto instance = pTeriMgr->createPublicContent( contentFinderConditionId );
+    auto instance = terriMgr.createPublicContent( contentFinderConditionId );
     if( instance )
       player.sendDebug( "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
     else
@@ -1310,7 +1310,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
     uint32_t instanceId;
     sscanf( params.c_str(), "%d", &instanceId );
 
-    auto terri = pTeriMgr->getTerritoryByGuId(instanceId);
+    auto terri = terriMgr.getTerritoryByGuId(instanceId);
     if( terri && terri->getAsPublicContent() )
     {
       auto pPublicContent = terri->getAsPublicContent();
@@ -1325,7 +1325,7 @@ void Sapphire::World::Manager::DebugCommandMgr::publicContent( char* data, Entit
     uint32_t terriId;
     sscanf( params.c_str(), "%d", &terriId );
 
-    if( pTeriMgr->removeTerritoryInstance( terriId ) )
+    if( terriMgr.removeTerritoryInstance( terriId ) )
       player.sendDebug( "Removed instance with id#{0}", terriId );
     else
       player.sendDebug( "Failed to remove instance with id#{0}", terriId );
@@ -1781,9 +1781,9 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
 void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
 {
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
-  auto pTerriMgr = framework()->get< TerritoryMgr >();
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   std::string subCommand = "";
   std::string params = "";
 
@@ -1811,23 +1811,23 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
     uint16_t param;
     sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
 
-    if ( !pExdData->get< Sapphire::Data::Status >( id ) )
+    if ( !exdData.get< Sapphire::Data::Status >( id ) )
     {
       player.sendUrgent ( "{0} is not a valid Status ID.", id );
       return;
     }
-    else if ( pExdData->get< Sapphire::Data::Status >( id )->transfiguration == true && !pExdData->get< Sapphire::Data::Transformation >( param ) )
+    else if ( exdData.get< Sapphire::Data::Status >( id )->transfiguration == true && !exdData.get< Sapphire::Data::Transformation >( param ) )
     {
       player.sendUrgent ( "Status {0} is a Transfiguration and requires a valid Transformation param.", id );
       return;
     }
 
     auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(),
-                                                   duration, 3000, framework() );
+                                                   duration, 3000 );
     effect->setParam( param );
 
     player.addStatusEffect( effect );
-    player.sendNotice( 0, "Status {0} ({1}) added.", id, pExdData->get< Sapphire::Data::Status >( id )->name );
+    player.sendNotice( 0, "Status {0} ({1}) added.", id, exdData.get< Sapphire::Data::Status >( id )->name );
   }
 
   else if( subCommand == "target" || subCommand == "t" )
@@ -1837,12 +1837,12 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
     uint16_t param;
     sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
 
-    if ( !pExdData->get< Sapphire::Data::Status >( id ) )
+    if ( !exdData.get< Sapphire::Data::Status >( id ) )
     {
       player.sendUrgent ( "{0} is not a valid Status ID.", id );
       return;
     }
-    else if ( pExdData->get< Sapphire::Data::Status >( id )->transfiguration == true && !pExdData->get< Sapphire::Data::Transformation >( param ) )
+    else if ( exdData.get< Sapphire::Data::Status >( id )->transfiguration == true && !exdData.get< Sapphire::Data::Transformation >( param ) )
     {
       player.sendUrgent ( "Status {0} is a Transfiguration and requires a valid Transformation param.", id );
       return;
@@ -1860,18 +1860,18 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
     }
 
     auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), targetActor->getAsPlayer(),
-                                                   duration, 3000, framework() );
+                                                   duration, 3000 );
     effect->setParam( param );
 
     targetActor->getAsPlayer()->addStatusEffect( effect );
-    player.sendNotice( 0, "Status {0} ({1}) added to {2}.", id, pExdData->get< Sapphire::Data::Status >( id )->name, targetActor->getAsPlayer()->getName() );
+    player.sendNotice( 0, "Status {0} ({1}) added to {2}.", id, exdData.get< Sapphire::Data::Status >( id )->name, targetActor->getAsPlayer()->getName() );
   }
   else if( subCommand == "remove" || subCommand == "rm" )
   {
     int32_t id;
     sscanf( params.c_str(), "%d", &id );
 
-    if ( !pExdData->get< Sapphire::Data::Status >( id ) )
+    if ( !exdData.get< Sapphire::Data::Status >( id ) )
     {
       player.sendUrgent ( "{0} is not a valid Status ID.", id );
       return;
@@ -1882,14 +1882,14 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
       return;
     } */
     player.removeSingleStatusEffectById( id );
-    player.sendNotice( 0, "Status {0} ({1}) removed.", id, pExdData->get< Sapphire::Data::Status >( id )->name );
+    player.sendNotice( 0, "Status {0} ({1}) removed.", id, exdData.get< Sapphire::Data::Status >( id )->name );
   }
   // TODO: Better name
   else if( subCommand == "targetremove" || subCommand == "trm" )
   {
     int32_t id;
     sscanf( params.c_str(), "%d", &id );
-    if ( !pExdData->get< Sapphire::Data::Status >( id ) )
+    if ( !exdData.get< Sapphire::Data::Status >( id ) )
     {
       player.sendUrgent ( "{0} is not a valid Status ID.", id );
       return;
@@ -1911,7 +1911,7 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
       return;
     } */
     targetActor->getAsPlayer()->removeSingleStatusEffectById( id );
-    player.sendNotice( 0, "Status {0} ({1}) removed from {2}.", id, pExdData->get< Sapphire::Data::Status >( id )->name, targetActor->getAsPlayer()->getName() );
+    player.sendNotice( 0, "Status {0} ({1}) removed from {2}.", id, exdData.get< Sapphire::Data::Status >( id )->name, targetActor->getAsPlayer()->getName() );
   }
   else
   {
@@ -2008,7 +2008,7 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
   std::string subCommand;
 
   // check if the command has parameters
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
   std::size_t spos = tmpCommand.find_first_of( " " );
   
@@ -2016,7 +2016,7 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
   uint32_t actionId;
   sscanf( tmpCommand.c_str(), "%u", &actionId );
 
-  if ( !pExdData->get< Sapphire::Data::Action >( actionId ) )
+  if ( !exdData.get< Sapphire::Data::Action >( actionId ) )
   {
     player.sendUrgent ( "{0} is not a valid Action ID.", actionId );
     return;
@@ -2025,7 +2025,7 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
   {
     auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( player.getRot() ) );
-    Logger::debug( "[Action] {0} uses {1}.", player.getName(), pExdData->get< Sapphire::Data::Action >( actionId )->name );
+    Logger::debug( "[Action] {0} uses {1}.", player.getName(), exdData.get< Sapphire::Data::Action >( actionId )->name );
     // effectPacket->addEffect( effectEntry );
 
     player.sendToInRangeSet( effectPacket, true );
@@ -2037,9 +2037,9 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
 void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
 {
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
-  auto pTerriMgr = framework()->get< TerritoryMgr >();
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   std::string subCommand = "";
   std::string params = "";
 
@@ -2196,7 +2196,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
     }
 
     sscanf( params.c_str(), "%d %d %d %d", &startzone, &startposx, &startposy, &startposz );
-    auto pZone = pTerriMgr->getZoneByTerritoryTypeId( startzone );
+    auto pZone = terriMgr.getZoneByTerritoryTypeId( startzone );
     player.sendNotice( 0, "The starting zone of the RP session has been set to {0} (ID: {1}), X: {2}, Y: {3}, Z: {4}.", pZone->getName(),
                        startzone, startposx, startposy, startposz );
   }
@@ -2232,8 +2232,8 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       return;
     }
 
-    auto pExdData = framework()->get< Data::ExdDataGenerated >();
-    auto pZone = pTerriMgr->getZoneByTerritoryTypeId( startzone );
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+    auto pZone = terriMgr.getZoneByTerritoryTypeId( startzone );
     if ( !startzone == 0 )
       player.sendNotice( 0, "Starting Zone: {0}", pZone->getName() );
     else
@@ -2263,7 +2263,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
     if( isRpPrepared == true )
     {
       m_rpMembers.insert ( player.getAsPlayer() );
-      auto pZone = pTerriMgr->getZoneByTerritoryTypeId( startzone );
+      auto pZone = terriMgr.getZoneByTerritoryTypeId( startzone );
       Logger::info( "==========================RP START=========================" );
       Logger::info( "RP session started by {0}", player.getName() );
       if ( !startzone == 0 )
@@ -2282,9 +2282,10 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         //member->getAsPlayer()->setGmRank( 1 );
         member->getAsPlayer()->setOnlineStatusMask( 0x0000000100400000 );
 
+        auto& serverMgr = Common::Service< World::ServerMgr >::ref();
         auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( member->getAsPlayer()->getId() );
         statusPacket->data().onlineStatusFlags = 0x0000000100400000;
-        framework()->get< World::ServerMgr >()->getSession( member->getAsPlayer()->getId() )->getZoneConnection()->queueOutPacket( statusPacket );
+        serverMgr.getSession( member->getAsPlayer()->getId() )->getZoneConnection()->queueOutPacket( statusPacket );
 
         auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( member->getAsPlayer()->getId() );
         searchInfoPacket->data().onlineStatusFlags = 0x0000000100400000;
@@ -2292,7 +2293,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         strcpy( searchInfoPacket->data().searchMessage, member->getAsPlayer()->getSearchMessage() );
         member->getAsPlayer()->queuePacket( searchInfoPacket );
 
-        member->getAsPlayer()->sendToInRangeSet( makeActorControl142( member->getAsPlayer()->getId(), SetStatusIcon, static_cast< uint8_t >( member->getAsPlayer()->getOnlineStatus() ) ), true );
+        member->getAsPlayer()->sendToInRangeSet( makeActorControl( member->getAsPlayer()->getId(), SetStatusIcon, static_cast< uint8_t >( member->getAsPlayer()->getOnlineStatus() ) ), true );
         if( member->getAsPlayer() != player.getAsPlayer() )
         {
           if( strcmp ( RpTheme, "" ) != 0 )
@@ -2469,9 +2470,9 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
 void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
 {
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
-  auto pTerriMgr = framework()->get< TerritoryMgr >();
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   std::string subCommand = "";
   std::string params = "";
 
@@ -2507,30 +2508,30 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
       return;
     }
     if ( params == "1l" )
-      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 1972864919, 43049, 4, 1, 0 ), true );
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl( targetActor->getAsPlayer()->getId(), 220, 1972864919, 43049, 4, 1, 0 ), true );
     else if ( params == "2l" )
-      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 2142861116, 41367, 4, 2, 0 ), true );
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl( targetActor->getAsPlayer()->getId(), 220, 2142861116, 41367, 4, 2, 0 ), true );
     else if ( params == "3l" )
-      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 1938652695, 38298, 4, 5, 0 ), true );
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl( targetActor->getAsPlayer()->getId(), 220, 1938652695, 38298, 4, 5, 0 ), true );
     else if ( params == "4l" )
-      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 2280161298, 33556, 4, 6, 0 ), true );
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl( targetActor->getAsPlayer()->getId(), 220, 2280161298, 33556, 4, 6, 0 ), true );
     else if ( params == "1r" )
-      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 2310376224, 42825, 4, 7, 0 ), true );
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl( targetActor->getAsPlayer()->getId(), 220, 2310376224, 42825, 4, 7, 0 ), true );
     else if ( params == "2r" )
-      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 2152036166, 41333, 4, 12, 0 ), true );
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl( targetActor->getAsPlayer()->getId(), 220, 2152036166, 41333, 4, 12, 0 ), true );
     else if ( params == "3r" )
-      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 2341175365, 37917, 4, 13, 0 ), true );
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl( targetActor->getAsPlayer()->getId(), 220, 2341175365, 37917, 4, 13, 0 ), true );
     else if ( params == "4r" )
-      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl142( targetActor->getAsPlayer()->getId(), 220, 2016247826, 33556, 4, 14, 0 ), true );
+      targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl( targetActor->getAsPlayer()->getId(), 220, 2016247826, 33556, 4, 14, 0 ), true );
   }
   else if( subCommand == "adsglow" )
   {
     if ( params == "0" )
-      player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 0, 32530 ), true );
+      player.sendToInRangeSet( makeActorControl( player.getId(), 31, 0, 0, 0, 0, 32530 ), true );
     else if ( params == "1" )
-      player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 1, 32530 ), true );
+      player.sendToInRangeSet( makeActorControl( player.getId(), 31, 0, 0, 0, 1, 32530 ), true );
     else if ( params == "2" )
-      player.sendToInRangeSet( makeActorControl142( player.getId(), 31, 0, 0, 0, 2, 0 ), true );
+      player.sendToInRangeSet( makeActorControl( player.getId(), 31, 0, 0, 0, 2, 0 ), true );
   }
   else if( subCommand == "afterimage" )
   {
@@ -2629,7 +2630,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
   {
     uint32_t action;
     sscanf( params.c_str(), "%u", &action );
-    if ( !pExdData->get< Sapphire::Data::Action >( action ) )
+    if ( !exdData.get< Sapphire::Data::Action >( action ) )
     {
       player.sendUrgent ( "{0} is not a valid Action ID.", action );
       return;
@@ -2640,8 +2641,8 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
     {
       if( actor->isPlayer() )
       {
-        actor->getAsPlayer()->sendToInRangeSet( makeActorControl142( player.getId(), BluActionLearn, 0, 1, 0, 0, 0 ), true );
-        actor->getAsPlayer()->sendNotice( 5, "{0} apprends {1} !", player.getName(), pExdData->get< Sapphire::Data::Action >( action )->name );
+        actor->getAsPlayer()->sendToInRangeSet( makeActorControl( player.getId(), BluActionLearn, 0, 1, 0, 0, 0 ), true );
+        actor->getAsPlayer()->sendNotice( 5, "{0} apprends {1} !", player.getName(), exdData.get< Sapphire::Data::Action >( action )->name );
       }
     }
     
@@ -2691,7 +2692,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
         if( actor->isPlayer() )
         {
           actor->getAsPlayer()->setGmInvis( true );
-          actor->getAsPlayer()->queuePacket( makeActorControl143( actor->getAsPlayer()->getId(), Flee, -1 ) );
+          actor->getAsPlayer()->queuePacket( makeActorControlSelf( actor->getAsPlayer()->getId(), Flee, -1 ) );
           actor->getAsPlayer()->respawn();
         }
       }
@@ -2705,7 +2706,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
         if( actor->isPlayer() )
         {
           actor->getAsPlayer()->setGmInvis( false );
-          actor->getAsPlayer()->queuePacket( makeActorControl143( actor->getAsPlayer()->getId(), Flee, 0 ) );
+          actor->getAsPlayer()->queuePacket( makeActorControlSelf( actor->getAsPlayer()->getId(), Flee, 0 ) );
           actor->getAsPlayer()->respawn();
         }
       }
@@ -2723,9 +2724,9 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
 void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
 {
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
-  auto pTerriMgr = framework()->get< TerritoryMgr >();
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   std::string subCommand = "";
   std::string params = "";
 
@@ -2797,17 +2798,17 @@ void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Playe
   }
   else if( subCommand == "name" )
   {
-    auto pExdData = framework()->get< Data::ExdDataGenerated >();
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
     uint32_t nameId;
     sscanf( params.c_str(), "%u", &nameId );
-    if ( !pExdData->get< Sapphire::Data::BNpcName > ( nameId ) )
+    if ( !exdData.get< Sapphire::Data::BNpcName > ( nameId ) )
     {
       player.sendUrgent ( "{0} is not a valid BNpcName ID.", nameId );
       return;
     }
     player.setbNPCName( nameId );
     player.respawn();
-    player.sendNotice( 0, "BNPCName set to {0} ({1}).", nameId, pExdData->get< Sapphire::Data::BNpcName >( nameId )->singular );
+    player.sendNotice( 0, "BNPCName set to {0} ({1}).", nameId, exdData.get< Sapphire::Data::BNpcName >( nameId )->singular );
   }
   
   else if( subCommand == "base" )

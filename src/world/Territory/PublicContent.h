@@ -28,8 +28,7 @@ namespace Sapphire
                      uint32_t guId,
                      const std::string& internalName,
                      const std::string& contentName,
-                     uint32_t publicContentId,
-                     FrameworkPtr pFw );
+                     uint32_t publicContentId );
 
     virtual ~PublicContent();
 
