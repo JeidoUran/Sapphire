@@ -56,6 +56,7 @@ namespace Sapphire::Network::Packets::Server
       m_data.aggressionMode = bnpc.getAggressionMode();
 
       m_data.classJob = 0;
+      m_data.currentMount = bnpc.getCurrentMount();
 
       m_data.directorId = bnpc.getDirectorId();
       m_data.targetId = bnpc.getTargetId();
@@ -80,7 +81,7 @@ namespace Sapphire::Network::Packets::Server
       // 0x20 == spawn hidden to be displayed by the spawneffect control
       //m_data.displayFlags = bnpc.getDisplayFlags();
 
-      //m_data.currentMount = bnpc.getCurrentMount();
+      m_data.currentMount = bnpc.getCurrentMount();
       //m_data.persistentEmote = bnpc.getPersistentEmote();
 
       m_data.targetId = static_cast< uint64_t >( bnpc.getTargetId() );

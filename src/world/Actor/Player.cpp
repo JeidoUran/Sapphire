@@ -78,6 +78,15 @@ Sapphire::Entity::Player::Player() :
   m_markedForRemoval( false ),
   m_mount( 0 ),
   m_emoteMode( 0 ),
+  m_bNPCBase ( 0 ),
+  m_bNPCName ( 0 ),
+  m_displayFlags( 0 ),
+  m_modelChara( 0 ),
+  m_modelType( 0 ),
+  m_subtype( 0 ),
+  m_enemyType( 0 ),
+  m_element( 0 ),
+  m_elementalLevel( 0 ),
   m_directorInitialized( false ),
   m_onEnterEventDone( false ),
   m_falling( false ),
@@ -158,6 +167,96 @@ void Sapphire::Entity::Player::setGmRank( uint8_t rank )
   m_gmRank = rank;
 }
 
+uint32_t Sapphire::Entity::Player::getbNPCBase() const
+{
+  return m_bNPCBase;
+}
+
+void Sapphire::Entity::Player::setbNPCBase( uint32_t bnpcbase )
+{
+  m_bNPCBase = bnpcbase;
+}
+
+uint32_t Sapphire::Entity::Player::getbNPCName() const
+{
+  return m_bNPCName;
+}
+
+void Sapphire::Entity::Player::setbNPCName( uint32_t bnpcname )
+{
+  m_bNPCName = bnpcname;
+}
+
+uint32_t Sapphire::Entity::Player::getDisplayFlags() const
+{
+  return m_displayFlags;
+}
+
+void Sapphire::Entity::Player::setDisplayFlags( uint32_t displayflags )
+{
+  m_displayFlags = displayflags;
+}
+
+uint16_t Sapphire::Entity::Player::getModelChara() const
+{
+  return m_modelChara;
+}
+
+void Sapphire::Entity::Player::setModelChara( uint16_t model )
+{
+  m_modelChara = model;
+}
+
+uint8_t Sapphire::Entity::Player::getModelType() const
+{
+  return m_modelType;
+}
+
+void Sapphire::Entity::Player::setModelType( uint8_t modeltype )
+{
+  m_modelType = modeltype;
+}
+
+uint8_t Sapphire::Entity::Player::getSubType() const
+{
+  return m_subtype;
+}
+
+void Sapphire::Entity::Player::setSubType( uint8_t subtype )
+{
+  m_subtype = subtype;
+}
+
+uint8_t Sapphire::Entity::Player::getEnemyType() const
+{
+  return m_enemyType;
+}
+
+void Sapphire::Entity::Player::setEnemyType( uint8_t enemytype )
+{
+  m_enemyType = enemytype;
+}
+
+uint16_t Sapphire::Entity::Player::getElementalLevel() const
+{
+  return m_elementalLevel;
+}
+
+void Sapphire::Entity::Player::setElementalLevel( uint16_t elementallevel )
+{
+  m_elementalLevel = elementallevel;
+}
+
+uint16_t Sapphire::Entity::Player::getElement() const
+{
+  return m_element;
+}
+
+void Sapphire::Entity::Player::setElement( uint16_t element )
+{
+  m_element = element;
+}
+
 bool Sapphire::Entity::Player::getGmInvis() const
 {
   return m_gmInvis;
@@ -173,6 +272,32 @@ bool Sapphire::Entity::Player::isActingAsGm() const
   auto status = getOnlineStatus();
   return status == OnlineStatus::GameMaster || status == OnlineStatus::GameMaster1 ||
          status == OnlineStatus::GameMaster2;
+}
+
+bool Sapphire::Entity::Player::isActingAsEnemy() const
+{
+  auto enemy = getModelType();
+  return enemy == 2;
+}
+
+// bool Sapphire::Entity::Player::isActingAsEnemy() const
+// {
+  // return m_isActingAsEnemy;
+// }
+
+// void Sapphire::Entity::Player::setActingAsEnemy( bool enemy )
+// {
+  // m_isActingAsEnemy = enemy;
+// }
+
+bool Sapphire::Entity::Player::getRPMode() const
+{
+  return m_RPMode;
+}
+
+void Sapphire::Entity::Player::setRPMode( bool RPMode )
+{
+  m_RPMode = RPMode;
 }
 
 uint8_t Sapphire::Entity::Player::getMode() const
@@ -901,6 +1026,12 @@ uint32_t Sapphire::Entity::Player::getModelForSlot( Common::GearModelSlot slot )
   return m_modelEquip[ slot ];
 }
 
+void Sapphire::Entity::Player::setModelForSlot( Common::GearModelSlot slot, uint32_t val )
+{
+  m_modelEquip[slot] = val;
+}
+
+
 uint64_t Sapphire::Entity::Player::getModelMainWeapon() const
 {
   return m_modelMainWeapon;
@@ -909,6 +1040,16 @@ uint64_t Sapphire::Entity::Player::getModelMainWeapon() const
 uint64_t Sapphire::Entity::Player::getModelSubWeapon() const
 {
   return m_modelSubWeapon;
+}
+
+void Sapphire::Entity::Player::setModelMainWeapon( uint64_t modelmainweapon )
+{
+  m_modelMainWeapon = modelmainweapon;
+}
+
+void Sapphire::Entity::Player::setModelSubWeapon( uint64_t modelsubweapon )
+{
+  m_modelSubWeapon = modelsubweapon;
 }
 
 uint64_t Sapphire::Entity::Player::getModelSystemWeapon() const
@@ -1371,9 +1512,9 @@ uint8_t Sapphire::Entity::Player::getSearchSelectClass() const
   return m_searchSelectClass;
 }
 
-void Sapphire::Entity::Player::sendNotice( const std::string& message ) //Purple Text
+void Sapphire::Entity::Player::sendNotice( uint8_t padding, const std::string& message ) //Purple Text
 {
-  queuePacket( std::make_shared< ServerNoticePacket >( getId(), message ) );
+  queuePacket( std::make_shared< ServerNoticePacket >( getId(), padding, message ) );
 }
 
 void Sapphire::Entity::Player::sendUrgent( const std::string& message ) //Red Text
@@ -1384,6 +1525,19 @@ void Sapphire::Entity::Player::sendUrgent( const std::string& message ) //Red Te
 void Sapphire::Entity::Player::sendDebug( const std::string& message ) //Grey Text
 {
   queuePacket( std::make_shared< ChatPacket >( *getAsPlayer(), ChatType::ServerDebug, message ) );
+}
+
+void Sapphire::Entity::Player::respawn()
+{
+  auto inRange = getInRangeActors( true );
+  for( auto actor : inRange )
+  {
+    if( actor->isPlayer() )
+    {
+      despawn( actor->getAsPlayer() );
+      spawn( actor->getAsPlayer() );
+    }
+  }
 }
 
 void Sapphire::Entity::Player::sendLogMessage( uint32_t messageId, uint32_t param2, uint32_t param3,
@@ -1803,6 +1957,7 @@ void Sapphire::Entity::Player::sendZonePackets()
   initZonePacket->data().zoneId = getCurrentTerritory()->getTerritoryTypeId();
   initZonePacket->data().weatherId = static_cast< uint8_t >( getCurrentTerritory()->getCurrentWeather() );
   initZonePacket->data().bitmask = 0x1;
+  initZonePacket->data().bitmask1 = 16;
   initZonePacket->data().festivalId = getCurrentTerritory()->getCurrentFestival().first;
   initZonePacket->data().additionalFestivalId = getCurrentTerritory()->getCurrentFestival().second;
   initZonePacket->data().pos.x = getPos().x;
@@ -2037,7 +2192,7 @@ void Sapphire::Entity::Player::setLandFlags( uint8_t flagSlot, uint32_t landFlag
 {
   m_landFlags[ flagSlot ].landIdent = ident;
   // todo: leave this in for now but we really need to handle this world id shit properly
-  m_landFlags[ flagSlot ].landIdent.worldId = 67;
+  m_landFlags[ flagSlot ].landIdent.worldId = 97;
   m_landFlags[ flagSlot ].landFlags = landFlags;
   m_landFlags[ flagSlot ].unkown1 = 0;
 }

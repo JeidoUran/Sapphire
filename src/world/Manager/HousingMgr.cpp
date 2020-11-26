@@ -235,7 +235,7 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
     ident.territoryTypeId = static_cast< int16_t >( entry.m_landSetId >> 16 );
     ident.wardNum = static_cast< int16_t >( entry.m_landSetId & 0xFFFF );
     ident.landId = static_cast< int16_t >( entry.m_landId );
-    ident.worldId = 67;
+    ident.worldId = 97;
 
     auto& containers = getEstateInventory( ident );
 
@@ -478,7 +478,7 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
   wardInfoPacket->data().landIdent.territoryTypeId = static_cast< int16_t >( territoryTypeId );
 
   // todo: properly get worldId
-  wardInfoPacket->data().landIdent.worldId = 67;
+  wardInfoPacket->data().landIdent.worldId = 97;
 
   for( int i = 0; i < 60; i++ )
   {

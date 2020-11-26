@@ -56,7 +56,7 @@ namespace Sapphire::World::Manager
       EventTrial = 36,
       TheFeastArea = 37,
       PrivateEventArea = 40,
-      //Eureka = 41, // wat
+      Eureka = 41, // wat
     };
 
     TerritoryMgr();
@@ -109,6 +109,8 @@ namespace Sapphire::World::Manager
 
     void createAndJoinQuestBattle( Entity::Player& player, uint16_t contentFinderConditionId );
 
+    TerritoryPtr createPublicContent( uint32_t contentFinderConditionId );
+    
     TerritoryPtr findOrCreateHousingInterior( const Common::LandIdent landIdent );
 
     /*! removes instance by instanceId, return true if successful */

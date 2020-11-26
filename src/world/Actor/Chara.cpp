@@ -63,6 +63,10 @@ std::string Sapphire::Entity::Chara::getName() const
   return std::string( m_name );
 }
 
+void Sapphire::Entity::Chara::setName( char name [34] )
+{
+  strcpy( m_name, name );
+}
 
 /*! \return current stance of the actors */
 Sapphire::Common::Stance Sapphire::Entity::Chara::getStance() const

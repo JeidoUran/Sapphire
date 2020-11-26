@@ -14,15 +14,16 @@ namespace Sapphire::Network::Packets::Server
   class ServerNoticePacket : public ZoneChannelPacket< FFXIVIpcServerNotice >
   {
   public:
-    ServerNoticePacket( uint32_t playerId, const std::string& message ) :
+    ServerNoticePacket( uint32_t playerId, uint8_t padding, const std::string& message ) :
       ZoneChannelPacket< FFXIVIpcServerNotice >( playerId, playerId )
     {
-      initialize( message );
+      initialize( padding, message );
     };
 
   private:
-    void initialize( const std::string& message )
+    void initialize( uint8_t padding, const std::string& message )
     {
+      m_data.padding = padding;
       strcpy( m_data.message, message.c_str() );
     };
   };

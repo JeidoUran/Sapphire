@@ -87,6 +87,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
   {
     case ClientTriggerType::ToggleSheathe:  // Toggle sheathe
     {
+      player.sendToInRangeSet( makeActorControl142( player.getId(), 0, param11, 1 ) );
       if( param11 == 1 )
         player.setStance( Common::Stance::Active );
       else
@@ -96,11 +97,11 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       }
 
       player.sendToInRangeSet( makeActorControl( player.getId(), 0, param11, 1 ) );
-
       break;
     }
     case ClientTriggerType::ToggleAutoAttack:  // Toggle auto-attack
     {
+      player.sendToInRangeSet( makeActorControl142( player.getId(), 0, param11, 1 ) );
       if( param11 == 1 )
       {
         player.setAutoattack( true );
@@ -202,7 +203,8 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
         return;
 
       player.emote( emoteId, targetId, isSilent );
-
+      Logger::debug( "[Emote] {1} used the emote \"{2}\" on {3}.", player.getId(), player.getName(), emoteData->name, player.getTargetId() );
+      // todo: get target name instead of ID
       bool isPersistent = emoteData->emoteMode != 0;
 
       if( isPersistent )
@@ -308,7 +310,8 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     case ClientTriggerType::RequestInstanceLeave:
     {
       // todo: apply cf penalty if applicable, make sure player isn't in combat
-      player.exitInstance();
+      player.sendUrgent( "Leaving an instance via client request has been disabled. If you wish to leave the instance, please use \"!instance ret\"." );
+      // player.exitInstance();
       break;
     }
     case ClientTriggerType::AbandonQuest:

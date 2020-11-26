@@ -206,6 +206,7 @@ namespace Sapphire::Network::ActorControl
     EObjAnimation = 0x19D,
 
     SetTitle = 0x1F4,
+    InstanceDialogue = 0x1F5,
 
     SetStatusIcon = 0x1F8,
     LimitBreakGauge = 0x1F9, // Max level, amount, build type (chop sound), lb type(0=pve lb 1=pvp lb)
@@ -443,6 +444,7 @@ namespace Sapphire::Network::ActorControl
 
     StartReplay = 0x7BC,
     EndReplay = 0x7BD, // request for restoring the original player state (actor, buff, gauge, etc..)
+
 
     OpenDuelUI = 0x898, // Open a duel ui
     DuelRequestResult = 0x899, // either accept/reject

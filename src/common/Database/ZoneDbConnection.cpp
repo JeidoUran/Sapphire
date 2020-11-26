@@ -33,7 +33,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "Aetheryte, HowTo, Minions, Mounts, Orchestrion, EquippedMannequin, ConfigFlags, "
                     "QuestCompleteFlags, OpeningSequence, QuestTracking, GrandCompany, "
                     "GrandCompanyRank, Discovery, GMRank, EquipDisplayFlags, Unlocks, CFPenaltyUntil, "
-                    "Pose "
+                    "Pose, modelChara "
                     "FROM charainfo WHERE CharacterId = ?;",
                     CONNECTION_SYNC );
 
@@ -223,7 +223,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
   /// ZONE QUERIES
   prepareStatement( ZONE_SEL_BNPCTEMPLATES,
                     "SELECT Id, Name, bNPCBaseId, bNPCNameId, mainWeaponModel, "
-                           "secWeaponModel, aggressionMode, enemyType, pose, "
+                           "secWeaponModel, aggressionMode, enemyType, currentMount, pose, "
                            "modelChara, displayFlags, Look, Models "
                     "FROM bnpctemplate WHERE 1;",
                     CONNECTION_BOTH );

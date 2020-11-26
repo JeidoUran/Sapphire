@@ -13,6 +13,7 @@
 #include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
+#include "Territory/PublicContent.h"
 #include "TerritoryMgr.h"
 #include "HousingMgr.h"
 
@@ -103,7 +104,6 @@ bool Sapphire::World::Manager::TerritoryMgr::isInstanceContentTerritory( uint32_
   auto intendedUse = pTeri->territoryIntendedUse;
 
   return intendedUse == TerritoryIntendedUse::AllianceRaid ||
-         intendedUse == TerritoryIntendedUse::BeforeTrialDung ||
          intendedUse == TerritoryIntendedUse::Trial ||
          intendedUse == TerritoryIntendedUse::Dungeon ||
          intendedUse == TerritoryIntendedUse::OpenWorldInstanceBattle ||
@@ -111,7 +111,8 @@ bool Sapphire::World::Manager::TerritoryMgr::isInstanceContentTerritory( uint32_
          intendedUse == TerritoryIntendedUse::RaidFights ||
          intendedUse == TerritoryIntendedUse::Raids ||
          intendedUse == TerritoryIntendedUse::TreasureMapInstance ||
-         intendedUse == TerritoryIntendedUse::EventTrial;
+         intendedUse == TerritoryIntendedUse::EventTrial ||
+         intendedUse == TerritoryIntendedUse::Eureka;
 }
 
 bool Sapphire::World::Manager::TerritoryMgr::isPrivateTerritory( uint32_t territoryTypeId ) const
@@ -123,7 +124,6 @@ bool Sapphire::World::Manager::TerritoryMgr::isPrivateTerritory( uint32_t territ
 
   return pTeri->territoryIntendedUse == TerritoryIntendedUse::OpeningArea ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::Inn ||
-         pTeri->territoryIntendedUse == TerritoryIntendedUse::JailArea ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::MSQPrivateArea;
 }
 
@@ -147,6 +147,7 @@ bool Sapphire::World::Manager::TerritoryMgr::isDefaultTerritory( uint32_t territ
   return pTeri->territoryIntendedUse == TerritoryIntendedUse::Inn ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::Town ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::OpenWorld ||
+         pTeri->territoryIntendedUse == TerritoryIntendedUse::JailArea ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::OpeningArea;
 
 }
@@ -355,6 +356,40 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createInstanceCon
 
   m_instanceContentIdToInstanceMap[ instanceContentId ][ pZone->getGuId() ] = pZone;
   m_guIdToTerritoryPtrMap[ pZone->getGuId() ] = pZone;
+  m_instanceZoneSet.insert( pZone );
+
+  return pZone;
+}
+
+Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createPublicContent( uint32_t contentFinderConditionId )
+{
+
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto pContentFinderCondition = pExdData->get< Sapphire::Data::ContentFinderCondition >( contentFinderConditionId );
+  if( !pContentFinderCondition )
+    return nullptr;
+  auto publicContentId = pContentFinderCondition->content;
+
+  auto pPublicContent = pExdData->get< Sapphire::Data::PublicContent >( publicContentId );
+  if( !pPublicContent )
+    return nullptr;
+
+  if( !isInstanceContentTerritory( pContentFinderCondition->territoryType ) )
+    return nullptr;
+
+  auto pTeri = getTerritoryDetail( pContentFinderCondition->territoryType );
+
+  if( !pTeri || pPublicContent->name.empty() )
+    return nullptr;
+
+  Logger::debug( "Starting instance for PublicContent id: {0} ({1})", publicContentId, pPublicContent->name );
+
+  auto pZone = make_PublicContent( pPublicContent, pContentFinderCondition->territoryType, getNextInstanceId(),
+                                     pTeri->name, pPublicContent->name, publicContentId, framework() );
+  pZone->init();
+
+  m_instanceContentIdToInstanceMap[ publicContentId ][ pZone->getGuId() ] = pZone;
+  m_guIdToTerritoryPtrMap[pZone->getGuId()] = pZone;
   m_instanceZoneSet.insert( pZone );
 
   return pZone;

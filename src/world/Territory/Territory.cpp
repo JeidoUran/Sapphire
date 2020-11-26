@@ -19,6 +19,7 @@
 #include "Territory.h"
 #include "InstanceContent.h"
 #include "QuestBattle.h"
+#include "PublicContent.h"
 #include "Manager/TerritoryMgr.h"
 #include "Navi/NaviProvider.h"
 
@@ -768,7 +769,7 @@ void Sapphire::Territory::registerEObj( Entity::EventObjectPtr object )
 
   onRegisterEObj( object );
 
-  //Logger::debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
+  Logger::debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
 Sapphire::Entity::EventObjectPtr Sapphire::Territory::getEObj( uint32_t objId )
@@ -788,6 +789,11 @@ Sapphire::InstanceContentPtr Sapphire::Territory::getAsInstanceContent()
 Sapphire::QuestBattlePtr Sapphire::Territory::getAsQuestBattle()
 {
   return std::dynamic_pointer_cast< QuestBattle, Territory >( shared_from_this() );
+}
+
+Sapphire::PublicContentPtr Sapphire::Territory::getAsPublicContent()
+{
+  return std::dynamic_pointer_cast< PublicContent, Territory >( shared_from_this() );
 }
 
 uint32_t Sapphire::Territory::getNextEObjId()

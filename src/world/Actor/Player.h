@@ -350,6 +350,12 @@ namespace Sapphire::Entity
     /*! get the current off hand model */
     uint64_t getModelSubWeapon() const;
 
+    /*! get the current main hand model */
+    void setModelMainWeapon( uint64_t modelmainweapon );
+
+    /*! get the current off hand model */
+    void setModelSubWeapon( uint64_t modelsubweapon );
+
     /*! get the current system hand model */
     uint64_t getModelSystemWeapon() const;
 
@@ -358,6 +364,9 @@ namespace Sapphire::Entity
 
     /*! return the equipment model in a specified equipment slot */
     uint32_t getModelForSlot( Common::GearModelSlot slot );
+
+    /*! set the equipment model in a specified equipment slot */
+    void setModelForSlot( Common::GearModelSlot slot, uint32_t val );
 
     /*! add amount to the currency of type */
     void addCurrency( Common::CurrencyType type, uint32_t amount, bool sendLootMessage = false );
@@ -785,11 +794,11 @@ namespace Sapphire::Entity
 
     uint8_t getSearchSelectClass() const;
 
-    void sendNotice( const std::string& message );
+    void sendNotice( uint8_t padding, const std::string& message );
     template< typename... Args >
-    void sendNotice( const std::string& message, const Args&... args )
+    void sendNotice( uint8_t padding, const std::string& message, const Args&... args )
     {
-      sendNotice( fmt::format( message, args... ) );
+      sendNotice( padding, fmt::format( message, args... ) );
     }
 
     void sendUrgent( const std::string& message );
@@ -806,6 +815,8 @@ namespace Sapphire::Entity
     {
       sendDebug( fmt::format( message, args... ) );
     }
+
+    void respawn();
 
     void sendLogMessage( uint32_t messageId, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0, uint32_t param5 = 0, uint32_t param6 = 0 );
 
@@ -852,7 +863,17 @@ namespace Sapphire::Entity
 
     void setGmInvis( bool invis );
 
+    // bool isActingAsEnemy() const;
+
+    // void setActingAsEnemy( bool enemy );
+
     bool isActingAsGm() const;
+
+    bool isActingAsEnemy() const;
+
+    bool getRPMode() const;
+
+    void setRPMode( bool RPMode );
 
     uint8_t getMode() const;
 
@@ -861,6 +882,42 @@ namespace Sapphire::Entity
     void setAutoattack( bool mode );
 
     bool isAutoattackOn() const;
+
+    uint32_t getbNPCBase() const;
+
+    void setbNPCBase( uint32_t bNPCBase );
+
+    uint32_t getbNPCName() const;
+
+    void setbNPCName( uint32_t bNPCName );
+
+    uint32_t getDisplayFlags() const;
+
+    void setDisplayFlags( uint32_t displayflags );
+
+    uint16_t getModelChara() const;
+
+    void setModelChara( uint16_t modelChara );
+
+    uint8_t getModelType() const;
+
+    void setModelType( uint8_t modelType );
+
+    uint8_t getSubType() const;
+
+    void setSubType( uint8_t subtype );
+
+    uint8_t getEnemyType() const;
+
+    void setEnemyType( uint8_t enemyType );
+
+    uint16_t getElementalLevel() const;
+
+    void setElementalLevel( uint16_t elementalLevel );
+
+    uint16_t getElement() const;
+
+    void setElement( uint16_t element );
 
     void onMobAggro( BNpcPtr pBNpc );
     void onMobDeaggro( BNpcPtr pBNpc );
@@ -1099,6 +1156,20 @@ namespace Sapphire::Entity
     uint8_t m_gmRank;
     uint16_t zoneId;
     bool m_gmInvis = false;
+
+    uint32_t m_bNPCBase;
+    uint32_t m_bNPCName;
+    uint32_t m_displayFlags;
+
+    bool m_RPMode = false;
+
+    uint16_t m_modelChara;
+
+    uint8_t m_modelType;
+    uint8_t m_subtype;
+    uint8_t m_enemyType;
+    uint16_t m_elementalLevel;
+    uint16_t m_element;
 
     uint8_t m_equipDisplayFlags;
 

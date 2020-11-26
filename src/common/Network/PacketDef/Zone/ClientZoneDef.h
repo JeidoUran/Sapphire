@@ -197,6 +197,23 @@ struct FFXIVIpcTellHandler : FFXIVIpcBasePacket< TellReq >
   /* 0024 */ char message[1029];
 };
 
+struct FFXIVIpcEurekaTellHandler : FFXIVIpcBasePacket< EurekaTellReq >
+{
+  uint32_t characterId;
+  uint32_t unk;
+  uint16_t worldId;
+  uint16_t unk1;
+  uint8_t unk2;
+  /* 0004 */ char targetPCName[10];
+  /* 0024 */ char message[1029];
+  uint32_t u0C;
+  uint16_t worldId1;
+  uint8_t preName;
+
+
+};
+
+
 struct FFXIVIpcChatHandler :
   FFXIVIpcBasePacket< ChatHandler >
 {

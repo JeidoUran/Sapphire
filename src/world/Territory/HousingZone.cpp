@@ -202,7 +202,7 @@ void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
   //landsetInitializePacket->data().landIdent.landSetId = m_landSetId;
   landsetInitializePacket->data().landIdent.territoryTypeId = m_territoryTypeId;
   //TODO: get current WorldId
-  landsetInitializePacket->data().landIdent.worldId = 67;
+  landsetInitializePacket->data().landIdent.worldId = 97;
   landsetInitializePacket->data().subInstance = !isPlayerSubInstance( player ) ? 1 : 2;
 
   uint8_t startIndex = !isPlayerSubInstance( player ) ? 0 : 30;

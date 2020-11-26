@@ -17,6 +17,21 @@ namespace Sapphire::World::Manager
     // container mapping command string to command object
     std::map< std::string, std::shared_ptr< DebugCommand > > m_commandMap;
 
+    std::set< Sapphire::Entity::PlayerPtr > m_rpMembers;
+    std::set< Sapphire::Entity::PlayerPtr > m_rpNPC;
+    std::set< Sapphire::Entity::PlayerPtr > m_rpSpectators;
+
+    bool isRpPrepared = ( false );
+    bool isRpStarted = ( false );
+    bool isBlackScreen = ( false );
+    bool isFlashBack = ( false );
+    int32_t startzone = 0;
+    int32_t startposx = 0;
+    int32_t startposy = 0;
+    int32_t startposz = 0;
+    char RpTheme [255] = "";
+
+
   public:
     DebugCommandMgr();
 
@@ -52,11 +67,35 @@ namespace Sapphire::World::Manager
     void unlockCharacter( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
     void instance( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void publicContent( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
     void questBattle( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
     void housing( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command) ;
 
     void script( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void random( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void status( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void tell( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void notice( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void action( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void rp( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void rpevent( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void enemy( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void respawn( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void ely( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
 
   };
 

@@ -50,7 +50,7 @@ Sapphire::World::ServerMgr::ServerMgr( const std::string& configName ) :
   m_configName( configName ),
   m_bRunning( true ),
   m_lastDBPingTime( 0 ),
-  m_worldId( 67 )
+  m_worldId( 97 )
 {
 }
 
@@ -460,15 +460,17 @@ void Sapphire::World::ServerMgr::loadBNpcTemplates()
     auto secWeaponModel = res->getUInt64( 6 );
     auto aggressionMode = res->getUInt8( 7 );
     auto enemyType = res->getUInt8( 8 );
+    // auto currentMount = res->getUInt8( 9 );
     auto pose = res->getUInt8( 9 );
     auto modelChara = res->getUInt( 10 );
     auto displayFlags = res->getUInt( 11 );
     auto look = res->getBlobVector( 12 );
     auto models = res->getBlobVector( 13 );
 
+
     auto bnpcTemplate = std::make_shared< Entity::BNpcTemplate >(
                                               id, bNPCBaseId, bNPCNameId, mainWeaponModel, secWeaponModel,
-                                              aggressionMode, enemyType, 0, pose, modelChara, displayFlags,
+                                              aggressionMode, enemyType,/*  currentMount, */ 0, pose, modelChara, displayFlags,
                                               reinterpret_cast< uint32_t* >( &models[ 0 ] ),
                                               reinterpret_cast< uint8_t* >( &look[ 0 ] ) );
 

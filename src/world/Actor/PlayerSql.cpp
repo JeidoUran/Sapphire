@@ -137,6 +137,8 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
   m_birthMonth = res->getUInt8( "BirthMonth" );
   m_status = static_cast< ActorStatus >( res->getUInt( "Status" ) );
   m_emoteMode = res->getUInt( "EmoteModeType" );
+  
+  m_modelChara = res->getUInt( "ModelChara" );
 
   m_activeTitle = res->getUInt16( "ActiveTitle" );
 

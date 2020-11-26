@@ -387,7 +387,7 @@ Sapphire::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t ev
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
 
-  if( !hasPlayerPreviouslySpawned( player ) )
+  if( !hasPlayerPreviouslySpawned( player ) && player.getRPMode() == false )
   {
     m_spawnedPlayers.insert( player.getId() );
     player.directorPlayScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |

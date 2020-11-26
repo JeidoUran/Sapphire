@@ -75,6 +75,16 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
       return name;
     }
 
+    case Event::EventHandler::EventHandlerType::PublicContentDirector:
+    {
+      auto contentInfo = pExdData->get< Sapphire::Data::PublicContent >( eventId & 0xFFFF );
+      std::string name = contentInfo->name;
+      std::string remove( ",â˜…_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" );
+      Util::eraseAllIn( name, remove );
+      name[ 0 ] = toupper( name[ 0 ] );
+      return name;
+    }
+
 
     case Event::EventHandler::EventHandlerType::Warp:
     {

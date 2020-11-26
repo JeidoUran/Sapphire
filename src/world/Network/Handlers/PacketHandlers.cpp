@@ -501,16 +501,25 @@ void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PAC
   {
     case ChatType::Say:
     {
-      if( player.isActingAsGm() )
+      if( player.isActingAsGm() ) 
+      {
         chatPacket->data().chatType = ChatType::GMSay;
-
+          Logger::debug( "[Chatlog] (GMSay) {0}: {1}", player.getName(), chatPacket->data().msg );
+      }
+      else
+          Logger::debug( "[Chatlog] (Say) {0}: {1}", player.getName(), chatPacket->data().msg );
       player.getCurrentTerritory()->queuePacketForRange( player, 50, chatPacket );
       break;
     }
     case ChatType::Yell:
     {
       if( player.isActingAsGm() )
+      {
         chatPacket->data().chatType = ChatType::GMYell;
+          Logger::debug( "[Chatlog] (GMYell) {0}: {1}", player.getName(), chatPacket->data().msg );
+      }
+      else
+          Logger::debug( "[Chatlog] (Yell) {0}: {1}", player.getName(), chatPacket->data().msg );
 
       player.getCurrentTerritory()->queuePacketForRange( player, 6000, chatPacket );
       break;
@@ -518,13 +527,19 @@ void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PAC
     case ChatType::Shout:
     {
       if( player.isActingAsGm() )
+      {
         chatPacket->data().chatType = ChatType::GMShout;
+          Logger::debug( "[Chatlog] (GMShout) {0}: {1}", player.getName(), chatPacket->data().msg );
+      }
+      else
+          Logger::debug( "[Chatlog] (Shout) {0}: {1}", player.getName(), chatPacket->data().msg );
 
       player.getCurrentTerritory()->queuePacketForRange( player, 6000, chatPacket );
       break;
     }
     default:
     {
+      Logger::debug( "[Chatlog] (Emote) {0} {1}", player.getName(), chatPacket->data().msg );
       player.getCurrentTerritory()->queuePacketForRange( player, 50, chatPacket );
       break;
     }
@@ -593,12 +608,15 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
   strcpy( tellPacket->data().receipientName, player.getName().c_str() );
   // TODO: world id from server
   tellPacket->data().contentId = player.getContentId();
-  tellPacket->data().worldId = 67;
+  tellPacket->data().worldId = 97;
 
   if( player.isActingAsGm() )
   {
     tellPacket->data().flags |= TellFlags::GmTellMsg;
+      Logger::debug( "[Chatlog] (GMTell) {0} > {1}: {2}", player.getName(), packet.data().targetPCName, tellPacket->data().msg );
   }
+  else
+      Logger::debug( "[Chatlog] (Tell) {0} > {1}: {2}", player.getName(), packet.data().targetPCName, tellPacket->data().msg );
 
   pTargetPlayer->queueChatPacket( tellPacket );
 }

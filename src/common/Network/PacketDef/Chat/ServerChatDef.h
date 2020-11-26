@@ -20,6 +20,15 @@ struct FFXIVIpcTell : FFXIVIpcBasePacket< Tell >
   char msg[1029];
 };
 
+struct FFXIVIpcEurekaTell : FFXIVIpcBasePacket< EurekaTell >
+{
+  uint64_t contentId;
+  uint16_t worldId;
+  uint16_t flags;
+  uint8_t unk;
+  char receipientName[32];
+  char msg[1029];
+};
 /**
 * Structural representation of the packet sent by the server as response
 * to a failed tell because of unavailable target player

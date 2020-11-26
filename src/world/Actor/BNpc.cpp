@@ -66,6 +66,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_bNpcNameId = pTemplate->getBNpcNameId();
   m_bNpcBaseId = pTemplate->getBNpcBaseId();
   m_enemyType = pTemplate->getEnemyType();
+  // m_currentMount = pTemplate->getCurrentMount();
   m_pos.x = posX;
   m_pos.y = posY;
   m_pos.z = posZ;
@@ -166,6 +167,11 @@ uint32_t Sapphire::Entity::BNpc::getBNpcBaseId() const
 uint32_t Sapphire::Entity::BNpc::getBNpcNameId() const
 {
   return m_bNpcNameId;
+}
+
+uint8_t Sapphire::Entity::BNpc::getCurrentMount() const
+{
+  return m_currentMount;
 }
 
 void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )

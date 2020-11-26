@@ -31,9 +31,8 @@ namespace Sapphire::Network::Packets::Server
       m_data.classJob = static_cast< uint8_t >( player.getClass() );
       //m_data.status = static_cast< uint8_t >( pPlayer->getStatus() );
 
-// TODO: world id from server
-      m_data.currentWorldId = 67;
-      m_data.homeWorldId = 67;
+      m_data.currentWorldId = 97;
+      m_data.homeWorldId = 97;
 
       m_data.hPCurr = player.getHp();
       m_data.mPCurr = player.getMp();
@@ -43,6 +42,16 @@ namespace Sapphire::Network::Packets::Server
       m_data.level = player.getLevel();
       m_data.gmRank = player.getGmRank();
       m_data.pose = player.getPose();
+
+      m_data.bNPCBase = player.getbNPCBase();
+      m_data.bNPCName = player.getbNPCName();
+
+      m_data.modelChara = player.getModelChara();
+
+      m_data.subtype = player.getSubType();
+      m_data.enemyType = player.getEnemyType();
+      m_data.elementalLevel = player.getElementalLevel();
+      m_data.element = player.getElement();
 
       memcpy( m_data.look, player.getLookArray(), sizeof( m_data.look ) );
 
@@ -81,7 +90,10 @@ namespace Sapphire::Network::Packets::Server
       //m_data.u23 = 0x04;
       //m_data.u24 = 256;
       m_data.state = static_cast< uint8_t >( player.getStatus() );
-      m_data.modelType = player.getObjKind();
+      if( player.isActingAsEnemy() == true )
+         m_data.modelType = player.getModelType();
+      else
+         m_data.modelType = player.getObjKind();
       if( target.getId() == player.getId() )
       {
         m_data.spawnIndex = 0x00;

@@ -49,7 +49,7 @@ namespace Sapphire::Network::Packets::Server
         m_data.mainWeaponModel = pTarget->getModelMainWeapon();
         m_data.secWeaponModel = pTarget->getModelSubWeapon();
 
-        m_data.worldId = 67; // TODO: world id from server
+        m_data.worldId = 97;
 
         memcpy( m_data.look, pTarget->getLookArray(), sizeof( m_data.look ) );
 

@@ -45,7 +45,7 @@ Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId,
   m_landIdent.landId = landId;
   m_landIdent.territoryTypeId = territoryTypeId;
   m_landIdent.wardNum = wardNum;
-  m_landIdent.worldId = 67; // todo: fix this
+  m_landIdent.worldId = 97; // todo: fix this
 
   m_minPrice = m_landInfo->minPrice[ m_landIdent.landId ];
   m_maxPrice = m_landInfo->initialPrice[ m_landIdent.landId ];

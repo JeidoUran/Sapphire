@@ -380,7 +380,7 @@ void Sapphire::Entity::Player::onLogin()
   std::string msg;
   while( std::getline( ss, msg, ';' ) )
   {
-    sendNotice( msg );
+    sendNotice( 0, msg );
   }
 }
 

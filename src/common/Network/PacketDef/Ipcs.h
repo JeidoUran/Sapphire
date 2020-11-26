@@ -406,6 +406,7 @@ namespace Sapphire::Network::Packets
   enum ServerChatIpcType : uint16_t
   {
     Tell = 0x0064, // updated for sb
+    EurekaTell = 0x00FB,
     TellErrNotFound = 0x0066,
 
     FreeCompanyEvent = 0x012C, // added 5.0
@@ -417,6 +418,7 @@ namespace Sapphire::Network::Packets
   enum ClientChatIpcType : uint16_t
   {
     TellReq = 0x0064,
+    EurekaTellReq = 0x00D8,
   };
 
 

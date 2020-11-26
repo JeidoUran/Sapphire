@@ -26,6 +26,7 @@ namespace Sapphire
   namespace Data
   {
     struct InstanceContent;
+    struct PublicContent;
     struct TerritoryType;
   }
 
@@ -169,6 +170,8 @@ namespace Sapphire
     InstanceContentPtr getAsInstanceContent();
 
     QuestBattlePtr getAsQuestBattle();
+
+    PublicContentPtr getAsPublicContent();
 
     void updateSpawnPoints();
 

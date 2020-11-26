@@ -65,7 +65,8 @@ namespace Sapphire::Entity
     uint32_t getBNpcNameId() const;
 
     uint8_t getEnemyType() const;
-
+    uint8_t getCurrentMount() const;
+	
     uint64_t getWeaponMain() const;
     uint64_t getWeaponSub() const;
 
@@ -133,6 +134,7 @@ namespace Sapphire::Entity
     uint32_t m_displayFlags;
     uint8_t m_level;
     uint32_t m_levelId;
+	uint8_t m_currentMount;
 
     uint32_t m_flags;
 

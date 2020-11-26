@@ -3,7 +3,7 @@
 #include <cstring>
 
 Sapphire::Entity::BNpcTemplate::BNpcTemplate( uint32_t id, uint32_t baseId, uint32_t nameId, uint64_t weaponMain, uint64_t weaponSub,
-                                              uint8_t aggressionMode, uint8_t enemyType, uint8_t onlineStatus, uint8_t pose,
+                                              uint8_t aggressionMode, uint8_t enemyType, /* uint8_t currentMount ,*/ uint8_t onlineStatus, uint8_t pose,
                                               uint16_t modelChara, uint32_t displayFlags, uint32_t* modelEquip,
                                               uint8_t* customize ) :
   m_id( id ),
@@ -13,6 +13,7 @@ Sapphire::Entity::BNpcTemplate::BNpcTemplate( uint32_t id, uint32_t baseId, uint
   m_weaponSub( weaponSub ),
   m_aggressionMode( aggressionMode ),
   m_enemyType( enemyType ),
+  // m_currentMount( currentMount ),
   m_onlineStatus( onlineStatus ),
   m_pose( pose ),
   m_modelChara( modelChara ),
@@ -106,6 +107,17 @@ uint8_t Sapphire::Entity::BNpcTemplate::getOnlineStatus() const
 {
   return m_onlineStatus;
 }
+
+// uint8_t Sapphire::Entity::BNpcTemplate::getCurrentMount() const
+// {
+  // return m_currentMount;
+// }
+
+// void Sapphire::Entity::BNpcTemplate::setCurrentMount( uint8_t currentMount )
+// {
+  // m_currentMount = currentMount;
+// }
+
 
 void Sapphire::Entity::BNpcTemplate::setOnlineStatus( uint8_t onlineStatus )
 {
