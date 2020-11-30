@@ -1771,7 +1771,7 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
     {
       if( actor->isPlayer() )
       {
-        actor->getAsPlayer()->sendNotice( 0, "{0} rolls 1d{1}. Result: {2}.", player.getName(), maxnumber, randomnumber );
+        actor->getAsPlayer()->sendNotice( 0, "{0} rolls 1d{1}. Result: {2}", player.getName(), maxnumber, randomnumber );
       }
     }
   }
@@ -1782,7 +1782,7 @@ void Sapphire::World::Manager::DebugCommandMgr::random( char* data, Entity::Play
   else if( randomnumber == maxnumber )
     player.sendNotice( 0, "You roll 1d{0}. Result: {1}!!", maxnumber, randomnumber );
   else
-    player.sendNotice( 0, "You roll 1d{0}. Result: {1}.", maxnumber, randomnumber );
+    player.sendNotice( 0, "You roll 1d{0}. Result: {1}", maxnumber, randomnumber );
 }
 
 
