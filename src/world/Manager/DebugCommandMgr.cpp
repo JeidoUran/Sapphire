@@ -2021,8 +2021,8 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
   std::size_t spos = tmpCommand.find_first_of( " " );
   
   Logger::debug( "[{0}] Command: action params: {1}", player.getId(), tmpCommand );
-  uint32_t actionId;
-  sscanf( tmpCommand.c_str(), "%u", &actionId );
+  uint16_t actionId;
+  sscanf( tmpCommand.c_str(), "%hu", &actionId );
 
   if ( !exdData.get< Sapphire::Data::Action >( actionId ) )
   {
@@ -2453,6 +2453,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         }
       }
       isBlackScreen = true;
+	  player.sendNotice( 0, "Loading screen toggled to ON." );
     }
     else if( isBlackScreen == true )
     {
@@ -2465,6 +2466,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         }
       }
       isBlackScreen = false;
+	  player.sendNotice( 0, "Loading screen toggled to OFF." );
     }
   }
   
