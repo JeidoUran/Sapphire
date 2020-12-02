@@ -510,7 +510,7 @@ namespace Sapphire::Entity
     /*! gets the players territoryTypeId */
     uint32_t getTerritoryTypeId() const;
 
-    void forceZoneing( uint32_t zoneId );
+    void forceZoneing( uint32_t zoneId = 0, float x = 0, float y = 0, float z = 0, float r = 0, bool showZoneName = false );
 
     /*! return player to preset homepoint */
     void returnToHomepoint();
@@ -1047,7 +1047,72 @@ namespace Sapphire::Entity
     void sendActorGauge();
     void gaugeSetRaw( uint8_t* pData );
 
+    void gaugeWarSetIb( uint8_t value );
+    uint8_t gaugeWarGetIb();
+
+    void gaugePldSetOath( uint8_t value );
+    uint8_t gaugePldGetOath();
+
+    uint8_t gaugeWhmGetLily();
+    uint8_t gaugeWhmGetBloodLily();
+    void gaugeWhmSetLilies( uint8_t liles, uint8_t bloodLilies );
+    void gaugeWhmSetLilyTimer( uint16_t value, bool sendPacket = false );
+    uint16_t gaugeWhmGetLilyTimer();
+
+    void gaugeDrkSetBlood( uint8_t value );
+    uint8_t gaugeDrkGetBlood();
+    void gaugeDrkSetDarkArts( bool value );
+    bool gaugeDrkGetDarkArts();
+    void gaugeDrkSetDarkSideTimer( uint16_t value, bool sendPacket = false );
+    uint16_t gaugeDrkGetDarkSideTimer();
+    void gaugeDrkSetShadowTimer( uint16_t value, bool sendPacket = false );
+    uint16_t gaugeDrkGetShadowTimer();
+
+    void gaugeGnbSetAmmo( uint8_t value );
+    uint8_t gaugeGnbGetAmmo();
+    void gaugeGnbSetComboStep( uint8_t value );
+    uint8_t gaugeGnbGetComboStep();
+
+    void gaugeSamSetKenki( uint8_t value );
+    uint8_t gaugeSamGetKenki();
+    void gaugeSamSetSen( Common::SamSen type, bool value );
+    void gaugeSamSetSen( Common::SamSen value );
+    bool gaugeSamGetSen( Common::SamSen type );
+    Common::SamSen gaugeSamGetSenRaw();
+    bool gaugeSamHasAnySen();
+
+    // party
     //////////////////////////////////////////////////////////////////////////////////////////////////////
+  private:
+    PlayerPtr m_partyLeader;
+    PlayerPtr m_partyInvitationSender;
+    std::vector< PlayerPtr > m_partyMemberList;
+    void clearPartyList();
+    void sendPartyListToParty();
+  public:
+    bool isPartyLeader();
+    bool isInParty();
+    bool createEmptyParty();
+    void disbandParty();
+    PlayerPtr getPartyLeader();
+    PlayerPtr getPartyInvitationSender();
+    void setPartyInvitationSender( PlayerPtr sender );
+    bool addPartyMember( PlayerPtr member );
+    bool removePartyMember( PlayerPtr member );
+    bool changePartyLeader( PlayerPtr newLeader );
+    uint8_t getPartySize();
+    void foreachPartyMember( std::function< void( PlayerPtr member ) > callback);
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    std::unordered_map< uint32_t, TerritoryPtr > m_privateInstanceMap;
+    TerritoryPtr getOrCreatePrivateInstance( uint32_t zoneId );
+    bool enterPredefinedPrivateInstance( uint32_t zoneId );
+
+    void* getEventMgr();
+    void* getExdData();
+    void* getPlayerMgr();
+    void* getInstanceObjectCache();
+    void* getTerritoryMgr();
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
 

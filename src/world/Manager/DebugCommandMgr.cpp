@@ -567,17 +567,15 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   {
     int32_t id;
     sscanf( params.c_str(), "%d", &id );
-    auto pPacket = makeZonePacket< FFXIVIpcCharaVisualEffect >( player.getId() );
-    pPacket->data().id = id;
-	auto inRange = player.getInRangeActors( true );
-    for( auto actor : inRange )
-	{
-		if( actor->isPlayer() )
-		{
-			actor->getAsPlayer()->queuePacket( pPacket );
-		}
+    for( auto actor : player.getInRangeActors() )
+    {
+      if( actor->getId() == player.getTargetId() )
+      {
+        actor->getAsChara()->setVisualEffect( id );
+        return;
+      }
     }
-
+    player.setVisualEffect( id );
   }
   else
   {
@@ -1273,6 +1271,15 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
 
     if( auto instance = player.getCurrentInstance() )
       instance->setCurrentBGM( bgmId );
+  }
+  else if( subCommand == "private" )
+  {
+    uint32_t zoneId = 0;
+    sscanf( params.c_str(), "%d", &zoneId );
+    if( zoneId > 0 )
+    {
+      player.enterPredefinedPrivateInstance( zoneId );
+    }
   }
   else
   {

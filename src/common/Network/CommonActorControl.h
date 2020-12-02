@@ -368,7 +368,7 @@ namespace Sapphire::Network::ActorControl
     AllotAttribute = 0x135,
 
     ClearFieldMarkers = 0x13A,
-    CameraMode = 0x13B, // param12, 1 = camera mode enable, 0 = disable
+    CameraMode = 0x13B, // param11, 1 = enable, 0 = disable
     CharaNameReq = 0x13D, // requests character name by content id
     HuntingLogDetails = 0x194,
 
@@ -396,6 +396,8 @@ namespace Sapphire::Network::ActorControl
     AchievementCatChat = 0x206,
 
     RequestEventBattle = 0x232C,
+
+    Trigger612 = 0x264, // AutoMoveFinished?
 
     QuestJournalUpdateQuestVisibility = 0x2BE,
     QuestJournalClosed = 0x2BF,

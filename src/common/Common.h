@@ -629,10 +629,10 @@ namespace Sapphire::Common
     //WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
     Physical = -1, // seems to be the case
     Unknown_0 = 0,
-    Slashing = 1,
-    Piercing = 2,
-    Blunt = 3,
-    Unknown_4 = 4,
+    Slashing = 1, // likely not used post 5.0
+    Piercing = 2, // likely not used post 5.0
+    Blunt = 3, // likely not used post 5.0
+    Unknown_4 = 4, // likely not used post 5.0
     Magical = 5,
     Darkness = 6,
     Unknown_7 = 7,
@@ -665,6 +665,7 @@ namespace Sapphire::Common
      * @param flags Required to be 128, doesn't show combo rings on hotbars otherwise
      * @param value The actionid that starts/continues the combo. eg, 3617 will start a spinning slash and/or syphon strike combo
      */
+    Provoke = 24,
     StartActionCombo = 27, // shifted one up from 5.18
     ComboSucceed = 28, // shifted one up from 5.18, on retail this is not seen anymore, still working though.
     Knockback = 33,
@@ -1060,6 +1061,69 @@ namespace Sapphire::Common
     Gatherer
   };
 
+  enum class StatusEffectType : uint32_t
+  {
+    Invalid = 0,
+    DamageMultiplier = 1,
+    DamageReceiveMultiplier = 2,
+    Hot = 3,
+    Dot = 4,
+    HealReceiveMultiplier = 5,
+    HealCastMultiplier = 6,
+    CritDHRateBonus = 7,
+    DamageReceiveTrigger = 8,
+    DamageDealtTrigger = 9,
+    Shield = 10,
+    MPRestore = 11,
+    Haste = 12,
+    InstantCast = 13,
+    BlockParryRateBonus = 14,
+    MPRestorePerGCD = 15,
+    AlwaysCombo = 16,
+    PotencyMultiplier = 17,
+  };
+
+  enum class ActionTypeFilter : int32_t
+  {
+    Unknown = 0,
+    Physical = 1,
+    Magical = 2,
+    All = 255,
+  };
+
+  enum class CritDHBonusFilter : int32_t
+  {
+    None = 0,
+    Damage = 1,
+    Heal = 2,
+    All = 255,
+  };
+
+  enum class StatusEffectTriggerResult : int32_t
+  {
+    ReflectDamage = 1,
+    AbsorbHP = 2,
+  };
+
+  enum ActionBonusEffect : uint8_t
+  {
+    NoBonus = 0,
+    CritBonus = 1,
+    DHBonus = 2,
+    GainMPPercentage = 4,
+    GainJobResource = 8,
+    SelfHeal = 16,
+    DamageFallOff = 32,
+    GainJobTimer = 64,
+  };
+
+  enum ActionBonusEffectRequirement : uint8_t
+  {
+    NoRequirement = 0,
+    RequireCorrectCombo = 1,
+    RequireCorrectPositional = 2,
+  };
+
   enum class AstCardType : uint8_t
   {
     None = 0,
@@ -1181,7 +1245,7 @@ namespace Sapphire::Common
     {
       uint8_t ammo;
       uint8_t unused;
-      uint16_t maxTimerDuration;
+      uint16_t maxTimerDuration; // what is this?
       uint8_t ammoComboStep;
     } gnb;
     struct

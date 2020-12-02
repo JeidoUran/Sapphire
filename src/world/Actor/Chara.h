@@ -47,6 +47,7 @@ namespace Sapphire::Entity
       uint32_t healingPotMagic = 0;
       uint32_t determination = 0;
       uint32_t skillSpeed = 0;
+      uint32_t haste = 0;
 
       uint32_t resistSlow = 0;
       uint32_t resistSilence = 0;
@@ -133,6 +134,8 @@ namespace Sapphire::Entity
     /*! Detour Crowd actor scale */
     float m_radius;
 
+    uint32_t m_effect;
+
   public:
     Chara( Common::ObjKind type );
 
@@ -145,13 +148,13 @@ namespace Sapphire::Entity
     /// Status effect functions
     void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
 
-    void removeStatusEffect( uint8_t effectSlotId );
+    void removeStatusEffect( uint8_t effectSlotId, bool sendStatusList = true );
 
-    void removeSingleStatusEffectById( uint32_t id );
+    void removeSingleStatusEffectById( uint32_t id, bool sendStatusList = true );
 
     void updateStatusEffects();
 
-    bool hasStatusEffect( uint32_t id );
+    std::pair< uint8_t, StatusEffect::StatusEffectPtr > getStatusEffectById( uint32_t id );
 
     int8_t getStatusEffectFreeSlot();
 
@@ -165,19 +168,19 @@ namespace Sapphire::Entity
 
     void sendStatusEffectUpdate();
 
+    void sendShieldUpdate();
+
     /*! return a const pointer to the look array */
     const uint8_t* getLookArray() const;
 
     const uint32_t* getModelArray() const;
 
     // add a status effect by id
-    void addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
+    void addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0, bool sendActorControl = false );
 
     // add a status effect by id if it doesn't exist
-    void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
+    void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0, bool sendActorControl = false );
 
-    // remove a status effect by id
-    void removeSingleStatusEffectFromId( uint32_t id );
     /// End Status Effect Functions
 
     std::string getName() const;
@@ -288,6 +291,12 @@ namespace Sapphire::Entity
     float getRadius() const;
 
     Common::BaseParam getPrimaryStat() const;
+
+    float applyShieldProtection( float damage );
+
+    uint32_t getVisualEffect();
+    void setVisualEffect( uint32_t effect, bool sendPacket = true );
+    void sendVisualEffect();
 
   };
 

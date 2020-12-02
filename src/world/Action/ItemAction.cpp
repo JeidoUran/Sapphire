@@ -50,7 +50,7 @@ void ItemAction::execute()
   }
 }
 
-void ItemAction::interrupt()
+void ItemAction::interrupt( Common::ActionInterruptType type )
 {
 
 }
