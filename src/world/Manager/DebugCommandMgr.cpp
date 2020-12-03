@@ -742,7 +742,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 //    effectPacket->setAnimationId( param1 );
 //    effectPacket->setEffectFlags( 0 );
 
-    player.queuePacket( effectPacket );
+    player.sendToInRangeSet( effectPacket, true );
   }
   else
   {

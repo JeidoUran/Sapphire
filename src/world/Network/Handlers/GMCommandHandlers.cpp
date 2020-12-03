@@ -250,7 +250,7 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
       strcpy( searchInfoPacket->data().searchMessage, targetPlayer->getSearchMessage() );
       targetPlayer->queuePacket( searchInfoPacket );
 
-      player.sendNotice( "Icon for {0} was set to {1}", targetPlayer->getName(), param1 );
+      player.sendNotice( 0, "Icon for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
     case GmCommand::Hp:
