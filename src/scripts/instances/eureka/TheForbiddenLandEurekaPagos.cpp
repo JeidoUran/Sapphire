@@ -20,7 +20,7 @@ public:
 
   }
 
-  void onUpdate( PublicContent& instance, uint32_t currTime ) override
+  void onUpdate( PublicContent& instance, uint64_t tickCount ) override
   {
 
   }

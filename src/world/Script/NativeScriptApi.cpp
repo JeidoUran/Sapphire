@@ -243,7 +243,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void PublicContentScript::onUpdate( PublicContent& instance, uint32_t currTime )
+  void PublicContentScript::onUpdate( PublicContent& instance, uint64_t tickCount )
   {
   }
 

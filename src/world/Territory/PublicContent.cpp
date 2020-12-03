@@ -50,7 +50,7 @@ bool Sapphire::PublicContent::init()
     return false;
 
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onInstanceInit(getAsInstanceContent());
+  scriptMgr.onInstanceInit( getAsPublicContent() );
 
   return true;
 }
@@ -100,7 +100,7 @@ void Sapphire::PublicContent::onUpdate( uint64_t tickCount )
   {
     case Created:
     {
-      if( m_boundPlayerIds.size() == 0 )
+      if( m_boundPlayerIds.empty() )
         return;
 
       for( auto playerId : m_boundPlayerIds )
@@ -145,6 +145,7 @@ void Sapphire::PublicContent::onUpdate( uint64_t tickCount )
 
     case DutyInProgress:
     {
+	  updateBNpcs( tickCount );
       break;
     }
 
@@ -155,6 +156,8 @@ void Sapphire::PublicContent::onUpdate( uint64_t tickCount )
 
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onInstanceUpdate( getAsPublicContent(), tickCount );
+  
+  m_lastUpdate = tickCount;
 }
 
 void Sapphire::PublicContent::onFinishLoading( Entity::Player& player )

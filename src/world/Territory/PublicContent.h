@@ -116,7 +116,6 @@ namespace Sapphire
 
     // the players which are bound to the instance, regardless of inside or offline
     std::set< uint32_t > m_boundPlayerIds;
-    Entity::PlayerPtr m_pPlayer;
   };
 
 }

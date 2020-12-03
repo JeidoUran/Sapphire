@@ -586,13 +586,13 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceInit( PublicContentPtr instance )
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( PublicContentPtr instance, uint32_t currTime )
+bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( PublicContentPtr instance, uint64_t tickCount )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::PublicContentScript >( instance->getDirectorId() );
 
   if( script )
   {
-    script->onUpdate( *instance, currTime );
+    script->onUpdate( *instance, tickCount );
     return true;
   }
 

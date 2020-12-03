@@ -77,12 +77,7 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
 
     case Event::EventHandler::EventHandlerType::PublicContentDirector:
     {
-      auto pcInfo = exdData.get< Sapphire::Data::PublicContent >(eventId & 0xFFFF);
-      std::string name = pcInfo->name;
-      std::string remove( ",â˜…_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" );
-      Util::eraseAllIn( name, remove );
-      name[ 0 ] = toupper( name[ 0 ] );
-      return name;
+      return "PublicContentDirector#" + std::to_string( eventId & 0xFFFF );
     }
 
 

@@ -255,7 +255,7 @@ namespace Sapphire::ScriptAPI
 
     virtual void onInit( Sapphire::PublicContent& instance );
 
-    virtual void onUpdate( Sapphire::PublicContent& instance, uint32_t currTime );
+    virtual void onUpdate( Sapphire::PublicContent& instance, uint64_t tickCount );
 
     virtual void onEnterTerritory( Sapphire::PublicContent& instance, Sapphire::Entity::Player& player, uint32_t eventId,
                                    uint16_t param1, uint16_t param2 );

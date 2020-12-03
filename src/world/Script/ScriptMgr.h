@@ -122,7 +122,7 @@ namespace Sapphire::Scripting
 
     bool onInstanceInit( PublicContentPtr instance );
 
-    bool onInstanceUpdate( PublicContentPtr instance, uint32_t currTime );
+    bool onInstanceUpdate( PublicContentPtr instance, uint64_t tickCount );
 
     bool onInstanceEnterTerritory( PublicContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                                    uint16_t param2 );
