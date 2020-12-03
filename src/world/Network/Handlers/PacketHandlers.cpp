@@ -511,8 +511,18 @@ void Sapphire::Network::GameConnection::partyChatHandler( const Packets::FFXIVAR
       //m->queuePacket( pChat );
 
       /* workaround */
-      auto chatPacket = std::make_shared< Server::ChatPacket >( player, ChatType::Party, packet.data().message );
-      m->queuePacket( chatPacket );
+	  if( player.isActingAsGm() ) 
+      {
+        auto chatPacket = std::make_shared< Server::ChatPacket >( player, ChatType::GMParty, packet.data().message );
+        m->queuePacket( chatPacket );
+		Logger::debug( "[Chatlog] (GMParty) {0}: {1}", player.getName(), chatPacket->data().msg );
+	  }
+	  else
+	  {
+		auto chatPacket = std::make_shared< Server::ChatPacket >( player, ChatType::Party, packet.data().message );
+        m->queuePacket( chatPacket );
+		Logger::debug( "[Chatlog] (Party) {0}: {1}", player.getName(), chatPacket->data().msg );
+	  }
     } );
 }
 
@@ -542,7 +552,7 @@ void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PAC
       if( player.isActingAsGm() ) 
       {
         chatPacket->data().chatType = ChatType::GMSay;
-          Logger::debug( "[Chatlog] (GMSay) {0}: {1}", player.getName(), chatPacket->data().msg );
+        Logger::debug( "[Chatlog] (GMSay) {0}: {1}", player.getName(), chatPacket->data().msg );
       }
       else
           Logger::debug( "[Chatlog] (Say) {0}: {1}", player.getName(), chatPacket->data().msg );
