@@ -25,7 +25,7 @@ namespace Sapphire::Network::Packets::Server
   private:
     void initialize( Entity::Player& player )
     {
-      memset( &m_data.unknownOword[ 0 ], 255, reinterpret_cast< uint64_t >( &m_data.padding2 ) - reinterpret_cast< uint64_t >( &m_data.unknownOword[ 0 ] ) );
+      //memset( &m_data.unknownOword[ 0 ], 255, reinterpret_cast< uint64_t >( &m_data.padding2 ) - reinterpret_cast< uint64_t >( &m_data.unknownOword[ 0 ] ) );
 
       m_data.contentId = player.getContentId();
 
@@ -52,7 +52,7 @@ namespace Sapphire::Network::Packets::Server
       memset( &m_data.name[ 0 ], 0, sizeof( m_data.name ) );
       strcpy( &m_data.name[ 0 ], player.getName().c_str() );
 
-      //memcpy( m_data.aetheryte, player.getAetheryteArray(), sizeof( m_data.aetheryte ) );
+      memcpy( m_data.aetheryte, player.getAetheryteArray(), sizeof( m_data.aetheryte ) );
 
       // Set the class levels and exp.
       for( uint8_t i = 0; i < 25; i++ )
@@ -61,17 +61,17 @@ namespace Sapphire::Network::Packets::Server
         m_data.exp[ i ] = player.getExpArray()[ i ];
       }
 
-      //memcpy( m_data.orchestrionMask, player.getOrchestrionBitmask(), sizeof( m_data.orchestrionMask ) );
+      memcpy( m_data.orchestrionMask, player.getOrchestrionBitmask(), sizeof( m_data.orchestrionMask ) );
       //m_data.orchestrionMask[0] = 0xFE;
       //memcpy( m_data.mountGuideMask, player.getMountGuideBitmask(), sizeof( m_data.mountGuideMask ) );
       memset( m_data.mountGuideMask, 0xFF, sizeof( m_data.mountGuideMask ) );
       m_data.mountGuideMask[21] = 0xBF; // mask out the broken mount
       
-      //memcpy( m_data.unlockBitmask, player.getUnlockBitmask(), sizeof( m_data.unlockBitmask ) );
+      memcpy( m_data.unlockBitmask, player.getUnlockBitmask(), sizeof( m_data.unlockBitmask ) );
       //m_data.unlockBitmask[0] = 0xFD;
-      //memcpy( m_data.discovery, player.getDiscoveryBitmask(), sizeof( m_data.discovery ) );
+      memcpy( m_data.discovery, player.getDiscoveryBitmask(), sizeof( m_data.discovery ) );
       //m_data.discovery[0] = 0xFB;
-      //memcpy( m_data.howto, player.getHowToArray(), sizeof( m_data.howto ) );
+      memcpy( m_data.howto, player.getHowToArray(), sizeof( m_data.howto ) );
       //m_data.howto[0] = 0xEF;
       // possibly max level or current level
       m_data.maxLevel = Common::MAX_PLAYER_LEVEL;
