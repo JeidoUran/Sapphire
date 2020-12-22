@@ -1380,10 +1380,10 @@ void Sapphire::Entity::Player::onMobKill( uint16_t nameId )
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onBNpcKill( *getAsPlayer(), nameId );
 
-  if( isActionLearned( static_cast< uint8_t >( Common::UnlockEntry::HuntingLog ) ) )
+/*   if( isActionLearned( static_cast< uint8_t >( Common::UnlockEntry::HuntingLog ) ) )
   {
     updateHuntingLog( nameId );
-  }
+  } */
 }
 
 void Sapphire::Entity::Player::freePlayerSpawnId( uint32_t actorId )

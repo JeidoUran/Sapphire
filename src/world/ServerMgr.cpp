@@ -460,17 +460,17 @@ void Sapphire::World::ServerMgr::loadBNpcTemplates()
     auto secWeaponModel = res->getUInt64( 6 );
     auto aggressionMode = res->getUInt8( 7 );
     auto enemyType = res->getUInt8( 8 );
-    // auto currentMount = res->getUInt8( 9 );
-    auto pose = res->getUInt8( 9 );
-    auto modelChara = res->getUInt( 10 );
-    auto displayFlags = res->getUInt( 11 );
-    auto look = res->getBlobVector( 12 );
-    auto models = res->getBlobVector( 13 );
+    auto currentMount = res->getUInt8( 9 );
+    auto pose = res->getUInt8( 10 );
+    auto modelChara = res->getUInt( 11 );
+    auto displayFlags = res->getUInt( 12 );
+    auto look = res->getBlobVector( 13 );
+    auto models = res->getBlobVector( 14 );
 
 
     auto bnpcTemplate = std::make_shared< Entity::BNpcTemplate >(
                                               id, bNPCBaseId, bNPCNameId, mainWeaponModel, secWeaponModel,
-                                              aggressionMode, enemyType,/*  currentMount, */ 0, pose, modelChara, displayFlags,
+                                              aggressionMode, enemyType, currentMount, 0, pose, modelChara, displayFlags,
                                               reinterpret_cast< uint32_t* >( &models[ 0 ] ),
                                               reinterpret_cast< uint8_t* >( &look[ 0 ] ) );
 

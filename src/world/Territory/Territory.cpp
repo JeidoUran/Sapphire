@@ -999,7 +999,7 @@ Sapphire::Entity::BNpcPtr
     }
   }
 
-  auto tmp = std::make_shared< Entity::BNpcTemplate >( 0, bnpcBaseId, nameId, modelMain, modeloff, 1, bnpcType, 0, 4,
+  auto tmp = std::make_shared< Entity::BNpcTemplate >( 0, bnpcBaseId, nameId, modelMain, modeloff, 1, bnpcType, 0, 0, 4,
                                                        bnpcBaseData->modelChara, 0, &models[0], &customize[0] );
 
   auto bnpc = std::make_shared< Entity::BNpc >( getNextActorId(), tmp, levelData->x, levelData->y, levelData->z,
