@@ -101,6 +101,7 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
   const auto param3 = packet.data().param3;
   const auto param4 = packet.data().param4;
   const auto target = packet.data().target;
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
   Logger::info( "{0} used GM1 commandId: {1}, params: {2}, {3}, {4}, {5}, target: {6}",
                 player.getName(), commandId,
@@ -320,6 +321,12 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
       {
         quantity = 1;
       }
+
+      if ( !exdData.get< Sapphire::Data::Item > ( param1 ) )
+    {
+      player.sendUrgent ( "{0} is not a valid item ID.", param1 );
+      return;
+    }
 
       if( ( param1 == 0xcccccccc ) )
       {
