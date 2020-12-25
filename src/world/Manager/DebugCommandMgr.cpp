@@ -78,8 +78,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr()
   registerCommand( "action", &DebugCommandMgr::action, "Displays an action's animation.", 1 );
   registerCommand( "rp", &DebugCommandMgr::rp, "RP management.", 1 );
   registerCommand( "rpevent", &DebugCommandMgr::rpevent, "Commands for specific RP events.", 1 );
-  registerCommand( "enemy", &DebugCommandMgr::enemy, "Commands to turn a player into an enemy.", 1 );
-  registerCommand( "respawn", &DebugCommandMgr::respawn, "Command to respawn your character.", 1 );
+  registerCommand( "player", &DebugCommandMgr::player, "Command to respawn or reset your character.", 1 );
   registerCommand( "ely", &DebugCommandMgr::ely, "Oui mais c'est parcequ'en fait cette commande sert à rien.", 1 );
 }
 
@@ -383,7 +382,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     player.setName( name );
     player.respawn();
   }
-  else if( subCommand == "sptp" )
+  else if( subCommand == "teleportanimation" )
   {
     if( params == "1" )
       player.sendToInRangeSet( makeActorControl( player.getId(), 407, 140, 0, 0, 0, 32515 ), true );
@@ -576,6 +575,55 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       }
     }
     player.setVisualEffect( id );
+  }
+  else if( subCommand == "entitytype" )
+  {
+    int32_t modeltype = 1;
+    int32_t subtype = 0;
+    int32_t enemytype = 0;
+    sscanf( params.c_str(), "%d %d %d", &modeltype, &subtype, &enemytype );
+    player.setModelType( modeltype );
+    player.setSubType( subtype );
+    player.setEnemyType( enemytype );
+    player.respawn();
+    player.sendNotice( 0, "Player respawned as ModelType {0}, SubType {1}, EnemyType {2}.", modeltype, subtype, enemytype );
+    return;
+  } 
+  else if( subCommand == "bnpcname" )
+  {
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+    uint32_t nameId;
+    sscanf( params.c_str(), "%u", &nameId );
+    if ( !exdData.get< Sapphire::Data::BNpcName > ( nameId ) )
+    {
+      player.sendUrgent ( "{0} is not a valid BNpcName ID.", nameId );
+      return;
+    }
+    player.setbNPCName( nameId );
+    player.respawn();
+    player.sendNotice( 0, "BNPCName set to {0} ({1}).", nameId, exdData.get< Sapphire::Data::BNpcName >( nameId )->singular );
+  }
+  else if( subCommand == "bnpcbase" )
+  {
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+    uint32_t baseId;
+    sscanf( params.c_str(), "%u", &baseId );
+	if ( !exdData.get< Sapphire::Data::BNpcBase > ( baseId ) )
+    {
+      player.sendUrgent ( "{0} is not a valid BNpcName ID.", baseId );
+      return;
+    }
+    player.setbNPCBase( baseId );
+    player.respawn();
+    player.sendNotice( 0, "BNPCBase set to {0}.", baseId );
+  }
+  else if( subCommand == "displayflags" )
+  {
+    uint32_t displayflags;
+    sscanf( params.c_str(), "%u", &displayflags);
+    player.setDisplayFlags( displayflags );
+    player.respawn();
+    player.sendNotice( 0, "DisplayFlags set to {0}.", displayflags );
   }
   else
   {
@@ -2737,9 +2785,33 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
   }
 }
 
+  
+  // else if( subCommand == "odinbase" )
+  // {
+    // player.setbNPCBase( 882 );
+    // player.respawn();
+  // }
+  // else if( subCommand == "element" || subCommand == "elem" )
+  // {
+    // uint32_t element;
+    // sscanf( params.c_str(), "%u", &element );
+    // player.setElement( element );
+    // player.respawn();
+    // player.sendNotice( 0, "Element set to {0}.", element );
+  // }
+  // else if( subCommand == "elvl" )
+  // {
+    // uint32_t elementallevel;
+    // sscanf( params.c_str(), "%u", &elementallevel );
+    // player.setElementalLevel( elementallevel );
+    // player.respawn();
+    // player.sendNotice( 0, "Elemental Level set to {0}.", elementallevel );
+  // }
 
-void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Player& player,
+
+void Sapphire::World::Manager::DebugCommandMgr::player( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
+
 {
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
@@ -2762,122 +2834,31 @@ void Sapphire::World::Manager::DebugCommandMgr::enemy( char* data, Entity::Playe
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  Logger::debug( "[{0}] Command: enemy subCommand: {1} params: {2}", player.getId(), subCommand, params );
-  if( subCommand == "set" )
+  Logger::debug( "[{0}] Command: player subCommand: {1} params: {2}", player.getId(), subCommand, params );
+
+  if( subCommand == "respawn" )
   {
-    if ( player.isActingAsEnemy() == false )
-    {
-      // player.isActingAsEnemy( true );
-      player.setModelType( 2 );
-      player.setSubType( 5 );
-      player.setEnemyType( 4 );
-      player.respawn();
-      player.sendNotice( 0, "Player respawned as an enemy." );
-      return;
-    }
-    else
-    {
-      // player.isActingAsEnemy( false );
-      player.setModelType( 1 );
-      player.setSubType( 0 );
-      player.setEnemyType( 0 );
-      player.setbNPCName( 0 );
-      player.setbNPCBase( 0 );
-      player.respawn();
-      player.sendNotice( 0, "Player respawned as a regular player." );
-      return;
-    }
-  }
-  if( subCommand == "friendly" )
-  {
-    if ( player.isActingAsEnemy() == false )
-    {
-      // player.isActingAsEnemy( true );
-      player.setModelType( 2 );
-      player.setSubType( 5 );
-      player.setEnemyType( 0 );
-      player.respawn();
-      player.sendNotice( 0, "Player respawned as a friendly NPC." );
-      return;
-    }
-    else
-    {
-      // player.isActingAsEnemy( false );
-      player.setModelType( 1 );
-      player.setSubType( 0 );
-      player.setEnemyType( 0 );
-      player.setbNPCName( 0 );
-      player.setbNPCBase( 0 );
-      player.respawn();
-      player.sendNotice( 0, "Player respawned as a regular player." );
-      return;
-    }
-  }
-  else if( subCommand == "name" )
-  {
-    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-    uint32_t nameId;
-    sscanf( params.c_str(), "%u", &nameId );
-    if ( !exdData.get< Sapphire::Data::BNpcName > ( nameId ) )
-    {
-      player.sendUrgent ( "{0} is not a valid BNpcName ID.", nameId );
-      return;
-    }
-    player.setbNPCName( nameId );
     player.respawn();
-    player.sendNotice( 0, "BNPCName set to {0} ({1}).", nameId, exdData.get< Sapphire::Data::BNpcName >( nameId )->singular );
+    player.sendNotice( 0, "Player respawned." );
   }
   
-  else if( subCommand == "base" )
+  else if( subCommand == "reset" )
   {
-    uint32_t baseId;
-    sscanf( params.c_str(), "%u", &baseId );
-    player.setbNPCBase( baseId );
+    player.setModelChara( 0 );
+	player.setModelType( 1 );
+    player.setSubType( 0 );
+	player.setEnemyType( 0 );
+    player.setbNPCName( 0 );
+    player.setbNPCBase( 0 );
+    player.setDisplayFlags( 0 );
+	player.mount( 0 );
     player.respawn();
-    player.sendNotice( 0, "BNPCBase set to {0}.", baseId );
-  }
-  
-  else if( subCommand == "odinbase" )
-  {
-    player.setbNPCBase( 882 );
-    player.respawn();
-  }
-  else if( subCommand == "element" || subCommand == "elem" )
-  {
-    uint32_t element;
-    sscanf( params.c_str(), "%u", &element );
-    player.setElement( element );
-    player.respawn();
-    player.sendNotice( 0, "Element set to {0}.", element );
-  }
-  else if( subCommand == "elvl" )
-  {
-    uint32_t elementallevel;
-    sscanf( params.c_str(), "%u", &elementallevel );
-    player.setElementalLevel( elementallevel );
-    player.respawn();
-    player.sendNotice( 0, "Elemental Level set to {0}.", elementallevel );
-  }
-  else if( subCommand == "flags" )
-  {
-    uint32_t displayflags;
-    sscanf( params.c_str(), "%u", &displayflags);
-    player.setDisplayFlags( displayflags );
-    player.respawn();
-    player.sendNotice( 0, "DisplayFlags set to {0}.", displayflags );
+    player.sendNotice( 0, "Player reseted." );
   }
   else
   {
-    player.sendUrgent( "{0} is not a valid enemy command.", subCommand );
+    player.sendUrgent( "{0} is not a valid player command.", subCommand );
   }
-}
-
-void Sapphire::World::Manager::DebugCommandMgr::respawn( char* data, Entity::Player& player,
-                                                       std::shared_ptr< DebugCommand > command )
-
-{
-  player.respawn();
-  player.sendNotice( 0, "Player respawned." );
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player& player,
