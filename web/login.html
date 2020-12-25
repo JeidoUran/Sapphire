@@ -65,6 +65,9 @@
 			<a href="https://github.com/SapphireMordred/Sapphire" class="s-link-badge s-link-badge-github col-xs-5 pull-right">
 				Our Github repository
 			</a>
+			<a href="https://github.com/JeidoUran/Sapphire/tree/roleplay_tools_5.35" class="s-link-badge s-link-badge-github col-xs-5 pull-left">
+				Jeido's repository
+			</a>
 		</div>
 		<h2>Recent Activity</h2>
 		<ul id="commit-log" class="commit-history">
@@ -106,7 +109,7 @@
 	<script src="assets/bootstrap/js/bootstrap.min.js"></script>
 
 	<script>
-		fetch( "https://api.github.com/repos/SapphireMordred/Sapphire/events" ).then( function( resp ) {
+		fetch( "https://api.github.com/repos/JeidoUran/Sapphire/events" ).then( function( resp ) {
 			return resp.json();
 		}).then( function( data ) {
 			data = data.filter( function( e ) {
@@ -117,7 +120,7 @@
 			for ( var evnt of data ) {
 				for ( var commit of evnt.payload.commits ) {
 					let e = document.createElement( 'li' );
-					e.innerHTML = '<a href="https://github.com/SapphireMordred/Sapphire/commit/' + commit.sha + '">' + commit.message + '</a>';
+					e.innerHTML = '<a href="https://github.com/SapphireMordred/JeidoUran/commit/' + commit.sha + '">' + commit.message + '</a>';
 
 					commitContainer.appendChild( e );
 				}

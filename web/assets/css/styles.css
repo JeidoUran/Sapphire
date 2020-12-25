@@ -171,6 +171,10 @@ h2.text-center{
   background: #7082E1 url("../img/fa-discord-icon.png") 10px 7px no-repeat;
 }
 
+.s-link-badge-kanka {
+  background: #002d70 url("../img/kanka-icon.png") 10px 7px no-repeat;
+}
+
 .s-link-badge-github {
   background: #fff url("../img/github-icon.png") 10px 7px no-repeat;
   color: #333;
