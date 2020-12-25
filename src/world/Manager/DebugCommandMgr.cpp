@@ -2851,7 +2851,7 @@ void Sapphire::World::Manager::DebugCommandMgr::player( char* data, Entity::Play
     player.setbNPCName( 0 );
     player.setbNPCBase( 0 );
     player.setDisplayFlags( 0 );
-	player.mount( 0 );
+	player.dismount();
     player.respawn();
     player.sendNotice( 0, "Player reseted." );
   }
