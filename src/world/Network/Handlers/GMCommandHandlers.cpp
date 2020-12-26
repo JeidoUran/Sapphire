@@ -714,7 +714,7 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
     {
       auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
       player.sendNotice( 0, "\nName: {0} (ID: {1})"
-                         "\nHomeWorld: Finis"
+                         "\nHomeWorld: Memiroa" // ToDo: Get correct name automagically
                          "\nHP: {2}/{3}, MP: {4}/{5}, TP: {6}/1000"
                          "\nClass: {7} (ID: {8})"
                          "\nLevel: {9}"
@@ -722,7 +722,7 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
                          "\nGC: {11} (ID: {12})"
                          "\nGil: {13}"
                          "\n"
-                         "\nCurrentWorld: Finis"
+                         "\nCurrentWorld: Memiroa" // ToDo: Get correct name automagically
                          "\nZone: {14} (ID: {15})"
                          "\nGuId: {16}"
                          "\nPos: \nX: {17} \nY: {18} \nZ: {19} \nR: {20}"
@@ -735,13 +735,14 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
                          "\nPlayTime: {25}"
                          "\nModelChara: {26}"
                          "\nCurrentMount: {27} (ID: {28})"
-                         "\nTarget: {29}"
+						 "\nCurrentMinion: {29} (ID: {30})"
                          "\n"
-                         "\nRPMode: {30}"
-                         "\nisActingAsEnemy: {31}"
-                         "\nbNPCBase: {32}"
-                         "\nbNPCName: {33} (ID: {34})"
-                         "\nEnemyType: {35} (Subtype: {36})",
+                         "\nTarget: {31}",			
+                         // "\nRPMode: {32}"
+                         // "\nisActingAsEnemy: {33}"
+                         // "\nbNPCBase: {34}"
+                         // "\nbNPCName: {35} (ID: {36})"
+                         // "\nEnemyType: {35} (Subtype: {36})",
                          targetPlayer->getName(), targetPlayer->getId(),
                          targetPlayer->getHp(), targetPlayer->getMaxHp(), targetPlayer->getMp(), targetPlayer->getMaxMp(), targetPlayer->getTp(),
                          exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( targetPlayer->getClass() ))->name, static_cast< uint8_t >( targetPlayer->getClass() ),
@@ -759,12 +760,13 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
                          targetPlayer->getPlayTime(),
                          targetPlayer->getModelChara(),
                          exdData.get< Sapphire::Data::Mount >( targetPlayer->getCurrentMount() )->singular, targetPlayer->getCurrentMount(),
-                         targetPlayer->getTargetId(),
-                         targetPlayer->getRPMode(),
-                         targetPlayer->isActingAsEnemy(),
-                         targetPlayer->getbNPCBase(),
-                         exdData.get< Sapphire::Data::BNpcName >( targetPlayer->getbNPCName() )->singular, targetPlayer->getbNPCName(),
-                         targetPlayer->getEnemyType(), targetPlayer->getSubType() );
+                         exdData.get< Sapphire::Data::Companion >( targetPlayer->getCurrentCompanion() )->singular, targetPlayer->getCurrentCompanion(),						 
+                         targetPlayer->getTargetId() );
+                         // targetPlayer->getRPMode(),
+                         // targetPlayer->isActingAsEnemy(),
+                         // targetPlayer->getbNPCBase(),
+                         // exdData.get< Sapphire::Data::BNpcName >( targetPlayer->getbNPCName() )->singular, targetPlayer->getbNPCName(),
+                         // targetPlayer->getEnemyType(), targetPlayer->getSubType() );
       break;
     }
 
