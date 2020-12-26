@@ -78,7 +78,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr()
   registerCommand( "action", &DebugCommandMgr::action, "Displays an action's animation.", 1 );
   registerCommand( "rp", &DebugCommandMgr::rp, "RP management.", 1 );
   registerCommand( "rpevent", &DebugCommandMgr::rpevent, "Commands for specific RP events.", 1 );
-  registerCommand( "player", &DebugCommandMgr::player, "Command to respawn or reset your character.", 1 );
+  registerCommand( "player", &DebugCommandMgr::player, "Command to respawn or reset your character.", 0 );
   registerCommand( "ely", &DebugCommandMgr::ely, "Oui mais c'est parcequ'en fait cette commande sert à rien.", 1 );
 }
 
@@ -2852,6 +2852,7 @@ void Sapphire::World::Manager::DebugCommandMgr::player( char* data, Entity::Play
     player.setbNPCBase( 0 );
     player.setDisplayFlags( 0 );
 	player.dismount();
+	player.queuePacket( makeActorControlSelf( actor->getAsPlayer()->getId(), Flee, 0 ) );
     player.respawn();
     player.sendNotice( 0, "Player reseted." );
   }
