@@ -2852,7 +2852,7 @@ void Sapphire::World::Manager::DebugCommandMgr::player( char* data, Entity::Play
     player.setbNPCBase( 0 );
     player.setDisplayFlags( 0 );
 	player.dismount();
-	player.queuePacket( makeActorControlSelf( actor->getAsPlayer()->getId(), Flee, 0 ) );
+	player.queuePacket( makeActorControlSelf( player.getId(), Flee, 0 ) );
     player.respawn();
     player.sendNotice( 0, "Player reseted." );
   }
