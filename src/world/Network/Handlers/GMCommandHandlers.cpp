@@ -735,7 +735,7 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
                          "\nPlayTime: {25}"
                          "\nModelChara: {26}"
                          "\nCurrentMount: {27} (ID: {28})"
-						 "\nCurrentMinion: {29} (ID: {30})"
+						 "\nCurrentCompanion: {29} (ID: {30})"
                          "\n"
                          "\nTarget: {31}",			
                          // "\nRPMode: {32}"
@@ -760,7 +760,7 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
                          targetPlayer->getPlayTime(),
                          targetPlayer->getModelChara(),
                          exdData.get< Sapphire::Data::Mount >( targetPlayer->getCurrentMount() )->singular, targetPlayer->getCurrentMount(),
-                         exdData.get< Sapphire::Data::Companion >( targetPlayer->getCurrentCompanion() )->singular, targetPlayer->getCurrentCompanion(),						 
+                         exdData.get< Sapphire::Data::Companion >( static_cast< uint8_t >( targetPlayer->getCurrentCompanion() ))->singular, static_cast< uint8_t >( targetPlayer->getCurrentCompanion() ),						 
                          targetPlayer->getTargetId() );
                          // targetPlayer->getRPMode(),
                          // targetPlayer->isActingAsEnemy(),
