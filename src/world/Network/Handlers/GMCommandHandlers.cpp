@@ -86,6 +86,7 @@ enum GmCommand
   JumpNpc = 0x025F,
   Jail = 0x025A,
   Unjail = 0x025B,
+  SafetyPoint = 0x0274,
 };
 
 void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
@@ -782,6 +783,12 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
       targetPlayer->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
       player.sendNotice( 0, "Jailed {0}.", targetPlayer->getName() );
       break;
+    }
+	
+    case GmCommand::SafetyPoint:
+    {
+      targetPlayer->sendToInRangeSet( makeActorControlSelf( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
+      targetPlayer->returnToHomepoint();
     }
   }
 }
