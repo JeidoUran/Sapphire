@@ -515,15 +515,24 @@ void Sapphire::Network::GameConnection::partyChatHandler( const Packets::FFXIVAR
       {
         auto chatPacket = std::make_shared< Server::ChatPacket >( player, ChatType::GMParty, packet.data().message );
         m->queuePacket( chatPacket );
-		Logger::debug( "[Chatlog] (GMParty) {0}: {1}", player.getName(), chatPacket->data().msg );
 	  }
 	  else
 	  {
 		auto chatPacket = std::make_shared< Server::ChatPacket >( player, ChatType::Party, packet.data().message );
         m->queuePacket( chatPacket );
-		Logger::debug( "[Chatlog] (Party) {0}: {1}", player.getName(), chatPacket->data().msg );
+
 	  }
     } );
+	if( player.isActingAsGm() ) 
+    {
+      auto chatPacket = std::make_shared< Server::ChatPacket >( player, ChatType::GMParty, packet.data().message );
+      Logger::debug( "[Chatlog] (GMParty) {0}: {1}", player.getName(), chatPacket->data().msg );
+	}
+    else
+    {
+      auto chatPacket = std::make_shared< Server::ChatPacket >( player, ChatType::Party, packet.data().message );
+      Logger::debug( "[Chatlog] (Party) {0}: {1}", player.getName(), chatPacket->data().msg );
+    }
 }
 
 void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
