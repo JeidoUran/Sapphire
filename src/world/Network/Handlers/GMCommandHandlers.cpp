@@ -187,7 +187,6 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
     }
     case GmCommand::Time:
     {
-      // TODO: Global time setting (check //gm weather code?)
       auto inRange = player.getInRangeActors( true );
       for( auto actor : inRange )
       {
@@ -657,7 +656,7 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
       targetPlayer->sendZoneInPackets( 0x01, 0x01, 0, 113, true );
 
 
-      targetPlayer->sendToInRangeSet( makeActorControlSelf( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
+      //targetPlayer->sendToInRangeSet( makeActorControlSelf( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
       targetPlayer->sendToInRangeSet( makeActorControl( player.getId(), SetStatus,
                                                         static_cast< uint8_t >( Common::ActorStatus::Idle ) ),
                                       true );
