@@ -73,6 +73,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr()
   registerCommand( "housing", &DebugCommandMgr::housing, "Housing utilities", 1 );
   registerCommand( "status", &DebugCommandMgr::status, "StatusEffect management.", 1 );
   registerCommand( "random", &DebugCommandMgr::random, "Rolls a random number.", 1 );
+  registerCommand( "dice", &DebugCommandMgr::random, "Rolls a random number.", 1 );
   registerCommand( "tell", &DebugCommandMgr::tell, "Allows in-instance private chatting.", 1 );
   registerCommand( "notice", &DebugCommandMgr::notice, "Allows the sending of server messages.", 1 );
   registerCommand( "action", &DebugCommandMgr::action, "Displays an action's animation.", 1 );
