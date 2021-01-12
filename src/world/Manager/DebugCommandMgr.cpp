@@ -792,6 +792,13 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     player.sendToInRangeSet( effectPacket, true );
   }
+  else if ( subCommand == "party" )
+  {
+    if (!player.isInParty())
+      player.createEmptyParty();
+	player.addPartyMember( targetActor->getAsPlayer() );
+	player.sendNotice( 0, "{0} has been forcefully added to the party.", targetActor->getAsPlayer()->getName() );
+  }
   else
   {
     player.sendUrgent( "{0} is not a valid ADD command.", subCommand );
