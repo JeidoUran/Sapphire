@@ -68,6 +68,7 @@ enum GmCommand
   Item = 0x00C8,
   Gil = 0x00C9,
   Collect = 0x00CA,
+  ItemList = 0x00CB,
 
   QuestAccept = 0x012C,
   QuestCancel = 0x012D,
