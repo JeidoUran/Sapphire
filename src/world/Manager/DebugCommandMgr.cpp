@@ -1109,32 +1109,6 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     else
       player.sendDebug( "Unknown instance with id#{0}", instanceId );
   }
-  // TODO: Better name
-  else if( subCommand == "rangebind" || subCommand == "rbind" )
-  {
-    uint32_t instanceId;
-    sscanf( params.c_str(), "%d", &instanceId );
-
-    auto terri = terriMgr.getTerritoryByGuId(instanceId);
-    if ( terri )
-    {
-      auto pInstanceContent = terri->getAsInstanceContent();
-      auto inRange = player.getInRangeActors( true );
-      for( auto actor : inRange )
-      {
-        if( actor->isPlayer() )
-        {
-          pInstanceContent->bindPlayer( actor->getId() );
-          player.sendDebug( "{0} bound.", actor->getAsPlayer()->getName() );
-        }
-      }
-       player.sendDebug(
-      "All players in range are now bound to instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
-      " -> " + pInstanceContent->getName() );
-    }
-    else
-      player.sendDebug( "Unknown instance with id: " + std::to_string( instanceId ) );
-  }
   else if( subCommand == "unbind" )
   {
     uint32_t instanceId;
@@ -1168,21 +1142,6 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
         "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
     else
       player.sendDebug( "Failed to create instance with id#{0}", zoneId );
-  }
-  else if( subCommand == "createbind" || subCommand == "crb" )
-  {
-    uint32_t instanceContentId;
-    sscanf( params.c_str(), "%d", &instanceContentId );
-
-    auto instance = terriMgr.createInstanceContent( instanceContentId );
-    if( instance )
-    {
-      auto pInstanceContent = instance->getAsInstanceContent();
-      pInstanceContent->bindPlayer( player.getId() );
-      player.sendDebug( "Created instance with id#{0} -> {1} and bound to it.", instance->getGuId(), instance->getName() );
-    }
-    else
-      player.sendDebug( "Failed to create instance with id#{0}", instanceContentId );
   }
   else if( subCommand == "remove" || subCommand == "rm" )
   {
