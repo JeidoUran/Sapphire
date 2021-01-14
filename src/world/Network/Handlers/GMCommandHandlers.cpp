@@ -87,6 +87,7 @@ enum GmCommand
   Jail = 0x025A,
   Unjail = 0x025B,
   SafetyPoint = 0x0274,
+  Eureka_Step = 0x09C4,
 };
 
 void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
@@ -594,6 +595,13 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
       break;
     }
 
+    case GmCommand::Eureka_Step:
+    {
+    targetPlayer->sendToInRangeSet( makeActorControlSelf( player.getId(), EurekaStep, param1, 0x3C, 0xFFFFE3, 0, 0 ), true );
+    player.sendNotice( 0, "Eureka progress of {0} is set to {1}.", targetPlayer->getName(), param1 );
+    break;
+    }
+
     default:
       player.sendUrgent( "GM1 Command not implemented: {0}", commandId );
       break;
@@ -735,9 +743,9 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
                          "\nPlayTime: {25}"
                          "\nModelChara: {26}"
                          "\nCurrentMount: {27} (ID: {28})"
-						 "\nCurrentCompanion: {29} (ID: {30})"
+                         "\nCurrentCompanion: {29} (ID: {30})"
                          "\n"
-                         "\nTarget: {31}",			
+                         "\nTarget: {31}",
                          // "\nRPMode: {32}"
                          // "\nisActingAsEnemy: {33}"
                          // "\nbNPCBase: {34}"
@@ -760,7 +768,7 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
                          targetPlayer->getPlayTime(),
                          targetPlayer->getModelChara(),
                          exdData.get< Sapphire::Data::Mount >( targetPlayer->getCurrentMount() )->singular, targetPlayer->getCurrentMount(),
-                         exdData.get< Sapphire::Data::Companion >( static_cast< uint8_t >( targetPlayer->getCurrentCompanion() ))->singular, static_cast< uint8_t >( targetPlayer->getCurrentCompanion() ),						 
+                         exdData.get< Sapphire::Data::Companion >( static_cast< uint8_t >( targetPlayer->getCurrentCompanion() ))->singular, static_cast< uint8_t >( targetPlayer->getCurrentCompanion() ),
                          targetPlayer->getTargetId() );
                          // targetPlayer->getRPMode(),
                          // targetPlayer->isActingAsEnemy(),
@@ -783,11 +791,12 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
       player.sendNotice( 0, "Jailed {0}.", targetPlayer->getName() );
       break;
     }
-	
+
     case GmCommand::SafetyPoint:
     {
       targetPlayer->sendToInRangeSet( makeActorControlSelf( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
       targetPlayer->returnToHomepoint();
     }
+
   }
 }
