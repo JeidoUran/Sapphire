@@ -268,13 +268,21 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     {
       targetActor->getAsPlayer()->setLevelForClass( 1, static_cast< Common::ClassJob > ( id ) );
       targetActor->getAsPlayer()->setClassJob( static_cast< Common::ClassJob > ( id ) );
+      targetActor->getAsPlayer()->sendModel();
+      targetActor->getAsPlayer()->sendItemLevel();
+      targetActor->getAsPlayer()->calculateStats();
+      targetActor->getAsPlayer()->sendStats();
+      targetActor->getAsPlayer()->sendStatusEffectUpdate();
+      targetActor->getAsPlayer()->sendStatusUpdate();
     }
     else
       targetActor->getAsPlayer()->setClassJob( static_cast< Common::ClassJob > ( id ) );
-	  targetActor->getAsPlayer()->sendModel();
-	  // targetActor->getAsPlayer()->calculateStats();
-	  // targetActor->getAsPlayer()->sendStats();
-	  // targetActor->getAsPlayer()->sendStatusUpdate();
+      targetActor->getAsPlayer()->sendModel();
+      targetActor->getAsPlayer()->sendItemLevel();
+      targetActor->getAsPlayer()->calculateStats();
+      targetActor->getAsPlayer()->sendStats();
+      targetActor->getAsPlayer()->sendStatusEffectUpdate();
+      targetActor->getAsPlayer()->sendStatusUpdate();
     player.sendNotice( 0, "Class of {0} set to {1} ({2}).", targetActor->getAsPlayer()->getName(), id, exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( id ) )->name );
   }
   else if( subCommand == "cfpenalty" )
