@@ -208,20 +208,20 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     }
 
     if( subCommand == "pos" )
-      player.setPos( static_cast< float >( posX ),
-                     static_cast< float >( posY ),
-                     static_cast< float >( posZ ) );
+      targetActor->getAsPlayer()->setPos( static_cast< float >( posX ),
+                                          static_cast< float >( posY ),
+                                          static_cast< float >( posZ ) );
     else
-      player.setPos( player.getPos().x + static_cast< float >( posX ),
-                     player.getPos().y + static_cast< float >( posY ),
-                     player.getPos().z + static_cast< float >( posZ ) );
+      targetActor->getAsPlayer()->setPos( player.getPos().x + static_cast< float >( posX ),
+                     targetActor->getAsPlayer()->getPos().y + static_cast< float >( posY ),
+                     targetActor->getAsPlayer()->getPos().z + static_cast< float >( posZ ) );
 
-    auto setActorPosPacket = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
-    setActorPosPacket->data().x = player.getPos().x;
-    setActorPosPacket->data().y = player.getPos().y;
-    setActorPosPacket->data().z = player.getPos().z;
-    setActorPosPacket->data().r16 = Common::Util::floatToUInt16Rot( player.getRot() );
-    player.queuePacket( setActorPosPacket );
+    auto setActorPosPacket = makeZonePacket< FFXIVIpcActorSetPos >( targetActor->getAsPlayer()->getId() );
+    setActorPosPacket->data().x = targetActor->getAsPlayer()->getPos().x;
+    setActorPosPacket->data().y = targetActor->getAsPlayer()->getPos().y;
+    setActorPosPacket->data().z = targetActor->getAsPlayer()->getPos().z;
+    setActorPosPacket->data().r16 = Common::Util::floatToUInt16Rot( targetActor->getAsPlayer()->getRot() );
+    targetActor->getAsPlayer()->queuePacket( setActorPosPacket );
 
   }
   else if( ( subCommand == "tele" ) && ( params != "" ) )
@@ -229,7 +229,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     int32_t aetheryteId;
     sscanf( params.c_str(), "%i", &aetheryteId );
 
-    player.teleport( static_cast< uint16_t >( aetheryteId ) );
+    targetActor->getAsPlayer()->teleport( static_cast< uint16_t >( aetheryteId ) );
   }
   else if( ( subCommand == "discovery" ) && ( params != "" ) )
   {
@@ -307,7 +307,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     initZonePacket->data().pos.y = player.getPos().y;
     initZonePacket->data().pos.z = player.getPos().z;
 
-    player.queuePacket( initZonePacket );
+    targetActor->getAsPlayer()->queuePacket( initZonePacket );
     player.sendNotice( 0, "Flight temporarily enabled." );
   }
   else if( subCommand == "gmrank" )
@@ -345,7 +345,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     }
     targetActor->getAsPlayer()->setModelChara( modelId );
     targetActor->getAsPlayer()->respawn();
-	player.setTargetId( 0 );
+    player.setTargetId( 0 );
     player.sendNotice( 0, "Model of {0} set to {1}.", targetActor->getAsPlayer()->getName(), modelId );
   }
   else if( subCommand == "name" )
@@ -426,14 +426,14 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     uint16_t additionalId = 0;
     sscanf( params.c_str(), "%hu %hu", &festivalId, &additionalId );
     if( !exdData.get< Sapphire::Data::Festival >( festivalId ) || !exdData.get< Sapphire::Data::Festival >( additionalId ) )
-	{
+    {
       if ( !exdData.get< Sapphire::Data::Festival >( festivalId ) )
         player.sendUrgent ( "{0} is not a valid Festival ID.", festivalId );
       if ( !exdData.get< Sapphire::Data::Festival >( additionalId ) )
         player.sendUrgent ( "{0} is not a valid Additional festival ID.", additionalId );
-	  return;
-	}
-	if ( exdData.get< Sapphire::Data::Festival >( festivalId ) )
+      return;
+    }
+    if ( exdData.get< Sapphire::Data::Festival >( festivalId ) )
       player.sendNotice( 0, "Festival set to {0} ({1}).", festivalId, exdData.get< Sapphire::Data::Festival >( festivalId )->name );
     if ( exdData.get< Sapphire::Data::Festival >( additionalId ) )
       player.sendNotice( 0, "Additional festival set to {0} ({1}).", additionalId, exdData.get< Sapphire::Data::Festival >( additionalId )->name );
@@ -497,13 +497,13 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   }
   else if( subCommand == "mobaggro" )
   {
-    auto inRange = player.getInRangeActors();
+    auto inRange = targetActor->getAsPlayer()->getInRangeActors();
 
     for( auto actor : inRange )
     {
-      if( actor->getId() == player.getTargetId() && actor->getAsChara()->isAlive() )
+      if( actor->getId() == targetActor->getAsPlayer()->getTargetId() && actor->getAsChara()->isAlive() )
       {
-        actor->getAsBNpc()->onActionHostile( player.getAsChara() );
+        actor->getAsBNpc()->onActionHostile( targetActor->getAsPlayer()->getAsChara() );
       }
     }
   }
@@ -523,7 +523,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
             &values[ 0 ], &values[ 1 ], &values[ 2 ], &values[ 3 ], &values[ 4 ],
             &values[ 5 ], &values[ 6 ], &values[ 7 ], &values[ 8 ], &values[ 9 ],
             &values[ 10 ], &values[ 11 ], &values[ 12 ], &values[ 13 ], &values[ 14 ] );
-    player.gaugeSetRaw( values );
+    targetActor->getAsPlayer()->gaugeSetRaw( values );
   }
   else if( subCommand == "visual" )
   {
@@ -571,7 +571,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
     uint32_t baseId;
     sscanf( params.c_str(), "%u", &baseId );
-	if ( !exdData.get< Sapphire::Data::BNpcBase > ( baseId ) )
+    if ( !exdData.get< Sapphire::Data::BNpcBase > ( baseId ) )
     {
       player.sendUrgent ( "{0} is not a valid BNpcName ID.", baseId );
       return;
@@ -617,7 +617,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
-	
+
   Sapphire::Entity::ActorPtr targetActor;
   if( player.getTargetId() != player.getId() )
   {
@@ -769,8 +769,8 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
   {
     if (!player.isInParty())
       player.createEmptyParty();
-	player.addPartyMember( targetActor->getAsPlayer() );
-	player.sendNotice( 0, "{0} has been forcefully added to the party.", targetActor->getAsPlayer()->getName() );
+    player.addPartyMember( targetActor->getAsPlayer() );
+    player.sendNotice( 0, "{0} has been forcefully added to the party.", targetActor->getAsPlayer()->getName() );
   }
   else
   {
@@ -1845,35 +1845,19 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  Logger::debug( "[{0}] Command: status subCommand: {1} params: {2}", player.getId(), subCommand, params );
-
-  if( subCommand == "self" || subCommand == "s" || subCommand == "add" )
+  Sapphire::Entity::ActorPtr targetActor;
+  if( player.getTargetId() != player.getId() )
   {
-    int32_t id;
-    int32_t duration;
-    uint16_t param;
-    sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
-
-    if ( !exdData.get< Sapphire::Data::Status >( id ) )
-    {
-      player.sendUrgent ( "{0} is not a valid Status ID.", id );
-      return;
-    }
-    else if ( exdData.get< Sapphire::Data::Status >( id )->transfiguration == true && !exdData.get< Sapphire::Data::Transformation >( param ) )
-    {
-      player.sendUrgent ( "Status {0} is a Transfiguration and requires a valid Transformation param.", id );
-      return;
-    }
-
-    auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(),
-                                                   duration, 3000 );
-    effect->setParam( param );
-
-    player.addStatusEffect( effect );
-    player.sendNotice( 0, "Status {0} ({1}) added.", id, exdData.get< Sapphire::Data::Status >( id )->name );
+    targetActor = player.lookupTargetById( player.getTargetId() );
+  }
+  if( !targetActor || !targetActor->isPlayer() )
+  {
+  targetActor = player.getAsPlayer();
   }
 
-  else if( subCommand == "target" || subCommand == "t" )
+  Logger::debug( "[{0}] Command: status subCommand: {1} params: {2}", player.getId(), subCommand, params );
+
+  if( subCommand == "add" )
   {
     int32_t id;
     int32_t duration;
@@ -1888,17 +1872,6 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
     else if ( exdData.get< Sapphire::Data::Status >( id )->transfiguration == true && !exdData.get< Sapphire::Data::Transformation >( param ) )
     {
       player.sendUrgent ( "Status {0} is a Transfiguration and requires a valid Transformation param.", id );
-      return;
-    }
-
-    Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
-    if( player.getTargetId() != player.getId() )
-    {
-      targetActor = player.lookupTargetById( player.getTargetId() );
-    }
-    if( !targetActor || !targetActor->isPlayer() )
-    {
-      player.sendUrgent( "Invalid target." );
       return;
     }
 
@@ -1909,6 +1882,7 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
     targetActor->getAsPlayer()->addStatusEffect( effect );
     player.sendNotice( 0, "Status {0} ({1}) added to {2}.", id, exdData.get< Sapphire::Data::Status >( id )->name, targetActor->getAsPlayer()->getName() );
   }
+
   else if( subCommand == "remove" || subCommand == "rm" )
   {
     int32_t id;
@@ -1924,38 +1898,10 @@ void Sapphire::World::Manager::DebugCommandMgr::status( char* data, Entity::Play
       player.sendUrgent ( "Player does not have Status {0}.", id );
       return;
     } */
-    player.removeSingleStatusEffectById( id );
-    player.sendNotice( 0, "Status {0} ({1}) removed.", id, exdData.get< Sapphire::Data::Status >( id )->name );
-  }
-  // TODO: Better name
-  else if( subCommand == "targetremove" || subCommand == "trm" )
-  {
-    int32_t id;
-    sscanf( params.c_str(), "%d", &id );
-    if ( !exdData.get< Sapphire::Data::Status >( id ) )
-    {
-      player.sendUrgent ( "{0} is not a valid Status ID.", id );
-      return;
-    }
-
-    Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
-    if( player.getTargetId() != player.getId() )
-    {
-      targetActor = player.lookupTargetById( player.getTargetId() );
-    }
-    if( !targetActor || !targetActor->isPlayer() )
-    {
-      player.sendUrgent( "Invalid target." );
-      return;
-    }
-/*     if ( !targetActor->getAsPlayer()->hasStatusEffect( id ) )
-    {
-      player.sendUrgent ( "Target player does not have Status {0}.", id );
-      return;
-    } */
     targetActor->getAsPlayer()->removeSingleStatusEffectById( id );
-    player.sendNotice( 0, "Status {0} ({1}) removed from {2}.", id, exdData.get< Sapphire::Data::Status >( id )->name, targetActor->getAsPlayer()->getName() );
+    player.sendNotice( 0, "Status {0} ({1}) removed on {2}.", id, exdData.get< Sapphire::Data::Status >( id )->name, targetActor->getAsPlayer()->getName() );
   }
+
   else
   {
     player.sendUrgent( "{0} is not a valid status command.", subCommand );
@@ -2012,7 +1958,21 @@ void Sapphire::World::Manager::DebugCommandMgr::notice( char* data, Entity::Play
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
   
   Logger::debug( "[{0}] Command: notice params: {1}", player.getId(), tmpCommand );
-  if( subCommand == "4" )
+  if( subCommand == "chat" || subCommand == "0" )
+  {
+    char notice [775] = "";
+    sscanf( params.c_str(), "%[^\n]%*c", &notice );
+
+    auto inRange = player.getInRangeActors( true );
+      for( auto actor : inRange )
+      {
+        if( actor->isPlayer() )
+        {
+          actor->getAsPlayer()->sendNotice( 0, "{0}", notice );
+        }
+      }
+  }
+  else if( subCommand == "screen" || subCommand == "4" )
   {
     char notice [775] = "";
     sscanf( params.c_str(), "%[^\n]%*c", &notice );
@@ -2026,7 +1986,7 @@ void Sapphire::World::Manager::DebugCommandMgr::notice( char* data, Entity::Play
         }
       }
   }
-  else if( subCommand == "5" )
+  else if( subCommand == "all" || subCommand == "5" )
   {
     char notice [775] = "";
     sscanf( params.c_str(), "%[^\n]%*c", &notice );
@@ -2488,7 +2448,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         }
       }
       isBlackScreen = true;
-	  player.sendNotice( 0, "Loading screen toggled to ON." );
+      player.sendNotice( 0, "Loading screen toggled to ON." );
     }
     else if( isBlackScreen == true )
     {
@@ -2501,7 +2461,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         }
       }
       isBlackScreen = false;
-	  player.sendNotice( 0, "Loading screen toggled to OFF." );
+      player.sendNotice( 0, "Loading screen toggled to OFF." );
     }
   }
   
@@ -2825,14 +2785,14 @@ void Sapphire::World::Manager::DebugCommandMgr::player( char* data, Entity::Play
   else if( subCommand == "reset" )
   {
     player.setModelChara( 0 );
-	player.setModelType( 1 );
+    player.setModelType( 1 );
     player.setSubType( 0 );
-	player.setEnemyType( 0 );
+    player.setEnemyType( 0 );
     player.setbNPCName( 0 );
     player.setbNPCBase( 0 );
     player.setDisplayFlags( 0 );
-	player.dismount();
-	player.queuePacket( makeActorControlSelf( player.getId(), Flee, 0 ) );
+    player.dismount();
+    player.queuePacket( makeActorControlSelf( player.getId(), Flee, 0 ) );
     player.respawn();
     player.sendNotice( 0, "Player reseted." );
   }
