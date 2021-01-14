@@ -626,7 +626,7 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
   const auto param4 = packet.data().param4;
   const auto target = std::string( packet.data().target );
 
-  Logger::debug( "{0} used GM2 commandId: {1}, params: {2}, {3}, {4}, {5}, target: {6}",
+  Logger::info( "{0} used GM2 commandId: {1}, params: {2}, {3}, {4}, {5}, target: {6}",
                  player.getName(), commandId, param1, param2, param3, param4, target );
 
   auto targetSession = serverMgr.getSession( target );
