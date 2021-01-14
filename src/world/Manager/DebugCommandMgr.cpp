@@ -1976,12 +1976,26 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
                                                        std::shared_ptr< DebugCommand > command )
 {
   std::string subCommand;
+  std::string params = "";
 
   // check if the command has parameters
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-  std::size_t spos = tmpCommand.find_first_of( " " );
-  
+
+  std::size_t pos = tmpCommand.find_first_of( " " );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+
+
   Logger::debug( "[{0}] Command: action params: {1}", player.getId(), tmpCommand );
   uint16_t actionId;
   sscanf( tmpCommand.c_str(), "%hu", &actionId );
@@ -1996,8 +2010,14 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
     auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( player.getRot() ) );
     Logger::debug( "[Action] {0} uses {1}.", player.getName(), exdData.get< Sapphire::Data::Action >( actionId )->name );
-    // effectPacket->addEffect( effectEntry );
-
+    if ( params == "dmg" )
+    {
+      Common::EffectEntry entry{};
+      entry.value = static_cast< int16_t >( actionId );
+      entry.effectType = Common::ActionEffectType::Damage;
+      entry.param0 = static_cast< uint8_t >( Common::ActionHitSeverityType::NormalDamage );
+      effectPacket->addEffect( entry );
+    }
     player.sendToInRangeSet( effectPacket, true );
   }
 
