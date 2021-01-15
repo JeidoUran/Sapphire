@@ -2761,27 +2761,37 @@ void Sapphire::World::Manager::DebugCommandMgr::player( char* data, Entity::Play
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
+  Sapphire::Entity::ActorPtr targetActor;
+  if( player.getTargetId() != player.getId() )
+  {
+    targetActor = player.lookupTargetById( player.getTargetId() );
+  }
+  if( !targetActor || !targetActor->isPlayer() )
+  {
+  targetActor = player.getAsPlayer();
+  }
+
   Logger::debug( "[{0}] Command: player subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
   if( subCommand == "respawn" )
   {
-    player.respawn();
-    player.sendNotice( 0, "Player respawned." );
+    targetActor->getAsPlayer()->respawn();
+    player.sendNotice( 0, "Player {0} respawned.", targetActor->getAsPlayer()->getName() );
   }
   
   else if( subCommand == "reset" )
   {
-    player.setModelChara( 0 );
-    player.setModelType( 1 );
-    player.setSubType( 0 );
-    player.setEnemyType( 0 );
-    player.setbNPCName( 0 );
-    player.setbNPCBase( 0 );
-    player.setDisplayFlags( 0 );
-    player.dismount();
-    player.queuePacket( makeActorControlSelf( player.getId(), Flee, 0 ) );
-    player.respawn();
-    player.sendNotice( 0, "Player reseted." );
+    targetActor->getAsPlayer()->setModelChara( 0 );
+    targetActor->getAsPlayer()->setModelType( 1 );
+    targetActor->getAsPlayer()->setSubType( 0 );
+    targetActor->getAsPlayer()->setEnemyType( 0 );
+    targetActor->getAsPlayer()->setbNPCName( 0 );
+    targetActor->getAsPlayer()->setbNPCBase( 0 );
+    targetActor->getAsPlayer()->setDisplayFlags( 0 );
+    targetActor->getAsPlayer()->dismount();
+    targetActor->getAsPlayer()->queuePacket( makeActorControlSelf( player.getId(), Flee, 0 ) );
+    targetActor->getAsPlayer()->respawn();
+    player.sendNotice( 0, "Player {0} reseted.", targetActor->getAsPlayer()->getName() );
   }
   else
   {
