@@ -723,36 +723,38 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
     {
       auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
       player.sendNotice( 0, "\nName: {0} (ID: {1})"
+                         "\nContentID: {2}"
                          "\nHomeWorld: Memiroa" // ToDo: Get correct name automagically
-                         "\nHP: {2}/{3}, MP: {4}/{5}, TP: {6}/1000"
-                         "\nClass: {7} (ID: {8})"
-                         "\nLevel: {9}"
-                         "\nExp: {10}"
-                         "\nGC: {11} (ID: {12})"
-                         "\nGil: {13}"
+                         "\nHP: {3}/{4}, MP: {5}/{6}, TP: {7}/1000"
+                         "\nClass: {8} (ID: {9})"
+                         "\nLevel: {10}"
+                         "\nExp: {11}"
+                         "\nGC: {12} (ID: {13})"
+                         "\nGil: {14}"
                          "\n"
                          "\nCurrentWorld: Memiroa" // ToDo: Get correct name automagically
-                         "\nZone: {14} (ID: {15})"
-                         "\nGuId: {16}"
-                         "\nPos: \nX: {17} \nY: {18} \nZ: {19} \nR: {20}"
+                         "\nZone: {15} (ID: {16})"
+                         "\nGuId: {17}"
+                         "\nPos: \nX: {18} \nY: {19} \nZ: {20} \nR: {21}"
                          "\n"
-                         "\nGMRank: {21}"
-                         "\nisActingAsGM: {22}"
-                         "\nInvisibilityFlag: {23}"
+                         "\nGMRank: {22}"
+                         "\nisActingAsGM: {23}"
+                         "\nInvisibilityFlag: {24}"
                          "\n"
-                         "\nSearchMessage: {24}"
-                         "\nPlayTime: {25}"
-                         "\nModelChara: {26}"
-                         "\nCurrentMount: {27} (ID: {28})"
-                         "\nCurrentCompanion: {29} (ID: {30})"
+                         "\nSearchMessage: {25}"
+                         "\nPlayTime: {26}"
+                         "\nModelChara: {27}"
+                         "\nCurrentMount: {28} (ID: {29})"
+                         "\nCurrentCompanion: {30} (ID: {31})"
                          "\n"
-                         "\nTarget: {31}",
+                         "\nTarget: {32}",
                          // "\nRPMode: {32}"
                          // "\nisActingAsEnemy: {33}"
                          // "\nbNPCBase: {34}"
                          // "\nbNPCName: {35} (ID: {36})"
                          // "\nEnemyType: {35} (Subtype: {36})",
                          targetPlayer->getName(), targetPlayer->getId(),
+                         targetPlayer->getContentId(),
                          targetPlayer->getHp(), targetPlayer->getMaxHp(), targetPlayer->getMp(), targetPlayer->getMaxMp(), targetPlayer->getTp(),
                          exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( targetPlayer->getClass() ))->name, static_cast< uint8_t >( targetPlayer->getClass() ),
                          targetPlayer->getLevel(),
