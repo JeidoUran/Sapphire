@@ -1994,8 +1994,6 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-
-
   Logger::debug( "[{0}] Command: action params: {1}", player.getId(), tmpCommand );
   uint16_t actionId;
   sscanf( tmpCommand.c_str(), "%hu", &actionId );

@@ -282,16 +282,6 @@ bool Sapphire::Entity::Player::isActingAsEnemy() const
   return enemy == 2;
 }
 
-// bool Sapphire::Entity::Player::isActingAsEnemy() const
-// {
-  // return m_isActingAsEnemy;
-// }
-
-// void Sapphire::Entity::Player::setActingAsEnemy( bool enemy )
-// {
-  // m_isActingAsEnemy = enemy;
-// }
-
 bool Sapphire::Entity::Player::getRPMode() const
 {
   return m_RPMode;

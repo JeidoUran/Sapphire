@@ -564,7 +564,7 @@ void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PAC
         Logger::debug( "[Chatlog] (GMSay) {0}: {1}", player.getName(), chatPacket->data().msg );
       }
       else
-          Logger::debug( "[Chatlog] (Say) {0}: {1}", player.getName(), chatPacket->data().msg );
+        Logger::debug( "[Chatlog] (Say) {0}: {1}", player.getName(), chatPacket->data().msg );
       player.getCurrentTerritory()->queuePacketForRange( player, 50, chatPacket );
       break;
     }
@@ -573,10 +573,10 @@ void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PAC
       if( player.isActingAsGm() )
       {
         chatPacket->data().chatType = ChatType::GMYell;
-          Logger::debug( "[Chatlog] (GMYell) {0}: {1}", player.getName(), chatPacket->data().msg );
+        Logger::debug( "[Chatlog] (GMYell) {0}: {1}", player.getName(), chatPacket->data().msg );
       }
       else
-          Logger::debug( "[Chatlog] (Yell) {0}: {1}", player.getName(), chatPacket->data().msg );
+        Logger::debug( "[Chatlog] (Yell) {0}: {1}", player.getName(), chatPacket->data().msg );
 
       player.getCurrentTerritory()->queuePacketForRange( player, 6000, chatPacket );
       break;
@@ -586,10 +586,10 @@ void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PAC
       if( player.isActingAsGm() )
       {
         chatPacket->data().chatType = ChatType::GMShout;
-          Logger::debug( "[Chatlog] (GMShout) {0}: {1}", player.getName(), chatPacket->data().msg );
+        Logger::debug( "[Chatlog] (GMShout) {0}: {1}", player.getName(), chatPacket->data().msg );
       }
       else
-          Logger::debug( "[Chatlog] (Shout) {0}: {1}", player.getName(), chatPacket->data().msg );
+        Logger::debug( "[Chatlog] (Shout) {0}: {1}", player.getName(), chatPacket->data().msg );
 
       player.getCurrentTerritory()->queuePacketForRange( player, 6000, chatPacket );
       break;
@@ -670,10 +670,10 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
   if( player.isActingAsGm() )
   {
     tellPacket->data().flags |= TellFlags::GmTellMsg;
-      Logger::debug( "[Chatlog] (GMTell) {0} > {1}: {2}", player.getName(), packet.data().targetPCName, tellPacket->data().msg );
+    Logger::debug( "[Chatlog] (GMTell) {0} > {1}: {2}", player.getName(), packet.data().targetPCName, tellPacket->data().msg );
   }
   else
-      Logger::debug( "[Chatlog] (Tell) {0} > {1}: {2}", player.getName(), packet.data().targetPCName, tellPacket->data().msg );
+    Logger::debug( "[Chatlog] (Tell) {0} > {1}: {2}", player.getName(), packet.data().targetPCName, tellPacket->data().msg );
 
   pTargetPlayer->queueChatPacket( tellPacket );
 }
