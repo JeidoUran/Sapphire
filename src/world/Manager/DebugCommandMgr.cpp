@@ -1967,6 +1967,14 @@ void Sapphire::World::Manager::DebugCommandMgr::notice( char* data, Entity::Play
         }
       }
   }
+  else if( subCommand == "global" )
+  {
+    char notice [775] = "";
+    auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+    sscanf( params.c_str(), "%[^\n]%*c", &notice );
+    serverMgr.sendToAllPlayers( std::make_shared< ServerNoticePacket >( player.getId(), 0, notice ) );
+
+  }
   Logger::debug( "[Notice] {0}", params);
   
 }
