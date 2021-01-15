@@ -406,10 +406,15 @@ void Sapphire::World::ServerMgr::removeSession( const std::string& playerName )
   m_sessionMapByName.erase( playerName );
 }
 
-
 bool Sapphire::World::ServerMgr::isRunning() const
 {
   return m_bRunning;
+}
+
+void Sapphire::World::ServerMgr::sendToAllPlayers( Network::Packets::FFXIVPacketBasePtr pPacket )
+{
+  for ( auto sessionid : m_sessionMapById )
+    sessionid.second->getPlayer()->queuePacket( pPacket );
 }
 
 std::string Sapphire::World::ServerMgr::getPlayerNameFromDb( uint32_t playerId, bool forceDbLoad )

@@ -32,6 +32,8 @@ namespace Sapphire::World
 
     size_t getSessionCount() const;
 
+    void sendToAllPlayers( Network::Packets::FFXIVPacketBasePtr pPacket );
+
     uint16_t getWorldId() const;
     void setWorldId( uint16_t worldId );
 
