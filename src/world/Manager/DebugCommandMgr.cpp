@@ -14,6 +14,8 @@
 #include <random>
 #include <Network/PacketWrappers/EffectPacket.h>
 #include <Service.h>
+#include <Network/PacketDef/Chat/ServerChatDef.h>
+
 
 #include "DebugCommand/DebugCommand.h"
 #include "DebugCommandMgr.h"
@@ -1880,25 +1882,64 @@ void Sapphire::World::Manager::DebugCommandMgr::tell( char* data, Entity::Player
                                                        std::shared_ptr< DebugCommand > command )
 {
   std::string subCommand;
+  std::string params = "";
 
   // check if the command has parameters
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-  std::size_t spos = tmpCommand.find_first_of( " " );
-  char tell [500] = "";
-  sscanf( tmpCommand.c_str(), "%[^\n]%*c", &tell );
 
-  Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
-  if( player.getTargetId() != player.getId() )
-  {
-    targetActor = player.lookupTargetById( player.getTargetId() );
-  }
-  if( !targetActor || !targetActor->isPlayer() )
-  {
-    player.sendUrgent( "Invalid target." );
-    return;
-  }
-  player.sendDebug( "Sent to {0}: {1}", targetActor->getAsPlayer()->getName(), tell );
-  targetActor->getAsPlayer()->sendNotice( 0, "Message from {0}: {1}", player.getName(), tell );
+  size_t pos = tmpCommand.find_first_of(" ");
+
+  //if ( tmpCommand != "t" )
+  pos = tmpCommand.find(" ", pos + 1 + 1 );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+  char tell [500] = "";
+  sscanf( params.c_str(), "%[^\n]%*c", &tell );
+
+  // Sapphire::Entity::ActorPtr targetActor;
+  // if( subCommand == "t" )
+  // {
+    // Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
+    // if( player.getTargetId() != player.getId() )
+    // {
+      // targetActor = player.lookupTargetById( player.getTargetId() );
+    // }
+    // if( !targetActor || !targetActor->isPlayer() )
+    // {
+      // player.sendUrgent( "Invalid target." );
+      // return;
+    // }
+  // }
+  // else
+  // {
+    if( !serverMgr.getSession( subCommand ) )
+    {
+      player.sendUrgent( "Invalid syntax. Command should look like \"!tell Player Name Message\"." );
+      return;
+    }
+    auto targetSession = serverMgr.getSession( subCommand );
+    auto targetActor = targetSession->getPlayer();
+
+  //}
+  auto tellPacket = makeChatPacket< FFXIVIpcTell >( player.getId() );
+  strcpy( tellPacket->data().msg, tell );
+  strcpy( tellPacket->data().receipientName, player.getName().c_str() );
+  // TODO: world id from server
+  tellPacket->data().contentId = player.getContentId();
+  tellPacket->data().worldId = 97;
+  
+  targetActor->getAsPlayer()->queueChatPacket( tellPacket );
+  player.sendDebug( "Sent to {0}: {1}", targetActor->getAsPlayer()->getName(), tell);
   Logger::debug( "[Chatlog] (DebugTell) {0} > {1}: {2}", player.getName(), targetActor->getAsPlayer()->getName(), tell );
   
 }
