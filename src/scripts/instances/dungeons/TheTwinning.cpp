@@ -59,6 +59,13 @@ public:
     instance.registerEObj( "Shortcut", 2000700, 0, 4, { -333.089203f, 318.060394f, 6.423950f }, 0.991760f, 0.000144f ); 
     instance.registerEObj( "Exit", 2000139, 0, 4, { 0.000000f, -848.000000f, -344.000000f }, 1.000000f, 0.000000f ); 
 
+    //! RP Renamed eobjs
+
+    //! RP Altered eobjs
+
+    //! RP Added eobjs
+    instance.registerEObj( "portal", 2007181, 0, 4, { 0.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f ); 
+
   }
 
   void onUpdate( InstanceContent& instance, uint64_t tickCount ) override
