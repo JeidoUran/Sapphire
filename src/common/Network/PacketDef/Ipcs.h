@@ -406,7 +406,7 @@ namespace Sapphire::Network::Packets
   enum ServerChatIpcType : uint16_t
   {
     Tell = 0x0064, // updated for sb
-    EurekaTell = 0x00FB,
+    PublicContentTell = 0x00FB, // added 4.5, this is used when receiving a /tell in PublicContent instances such as Eureka or Bozja
     TellErrNotFound = 0x0066,
 
     FreeCompanyEvent = 0x012C, // added 5.0
@@ -418,7 +418,7 @@ namespace Sapphire::Network::Packets
   enum ClientChatIpcType : uint16_t
   {
     TellReq = 0x0064,
-    EurekaTellReq = 0x00D8,
+    PublicContentTellReq = 0x0326, // updated 5.35 hotfix, this is used when sending a /tell in PublicContent instances such as Eureka or Bozja
   };
 
 
