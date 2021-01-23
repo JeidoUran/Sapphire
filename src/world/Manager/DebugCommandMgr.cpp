@@ -1210,6 +1210,25 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
 
     obj->setAnimationFlag( state1, state2 );
   }
+
+  else if( subCommand == "despawn" )
+  {
+    char objName[128];
+
+    sscanf( params.c_str(), "%s ", objName );
+
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
+    if( !instance )
+      return;
+
+    auto obj = instance->getEObjByName( objName );
+    if( !obj )
+      return;
+
+  player.freeObjSpawnIndexForActorId( obj->getId() );
+  player.sendDebug( "Eobj despawned." );
+  }
+
   else if( subCommand == "seq" )
   {
     uint8_t seq;
