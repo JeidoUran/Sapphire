@@ -197,7 +197,7 @@ struct FFXIVIpcTellHandler : FFXIVIpcBasePacket< TellReq >
   /* 0024 */ char message[1029];
 };
 
-struct FFXIVIpcEurekaTellHandler : FFXIVIpcBasePacket< EurekaTellReq >
+struct FFXIVIpcPublicContentTellHandler : FFXIVIpcBasePacket< PublicContentTellReq >
 {
   uint32_t characterId;
   uint32_t unk;

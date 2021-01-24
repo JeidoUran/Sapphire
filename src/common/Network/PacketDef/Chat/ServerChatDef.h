@@ -20,7 +20,7 @@ struct FFXIVIpcTell : FFXIVIpcBasePacket< Tell >
   char msg[1029];
 };
 
-struct FFXIVIpcEurekaTell : FFXIVIpcBasePacket< EurekaTell >
+struct FFXIVIpcPublicContentTell : FFXIVIpcBasePacket< PublicContentTell >
 {
   uint64_t contentId;
   uint16_t worldId;
