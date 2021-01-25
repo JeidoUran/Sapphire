@@ -681,6 +681,11 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( TerritoryPtr pZone, Sap
     // map player to instanceId so it can be tracked.
     m_playerIdToInstanceMap[ pPlayer->getId() ] = pZone->getGuId();
   }
+  else
+  {
+    pPlayer->removeFromInRange();
+    pPlayer->clearInRangeSet();
+  }
 
   pPlayer->sendZonePackets();
 
