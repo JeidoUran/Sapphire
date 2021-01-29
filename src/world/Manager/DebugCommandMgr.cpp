@@ -82,6 +82,8 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr()
   registerCommand( "rp", &DebugCommandMgr::rp, "RP management.", 1 );
   registerCommand( "rpevent", &DebugCommandMgr::rpevent, "Commands for specific RP events.", 1 );
   registerCommand( "player", &DebugCommandMgr::player, "Command to respawn or reset your character.", 0 );
+  registerCommand( "jeido", &DebugCommandMgr::jeido, "Jeido's commands.", 1 );
+  registerCommand( "eden", &DebugCommandMgr::eden, "Eden's commands.", 1 );
   registerCommand( "ely", &DebugCommandMgr::ely, "Oui mais c'est parcequ'en fait cette commande sert à rien.", 1 );
 }
 
@@ -2645,21 +2647,6 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
       player.sendModel();
     }
   }
-  else if( subCommand == "edenwep" )
-  {
-    if ( params == "brd" )
-    {
-      player.setModelMainWeapon( 0x0000000100010265 );
-      player.setModelSubWeapon( 0x00000001004602BA );
-      player.sendModel();
-    }
-    else if ( params == "drk" )
-    {
-      player.setModelMainWeapon( 0x00000001000805DD );
-      player.setModelSubWeapon( 0 );
-      player.sendModel();
-    }
-  }
   else if( subCommand == "batwin" )
   {
     if ( params == "art" )
@@ -2871,6 +2858,100 @@ void Sapphire::World::Manager::DebugCommandMgr::player( char* data, Entity::Play
   {
     player.sendUrgent( "{0} is not a valid player command.", subCommand );
   }
+}
+
+void Sapphire::World::Manager::DebugCommandMgr::jeido( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+{
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  std::string subCommand = "";
+  std::string params = "";
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+  std::size_t pos = tmpCommand.find_first_of( " " );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+  Sapphire::Entity::ActorPtr targetActor;
+  if( player.getTargetId() != player.getId() )
+  {
+    targetActor = player.lookupTargetById( player.getTargetId() );
+  }
+  if( !targetActor || !targetActor->isPlayer() )
+  {
+  targetActor = player.getAsPlayer();
+  }
+
+  Logger::debug( "[{0}] Command: jeido subCommand: {1} params: {2}", player.getId(), subCommand, params );
+
+  if( subCommand == "bump" )
+  {
+    uint32_t param1;
+    uint32_t param2;
+    uint32_t param3;
+
+    sscanf( params.c_str(), "%u %u %u", &param1, &param2, &param3 );
+    targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl( targetActor->getAsPlayer()->getId(), 220, param1, param2, param3, 1, 0 ), true );
+  }
+  else
+    player.sendUrgent( "{0} is not a valid jeido command.", subCommand );
+}
+
+void Sapphire::World::Manager::DebugCommandMgr::eden( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+{
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  std::string subCommand = "";
+  std::string params = "";
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+  std::size_t pos = tmpCommand.find_first_of( " " );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+  Logger::debug( "[{0}] Command: eden subCommand: {1} params: {2}", player.getId(), subCommand, params );
+
+  if( subCommand == "weapon" )
+  {
+    if ( params == "brd" )
+    {
+      player.setModelMainWeapon( 0x0000000100010265 );
+      player.setModelSubWeapon( 0x00000001004602BA );
+      player.sendModel();
+    }
+    else if ( params == "drk" )
+    {
+      player.setModelMainWeapon( 0x00000001000805DD );
+      player.setModelSubWeapon( 0 );
+      player.sendModel();
+    }
+  }
+  else
+    player.sendUrgent( "{0} is not a valid eden command.", subCommand );
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player& player,

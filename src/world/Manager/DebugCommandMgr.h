@@ -92,6 +92,10 @@ namespace Sapphire::World::Manager
 
     void player( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
+    void jeido( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void eden( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
     void ely( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
 
