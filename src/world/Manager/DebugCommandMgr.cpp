@@ -2042,10 +2042,13 @@ void Sapphire::World::Manager::DebugCommandMgr::notice( char* data, Entity::Play
     serverMgr.sendToAllPlayers( std::make_shared< ServerNoticePacket >( player.getId(), 0, notice ) );
 
   }
+  else
+  {
+    player.sendUrgent( "{0} is not a valid notice command.", subCommand );
+    return;
+  }
   Logger::debug( "[Notice] {0}", params);
-  
 }
-
 
 void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
@@ -2768,9 +2771,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
   }
   }
   else
-  {
     player.sendUrgent( "{0} is not a valid rpevent command.", subCommand );
-  }
 }
 
   

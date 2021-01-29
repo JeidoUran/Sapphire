@@ -479,7 +479,6 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
           // player.sendUrgent( "Player not bound! ( run !instance bind <instanceId> first ) {0}", param1 );
           // break;
         }
-
         player.setInstance( instance );
       }
       else if( !teriMgr.isValidTerritory( param1 ) )
