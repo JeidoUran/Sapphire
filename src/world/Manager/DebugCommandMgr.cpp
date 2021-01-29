@@ -150,7 +150,8 @@ void Sapphire::World::Manager::DebugCommandMgr::execCommand( char* data, Entity:
 void Sapphire::World::Manager::DebugCommandMgr::help( char* data, Entity::Player& player,
                                                       std::shared_ptr< DebugCommand > command )
 {
-  player.sendDebug( "Registered debug commands:" );
+  player.sendDebug( "Your GMRank is {0}."
+                    "\nRegistered debug commands for your GMRank:", player.getGmRank() );
   for( auto cmd : m_commandMap )
   {
     if( player.getGmRank() >= cmd.second->m_gmLevel )
@@ -158,6 +159,7 @@ void Sapphire::World::Manager::DebugCommandMgr::help( char* data, Entity::Player
       player.sendDebug( " - {0} - {1}", cmd.first, cmd.second->getHelpText() );
     }
   }
+  player.sendDebug( "Command usage : https://github.com/JeidoUran/Sapphire/wiki/Commandes-Debug-(FR)" );
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player& player,
@@ -1211,10 +1213,9 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     obj->setAnimationFlag( state1, state2 );
   }
 
-  else if( subCommand == "despawn" )
+  else if( subCommand == "objdespawn" )
   {
     char objName[128];
-
     sscanf( params.c_str(), "%s ", objName );
 
     auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
@@ -1223,7 +1224,10 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
 
     auto obj = instance->getEObjByName( objName );
     if( !obj )
+    {
+      player.sendDebug( "No eobj found." );
       return;
+    }
 
   player.freeObjSpawnIndexForActorId( obj->getId() );
   player.sendDebug( "Eobj despawned." );
