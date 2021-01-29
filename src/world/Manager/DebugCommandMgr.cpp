@@ -564,6 +564,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     targetActor->getAsPlayer()->setEnemyType( enemytype );
     targetActor->getAsPlayer()->respawn();
     player.sendNotice( 0, "Player {0} respawned as ModelType {1}, SubType {2}, EnemyType {3}.", targetActor->getAsPlayer()->getName(), modeltype, subtype, enemytype );
+    player.setTargetId( 0 );
     return;
   } 
   else if( subCommand == "bnpcname" )
