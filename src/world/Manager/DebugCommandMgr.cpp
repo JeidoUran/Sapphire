@@ -2862,6 +2862,7 @@ void Sapphire::World::Manager::DebugCommandMgr::player( char* data, Entity::Play
     targetActor->getAsPlayer()->setbNPCBase( 0 );
     targetActor->getAsPlayer()->setDisplayFlags( 0 );
     targetActor->getAsPlayer()->dismount();
+    targetActor->getAsPlayer()->setVisualEffect( 0 );
     targetActor->getAsPlayer()->queuePacket( makeActorControlSelf( player.getId(), Flee, 0 ) );
     targetActor->getAsPlayer()->respawn();
     player.sendNotice( 0, "Player {0} reseted.", targetActor->getAsPlayer()->getName() );
