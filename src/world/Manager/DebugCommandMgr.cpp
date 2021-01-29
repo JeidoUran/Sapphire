@@ -2494,7 +2494,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
   
   else if( subCommand == "loadscreen" )
   {
-    if( isBlackScreen == false )
+    if( isLoadScreen == false )
     {
       auto inRange = player.getInRangeActors( false );
       for( auto actor : inRange )
@@ -2504,10 +2504,10 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
           actor->getAsPlayer()->prepareZoning( player.getZoneId(), true, 1, 0 );
         }
       }
-      isBlackScreen = true;
+      isLoadScreen = true;
       player.sendNotice( 0, "Loading screen toggled to ON." );
     }
-    else if( isBlackScreen == true )
+    else if( isLoadScreen == true )
     {
       auto inRange = player.getInRangeActors( false );
       for( auto actor : inRange )
@@ -2517,7 +2517,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
           actor->getAsPlayer()->changePosition( actor->getAsPlayer()->getPos().x, actor->getAsPlayer()->getPos().y, actor->getAsPlayer()->getPos().z, actor->getAsPlayer()->getRot() );
         }
       }
-      isBlackScreen = false;
+      isLoadScreen = false;
       player.sendNotice( 0, "Loading screen toggled to OFF." );
     }
   }
