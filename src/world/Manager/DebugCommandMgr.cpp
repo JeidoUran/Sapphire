@@ -2335,9 +2335,12 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       else
         Logger::info( "Theme: None" );
       Logger::info( "Participants: {0}", m_rpMembers.size() );
+      if (!player.isInParty())
+        player.createEmptyParty();
       for( auto member : m_rpMembers )
       {
         Logger::info( "{0}", member->getAsPlayer()->getName() );
+        player.addPartyMember( member->getAsPlayer() );
         member->getAsPlayer()->setRPMode( true );
         //member->getAsPlayer()->setGmRank( 1 );
         member->getAsPlayer()->setOnlineStatusMask( 0x0000000100400000 );
