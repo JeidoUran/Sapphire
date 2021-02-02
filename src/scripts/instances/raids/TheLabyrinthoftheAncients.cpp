@@ -1,6 +1,7 @@
 #include <ScriptObject.h>
 #include "Actor/EventObject.h"
 #include <Territory/InstanceContent.h>
+#include <Actor/Player.h>
 
 using namespace Sapphire;
 
