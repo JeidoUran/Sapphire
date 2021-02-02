@@ -303,7 +303,10 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     uint64_t timestamp;
     sscanf( params.c_str(), "%" SCNu64, &timestamp );
 
-    player.setEorzeaTimeOffset( timestamp );
+    auto packet = makeZonePacket< FFXIVIpcEorzeaTimeOffset >( player.getId() );
+    packet->data().timestamp = timestamp;
+    auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+    serverMgr.sendToAllPlayers( packet );
     player.sendNotice( 0, "Eorzea time offset: {0}", timestamp );
   }
   else if( subCommand == "fly" )
