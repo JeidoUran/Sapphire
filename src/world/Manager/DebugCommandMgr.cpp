@@ -2087,6 +2087,7 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
   else
   {
     auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), actionId );
+    auto castPacket = makeZonePacket< FFXIVIpcActorCast >( player.getId() );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( player.getRot() ) );
     Logger::debug( "[Action] {0} uses {1}.", player.getName(), exdData.get< Sapphire::Data::Action >( actionId )->name );
     if ( params == "dmg" )
@@ -2097,10 +2098,25 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
       entry.param0 = static_cast< uint8_t >( Common::ActionHitSeverityType::NormalDamage );
       effectPacket->addEffect( entry );
     }
+    else if ( params == "cast" )
+    {
+      castPacket->data().action_id = actionId;
+      castPacket->data().skillType = Common::SkillType::Normal;
+      castPacket->data().unknown_1 = actionId;
+      castPacket->data().cast_time = 2.5;
+      castPacket->data().target_id = player.getTargetId();
+      castPacket->data().flag = 1;
+      castPacket->data().posX = Common::Util::floatToUInt16( player.getPos().x );
+      castPacket->data().posY = Common::Util::floatToUInt16( player.getPos().y );
+      castPacket->data().posZ = Common::Util::floatToUInt16( player.getPos().z );
+      player.sendToInRangeSet( castPacket, true );
+      auto actionStartPkt = makeActorControlSelf( player.getId, ActorControlType::ActionStart, 1, actionId, 2.5 );
+      //player.sendToInRangeSet( makeActorControlSelf( player.getId(), ActorControlType::ActionStart, 1, actionId, 2.5 ));
+      return;
+    }
+
     player.sendToInRangeSet( effectPacket, true );
   }
-
-  
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& player,
