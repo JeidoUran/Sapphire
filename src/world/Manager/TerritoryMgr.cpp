@@ -113,9 +113,9 @@ bool Sapphire::World::Manager::TerritoryMgr::isInstanceContentTerritory( uint32_
          intendedUse == TerritoryIntendedUse::TreasureMapInstance ||
          intendedUse == TerritoryIntendedUse::EventTrial ||
          intendedUse == TerritoryIntendedUse::Eureka ||
-		 intendedUse == TerritoryIntendedUse::MaskedCarnival ||
-		 intendedUse == TerritoryIntendedUse::DiademV3 ||
-		 intendedUse == TerritoryIntendedUse::Bozja;
+         intendedUse == TerritoryIntendedUse::MaskedCarnival ||
+         intendedUse == TerritoryIntendedUse::DiademV3 ||
+         intendedUse == TerritoryIntendedUse::Bozja;
 }
 
 bool Sapphire::World::Manager::TerritoryMgr::isPrivateTerritory( uint32_t territoryTypeId ) const
@@ -152,6 +152,7 @@ bool Sapphire::World::Manager::TerritoryMgr::isDefaultTerritory( uint32_t territ
          pTeri->territoryIntendedUse == TerritoryIntendedUse::OpenWorld ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::JailArea ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::OpeningArea;
+         pTeri->territoryIntendedUse == 23;
 
 }
 
@@ -564,7 +565,7 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t 
   }
 
   // remove internal house zones with nobody in them
-  for( auto it = m_landIdentToTerritoryPtrMap.begin(); it != m_landIdentToTerritoryPtrMap.end(); )
+/*   for( auto it = m_landIdentToTerritoryPtrMap.begin(); it != m_landIdentToTerritoryPtrMap.end(); )
   {
     auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( it->second );
     assert( zone ); // wtf??
@@ -582,7 +583,7 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t 
     }
     else
       it++;
-  }
+  } */
 
   // remove internal house zones with nobody in them
   for( auto it = m_questBattleIdToInstanceMap.begin(); it != m_questBattleIdToInstanceMap.end(); ++it )
@@ -665,14 +666,27 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( TerritoryPtr pZone, Sap
   // mark character as zoning in progress
   pPlayer->setLoadingComplete( false );
 
+  bool zoneChanged = true;
   if( pPlayer->getLastPing() != 0 && pPlayer->getCurrentTerritory() )
-    pPlayer->getCurrentTerritory()->removeActor( pPlayer );
+  {
+    zoneChanged = pPlayer->getCurrentTerritory()->getGuId() != pZone->getGuId();
+    if( zoneChanged )
+      pPlayer->getCurrentTerritory()->removeActor( pPlayer );
+  }
 
-  pPlayer->setCurrentZone( pZone );
-  pZone->pushActor( pPlayer );
+  if( zoneChanged )
+  {
+    pPlayer->setCurrentZone( pZone );
+    pZone->pushActor( pPlayer );
 
-  // map player to instanceId so it can be tracked.
-  m_playerIdToInstanceMap[ pPlayer->getId() ] = pZone->getGuId();
+    // map player to instanceId so it can be tracked.
+    m_playerIdToInstanceMap[ pPlayer->getId() ] = pZone->getGuId();
+  }
+  else
+  {
+    pPlayer->removeFromInRange();
+    pPlayer->clearInRangeSet();
+  }
 
   pPlayer->sendZonePackets();
 
@@ -743,6 +757,14 @@ std::unordered_map< uint32_t, Sapphire::World::Manager::TerritoryMgr::InstanceSp
   { 507, { { -0.7, 0, 11.5 }, 3.1415 } },
   { 636, { { 0, 0, 8 }, -3.1416 } },
   { 680, { { 0, 16.35, -16.46 }, 0 } },
+  { 639, { { 0, 0, 10 }, -3.14 } },
+  { 681, { { 20, -1, 15 }, -2.25 } },
+  { 682, { { 144.15, -4.178, 55 }, 0 } },
+  { 683, { { 0, -5.169, 30 }, -3.14 } },
+  { 727, { { -454, 383, -127 }, 1.578 } },
+  { 738, { { 0, -2, 55 }, -3.14 } },
+  { 737, { { 250, 122, -346 }, -3.14 } },
+  { 744, { { 0, 0, 0 }, 0 } },
 };
 
 std::unordered_map< uint32_t, uint32_t > Sapphire::World::Manager::TerritoryMgr::instanceExitEvent =
@@ -763,4 +785,12 @@ std::unordered_map< uint32_t, uint32_t > Sapphire::World::Manager::TerritoryMgr:
   { 131213, 507 },
   { 131247, 636 },
   { 131274, 680 },
+  { 131260, 639 },
+  { 131266, 681 },
+  //{ 131268, 682 }, scripted
+  { 131273, 683 },
+  { 131276, 727 },
+  { 131286, 738 },
+  { 131289, 737 },
+  { 131294, 744 },
 };

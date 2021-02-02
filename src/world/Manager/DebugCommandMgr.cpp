@@ -82,6 +82,8 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr()
   registerCommand( "rp", &DebugCommandMgr::rp, "RP management.", 1 );
   registerCommand( "rpevent", &DebugCommandMgr::rpevent, "Commands for specific RP events.", 1 );
   registerCommand( "player", &DebugCommandMgr::player, "Command to respawn or reset your character.", 0 );
+  registerCommand( "jeido", &DebugCommandMgr::jeido, "Jeido's commands.", 1 );
+  registerCommand( "eden", &DebugCommandMgr::eden, "Eden's commands.", 1 );
   registerCommand( "ely", &DebugCommandMgr::ely, "Oui mais c'est parcequ'en fait cette commande sert à rien.", 1 );
 }
 
@@ -150,7 +152,8 @@ void Sapphire::World::Manager::DebugCommandMgr::execCommand( char* data, Entity:
 void Sapphire::World::Manager::DebugCommandMgr::help( char* data, Entity::Player& player,
                                                       std::shared_ptr< DebugCommand > command )
 {
-  player.sendDebug( "Registered debug commands:" );
+  player.sendDebug( "Your GMRank is {0}."
+                    "\nRegistered debug commands for your GMRank:", player.getGmRank() );
   for( auto cmd : m_commandMap )
   {
     if( player.getGmRank() >= cmd.second->m_gmLevel )
@@ -158,6 +161,7 @@ void Sapphire::World::Manager::DebugCommandMgr::help( char* data, Entity::Player
       player.sendDebug( " - {0} - {1}", cmd.first, cmd.second->getHelpText() );
     }
   }
+  player.sendDebug( "Command usage : https://github.com/JeidoUran/Sapphire/wiki/Commandes-Debug-(FR)" );
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player& player,
@@ -299,7 +303,10 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     uint64_t timestamp;
     sscanf( params.c_str(), "%" SCNu64, &timestamp );
 
-    player.setEorzeaTimeOffset( timestamp );
+    auto packet = makeZonePacket< FFXIVIpcEorzeaTimeOffset >( player.getId() );
+    packet->data().timestamp = timestamp;
+    auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+    serverMgr.sendToAllPlayers( packet );
     player.sendNotice( 0, "Eorzea time offset: {0}", timestamp );
   }
   else if( subCommand == "fly" )
@@ -560,6 +567,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     targetActor->getAsPlayer()->setEnemyType( enemytype );
     targetActor->getAsPlayer()->respawn();
     player.sendNotice( 0, "Player {0} respawned as ModelType {1}, SubType {2}, EnemyType {3}.", targetActor->getAsPlayer()->getName(), modeltype, subtype, enemytype );
+    player.setTargetId( 0 );
     return;
   } 
   else if( subCommand == "bnpcname" )
@@ -1211,10 +1219,9 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     obj->setAnimationFlag( state1, state2 );
   }
 
-  else if( subCommand == "despawn" )
+  else if( subCommand == "objdespawn" )
   {
     char objName[128];
-
     sscanf( params.c_str(), "%s ", objName );
 
     auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
@@ -1223,7 +1230,10 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
 
     auto obj = instance->getEObjByName( objName );
     if( !obj )
+    {
+      player.sendDebug( "No eobj found." );
       return;
+    }
 
   player.freeObjSpawnIndexForActorId( obj->getId() );
   player.sendDebug( "Eobj despawned." );
@@ -2035,10 +2045,13 @@ void Sapphire::World::Manager::DebugCommandMgr::notice( char* data, Entity::Play
     serverMgr.sendToAllPlayers( std::make_shared< ServerNoticePacket >( player.getId(), 0, notice ) );
 
   }
+  else
+  {
+    player.sendUrgent( "{0} is not a valid notice command.", subCommand );
+    return;
+  }
   Logger::debug( "[Notice] {0}", params);
-  
 }
-
 
 void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
@@ -2074,6 +2087,7 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
   else
   {
     auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), actionId );
+    auto castPacket = makeZonePacket< FFXIVIpcActorCast >( player.getId() );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( player.getRot() ) );
     Logger::debug( "[Action] {0} uses {1}.", player.getName(), exdData.get< Sapphire::Data::Action >( actionId )->name );
     if ( params == "dmg" )
@@ -2084,10 +2098,25 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
       entry.param0 = static_cast< uint8_t >( Common::ActionHitSeverityType::NormalDamage );
       effectPacket->addEffect( entry );
     }
+    else if ( params == "cast" )
+    {
+      castPacket->data().action_id = actionId;
+      castPacket->data().skillType = Common::SkillType::Normal;
+      castPacket->data().unknown_1 = actionId;
+      castPacket->data().cast_time = 2.5;
+      castPacket->data().target_id = player.getTargetId();
+      castPacket->data().flag = 1;
+      castPacket->data().posX = Common::Util::floatToUInt16( player.getPos().x );
+      castPacket->data().posY = Common::Util::floatToUInt16( player.getPos().y );
+      castPacket->data().posZ = Common::Util::floatToUInt16( player.getPos().z );
+      player.sendToInRangeSet( castPacket, true );
+      auto actionStartPkt = makeActorControlSelf( player.getId, ActorControlType::ActionStart, 1, actionId, 2.5 );
+      //player.sendToInRangeSet( makeActorControlSelf( player.getId(), ActorControlType::ActionStart, 1, actionId, 2.5 ));
+      return;
+    }
+
     player.sendToInRangeSet( effectPacket, true );
   }
-
-  
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& player,
@@ -2331,9 +2360,12 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       else
         Logger::info( "Theme: None" );
       Logger::info( "Participants: {0}", m_rpMembers.size() );
+      if (!player.isInParty())
+        player.createEmptyParty();
       for( auto member : m_rpMembers )
       {
         Logger::info( "{0}", member->getAsPlayer()->getName() );
+        player.addPartyMember( member->getAsPlayer() );
         member->getAsPlayer()->setRPMode( true );
         //member->getAsPlayer()->setGmRank( 1 );
         member->getAsPlayer()->setOnlineStatusMask( 0x0000000100400000 );
@@ -2490,7 +2522,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
   
   else if( subCommand == "loadscreen" )
   {
-    if( isBlackScreen == false )
+    if( isLoadScreen == false )
     {
       auto inRange = player.getInRangeActors( false );
       for( auto actor : inRange )
@@ -2500,10 +2532,10 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
           actor->getAsPlayer()->prepareZoning( player.getZoneId(), true, 1, 0 );
         }
       }
-      isBlackScreen = true;
+      isLoadScreen = true;
       player.sendNotice( 0, "Loading screen toggled to ON." );
     }
-    else if( isBlackScreen == true )
+    else if( isLoadScreen == true )
     {
       auto inRange = player.getInRangeActors( false );
       for( auto actor : inRange )
@@ -2513,7 +2545,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
           actor->getAsPlayer()->changePosition( actor->getAsPlayer()->getPos().x, actor->getAsPlayer()->getPos().y, actor->getAsPlayer()->getPos().z, actor->getAsPlayer()->getRot() );
         }
       }
-      isBlackScreen = false;
+      isLoadScreen = false;
       player.sendNotice( 0, "Loading screen toggled to OFF." );
     }
   }
@@ -2638,21 +2670,6 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
       player.sendModel();
     }
   }
-  else if( subCommand == "edenwep" )
-  {
-    if ( params == "brd" )
-    {
-      player.setModelMainWeapon( 0x0000000100010265 );
-      player.setModelSubWeapon( 0x00000001004602BA );
-      player.sendModel();
-    }
-    else if ( params == "drk" )
-    {
-      player.setModelMainWeapon( 0x00000001000805DD );
-      player.setModelSubWeapon( 0 );
-      player.sendModel();
-    }
-  }
   else if( subCommand == "batwin" )
   {
     if ( params == "art" )
@@ -2773,9 +2790,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rpevent( char* data, Entity::Pla
   }
   }
   else
-  {
     player.sendUrgent( "{0} is not a valid rpevent command.", subCommand );
-  }
 }
 
   
@@ -2855,6 +2870,7 @@ void Sapphire::World::Manager::DebugCommandMgr::player( char* data, Entity::Play
     targetActor->getAsPlayer()->setbNPCBase( 0 );
     targetActor->getAsPlayer()->setDisplayFlags( 0 );
     targetActor->getAsPlayer()->dismount();
+    targetActor->getAsPlayer()->setVisualEffect( 0 );
     targetActor->getAsPlayer()->queuePacket( makeActorControlSelf( player.getId(), Flee, 0 ) );
     targetActor->getAsPlayer()->respawn();
     player.sendNotice( 0, "Player {0} reseted.", targetActor->getAsPlayer()->getName() );
@@ -2863,6 +2879,100 @@ void Sapphire::World::Manager::DebugCommandMgr::player( char* data, Entity::Play
   {
     player.sendUrgent( "{0} is not a valid player command.", subCommand );
   }
+}
+
+void Sapphire::World::Manager::DebugCommandMgr::jeido( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+{
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  std::string subCommand = "";
+  std::string params = "";
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+  std::size_t pos = tmpCommand.find_first_of( " " );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+  Sapphire::Entity::ActorPtr targetActor;
+  if( player.getTargetId() != player.getId() )
+  {
+    targetActor = player.lookupTargetById( player.getTargetId() );
+  }
+  if( !targetActor || !targetActor->isPlayer() )
+  {
+  targetActor = player.getAsPlayer();
+  }
+
+  Logger::debug( "[{0}] Command: jeido subCommand: {1} params: {2}", player.getId(), subCommand, params );
+
+  if( subCommand == "bump" )
+  {
+    uint32_t param1;
+    uint32_t param2;
+    uint32_t param3;
+
+    sscanf( params.c_str(), "%u %u %u", &param1, &param2, &param3 );
+    targetActor->getAsPlayer()->sendToInRangeSet( makeActorControl( targetActor->getAsPlayer()->getId(), 220, param1, param2, param3, 1, 0 ), true );
+  }
+  else
+    player.sendUrgent( "{0} is not a valid jeido command.", subCommand );
+}
+
+void Sapphire::World::Manager::DebugCommandMgr::eden( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
+{
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  std::string subCommand = "";
+  std::string params = "";
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+  std::size_t pos = tmpCommand.find_first_of( " " );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+  Logger::debug( "[{0}] Command: eden subCommand: {1} params: {2}", player.getId(), subCommand, params );
+
+  if( subCommand == "weapon" )
+  {
+    if ( params == "brd" )
+    {
+      player.setModelMainWeapon( 0x0000000100010265 );
+      player.setModelSubWeapon( 0x00000001004602BA );
+      player.sendModel();
+    }
+    else if ( params == "drk" )
+    {
+      player.setModelMainWeapon( 0x00000001000805DD );
+      player.setModelSubWeapon( 0 );
+      player.sendModel();
+    }
+  }
+  else
+    player.sendUrgent( "{0} is not a valid eden command.", subCommand );
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::ely( char* data, Entity::Player& player,

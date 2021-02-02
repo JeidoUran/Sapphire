@@ -79,7 +79,6 @@ uint8_t Sapphire::Entity::EventObject::getState() const
 void Sapphire::Entity::EventObject::setState( uint8_t state )
 {
   m_state = state;
-
   for( const auto& player : m_inRangePlayers )
   {
     player->queuePacket( makeActorControl( getId(), DirectorEObjMod, state ) );
@@ -142,7 +141,6 @@ void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
   eobjStatePacket->data().flag = getFlag();
   pTarget->queuePacket( eobjStatePacket );
 }
-
 
 void Sapphire::Entity::EventObject::despawn( Sapphire::Entity::PlayerPtr pTarget )
 {

@@ -120,7 +120,7 @@
 			for ( var evnt of data ) {
 				for ( var commit of evnt.payload.commits ) {
 					let e = document.createElement( 'li' );
-					e.innerHTML = '<a href="https://github.com/SapphireMordred/JeidoUran/commit/' + commit.sha + '">' + commit.message + '</a>';
+					e.innerHTML = '<a href="https://github.com/JeidoUran/Sapphire/commit/' + commit.sha + '">' + commit.message + '</a>';
 
 					commitContainer.appendChild( e );
 				}

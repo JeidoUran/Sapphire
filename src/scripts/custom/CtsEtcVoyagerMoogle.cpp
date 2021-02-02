@@ -20,10 +20,12 @@ public:
 
 void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-	// for( uint32_t i = 5728; i < 5813; i++ )
-	  // player.addItem( i, 5, false, false, true, true );
-	player.finishQuest( 69190 );
-	player.finishQuest( 69314 );
+    // for( uint32_t i = 5728; i < 5813; i++ )
+      // player.addItem( i, 5, false, false, true, true );
+    player.finishQuest( 69190 );
+    player.sendDebug( "Quest \"Shadowbringers\" completed." );
+    player.finishQuest( 69314 );
+    player.sendDebug( "Quest \"Hope's Confluence\" completed." );
   }
 };
 EXPOSE_SCRIPT( CtsEtcVoyagerMoogle );

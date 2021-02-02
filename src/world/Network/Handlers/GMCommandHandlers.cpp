@@ -135,6 +135,11 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
   {
     case GmCommand::Lv:
     {
+      if( param1 == 0 || param1 > 99 )
+      {
+        player.sendUrgent( "Invalid value. Value must be between 1 and 99." );
+        return;
+      }
       targetPlayer->setLevel( static_cast< uint8_t >( param1 ) );
       player.sendNotice( 0, "Level for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
@@ -239,6 +244,11 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
     }
     case GmCommand::Kill:
     {
+      if ( player.getGmRank() < targetActor->getAsPlayer()->getGmRank() )
+      {
+        player.sendUrgent( "This command cannot be used on a player of higher GMRank than yourself." );
+        return;
+      }
       targetActor->getAsChara()->takeDamage( 9999999 );
       player.sendNotice( 0, "Killed {0}", targetActor->getId() );
       break;
@@ -479,7 +489,6 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
           // player.sendUrgent( "Player not bound! ( run !instance bind <instanceId> first ) {0}", param1 );
           // break;
         }
-
         player.setInstance( instance );
       }
       else if( !teriMgr.isValidTerritory( param1 ) )
