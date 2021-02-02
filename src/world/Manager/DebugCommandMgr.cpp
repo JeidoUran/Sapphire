@@ -2110,7 +2110,7 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
       castPacket->data().posY = Common::Util::floatToUInt16( player.getPos().y );
       castPacket->data().posZ = Common::Util::floatToUInt16( player.getPos().z );
       player.sendToInRangeSet( castPacket, true );
-      auto actionStartPkt = makeActorControlSelf( player.getId, ActorControlType::ActionStart, 1, actionId, 2.5 );
+      //auto actionStartPkt = makeActorControlSelf( player.getId, ActorControlType::ActionStart, 1, actionId, 2.5 );
       //player.sendToInRangeSet( makeActorControlSelf( player.getId(), ActorControlType::ActionStart, 1, actionId, 2.5 ));
       return;
     }
