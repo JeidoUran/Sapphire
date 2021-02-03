@@ -460,6 +460,18 @@ bool Sapphire::Scripting::ScriptMgr::onZoneInit( TerritoryPtr pZone )
   return false;
 }
 
+bool Sapphire::Scripting::ScriptMgr::onPlayerSetup( InstanceContentPtr instance, Entity::Player& player )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
+  if( script )
+  {
+    script->onPlayerSetup( *instance, player );
+    return true;
+  }
+
+  return false;
+}
+
 bool Sapphire::Scripting::ScriptMgr::onInstanceInit( InstanceContentPtr instance )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
