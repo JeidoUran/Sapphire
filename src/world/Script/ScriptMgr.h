@@ -97,6 +97,8 @@ namespace Sapphire::Scripting
     bool onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
                                     uint32_t catalogId );
 
+    bool onPlayerSetup( InstanceContentPtr instance, Entity::Player& player );
+
     bool onInstanceInit( InstanceContentPtr instance );
 
     bool onInstanceUpdate( InstanceContentPtr instance, uint64_t tickCount );

@@ -213,6 +213,8 @@ namespace Sapphire::ScriptAPI
   public:
     explicit InstanceContentScript( uint32_t instanceContentId );
 
+    virtual void onPlayerSetup( Sapphire::InstanceContent& instance, Entity::Player& player );
+
     virtual void onInit( Sapphire::InstanceContent& instance );
 
     virtual void onUpdate( Sapphire::InstanceContent& instance, uint64_t tickCount );

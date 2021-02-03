@@ -182,6 +182,10 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void InstanceContentScript::onPlayerSetup( InstanceContent& instance, Entity::Player& player )
+  {
+  }
+
   void InstanceContentScript::onInit( InstanceContent& instance )
   {
   }

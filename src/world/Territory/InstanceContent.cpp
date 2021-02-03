@@ -353,7 +353,8 @@ void Sapphire::InstanceContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& 
       player.setPos( { 0.f, 0.f, 0.f } );
     }
   }
-
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onPlayerSetup( getAsInstanceContent(), player );
   player.resetObjSpawnIndex();
 }
 
