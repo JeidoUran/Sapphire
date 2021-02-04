@@ -684,12 +684,12 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
     case GmCommand::Jump:
     {
       player.prepareZoning( targetPlayer->getZoneId(), true, 1, 0 );
-      if( player.getCurrentInstance() )
-      {
-        player.exitInstance();
-      }
       if( targetPlayer->getCurrentTerritory()->getGuId() != player.getCurrentTerritory()->getGuId() )
       {
+        if( player.getCurrentInstance() )
+        {
+          player.exitInstance();
+        }
         // Checks if the target player is in an InstanceContent to avoid binding to a Territory or PublicContent
         if( targetPlayer->getCurrentInstance() )
         {
@@ -708,12 +708,12 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
     case GmCommand::Call:
     {
       targetPlayer->prepareZoning( player.getZoneId(), true, 1, 0 );
-      if( targetPlayer->getCurrentInstance() )
-      {
-        targetPlayer->exitInstance();
-      }
       if( targetPlayer->getCurrentTerritory()->getGuId() != player.getCurrentTerritory()->getGuId() )
       {
+        if( targetPlayer->getCurrentInstance() )
+        {
+          targetPlayer->exitInstance();
+        }
         // Checks if the player is in an InstanceContent to avoid binding to a Zone or PublicContent
         if( player.getCurrentInstance() )
         {
