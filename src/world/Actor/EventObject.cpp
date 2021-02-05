@@ -85,6 +85,11 @@ void Sapphire::Entity::EventObject::setState( uint8_t state )
   }
 }
 
+uint8_t Sapphire::Entity::EventObject::getFlag() const
+{
+  return m_flag;
+}
+
 void Sapphire::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag )
 {
   m_flag = animationFlag;
@@ -102,11 +107,6 @@ void Sapphire::Entity::EventObject::setHousingLink( uint32_t housingLink )
 uint32_t Sapphire::Entity::EventObject::getHousingLink() const
 {
   return m_housingLink;
-}
-
-uint8_t Sapphire::Entity::EventObject::getFlag() const
-{
-  return m_flag;
 }
 
 void Sapphire::Entity::EventObject::setParentInstance( Sapphire::TerritoryPtr instance )
