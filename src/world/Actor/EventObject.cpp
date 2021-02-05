@@ -109,11 +109,6 @@ uint32_t Sapphire::Entity::EventObject::getHousingLink() const
   return m_housingLink;
 }
 
-uint8_t Sapphire::Entity::EventObject::getFlag() const
-{
-  return m_flag;
-}
-
 void Sapphire::Entity::EventObject::setParentInstance( Sapphire::TerritoryPtr instance )
 {
   m_parentInstance = instance;
