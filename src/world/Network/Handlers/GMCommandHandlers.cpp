@@ -673,8 +673,6 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
       targetPlayer->setStatus( Common::ActorStatus::Idle );
       targetPlayer->sendZoneInPackets( 0x01, 0x01, 0, 113, true );
 
-
-      //targetPlayer->sendToInRangeSet( makeActorControlSelf( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
       targetPlayer->sendToInRangeSet( makeActorControl( player.getId(), SetStatus,
                                                         static_cast< uint8_t >( Common::ActorStatus::Idle ) ),
                                       true );

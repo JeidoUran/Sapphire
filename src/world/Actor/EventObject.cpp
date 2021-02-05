@@ -85,6 +85,11 @@ void Sapphire::Entity::EventObject::setState( uint8_t state )
   }
 }
 
+uint8_t Sapphire::Entity::EventObject::getFlag() const
+{
+  return m_flag;
+}
+
 void Sapphire::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag )
 {
   m_flag = animationFlag;
