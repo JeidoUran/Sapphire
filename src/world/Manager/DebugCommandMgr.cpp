@@ -546,15 +546,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   {
     int32_t id;
     sscanf( params.c_str(), "%d", &id );
-    for( auto actor : targetActor->getAsPlayer()->getInRangeActors() )
-    {
-      if( actor->getId() == targetActor->getAsPlayer()->getTargetId() )
-      {
-        actor->getAsChara()->setVisualEffect( id );
-        return;
-      }
-    }
-    targetActor->getAsPlayer()->setVisualEffect( id );
+    targetActor->getAsChara()->setVisualEffect( id );
   }
   else if( subCommand == "entitytype" )
   {
