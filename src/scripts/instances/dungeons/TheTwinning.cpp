@@ -87,13 +87,13 @@ public:
     //! Setup Chimeira
     if( player.getId() == 2097214 )
     {
-      player.setRot( -1.5888 );
-      player.setPos( { 60.562988f, 299.977112f, 281.239014f } );
+      player.setRot( -1.87307 );
+      player.setPos( { 67.863998f, 301.179169f, 291.554810f } );
       player.setModelType( 2 );
-      player.setSubType( 5 );
-      player.setEnemyType( 4 );
-      player.setbNPCBase( 882 );
-      player.setbNPCName( 1468 );
+      player.setSubType( 6 );
+      player.setEnemyType( 1 );
+      player.setbNPCBase( 2161 );
+      player.setbNPCName( 3540 );
       player.setModelMainWeapon( 0x0000000000000000 );
       player.sendModel();
       //player.setGmInvis( true );

@@ -88,7 +88,7 @@ public:
     //instance.registerEObj( "Exit", 2000139, 0, 4, { -110.009903f, 650.972229f, 157.832199f }, 0.793408f, 0.000048f ); 
 
     //! RP Renamed eobjs
-    instance.registerEObj( "platform1", 2002823, 4101871, 4, { 71.280701, 650.308350, 191.918152 }, 1.000000f, 0.000000f ); 
+    instance.registerEObj( "platform1", 2002823, 4101871, 4, { -71.280701, 650.308350, 191.918152 }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "platform2", 2002824, 4101872, 4, { -109.887199f, 650.970886f, 207.029099f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "platform3", 2002825, 4101873, 4, { -132.905304f, 650.731018f, 191.279907f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "circle1", 2002826, 0, 4, { -78.160004f, 649.950125f, 206.024597f }, 0.800000f, -0.634151f ); 
@@ -101,7 +101,7 @@ public:
     instance.registerEObj( "arenabarrier", 2001029, 4499125, 4, { -109.987602f, 650.731018f, 181.576202f }, 1.000000f, 0.000000f ); 
 
     //! RP Altered eobjs
-    instance.registerEObj( "Entrance", 2000182, 4317322, 5, { -145.124924f, 462.032715f, 0.094078f }, 0.991760f,  -1.57362f ); 
+    instance.registerEObj( "Entrance", 2000182, 4317322, 5, { -110.032799f, 11.600000f, 850.444763f }, 0.991760f,  -1.57362f ); 
 
     //! RP Added eobjs
     //instance.registerEObj( "Shortcut", 2000700, 0, 4, { -101.470718f, 30.392542f, 416.210571f }, 0.991760f, 0.000144f ); 
@@ -176,7 +176,7 @@ public:
       player.setSubType( 5 );
       player.setEnemyType( 4 );
       player.setbNPCBase( 882 );
-      player.setbNPCName( 1468 );
+      player.setbNPCName( 1472 );
       player.setModelMainWeapon( 0x0000000000000000 );
       player.sendModel();
       //player.setGmInvis( true );
@@ -191,7 +191,7 @@ public:
       player.setSubType( 5 );
       player.setEnemyType( 4 );
       player.setbNPCBase( 882 );
-      player.setbNPCName( 1468 );
+      player.setbNPCName( 2193 );
       player.setModelMainWeapon( 0x0000000000000000 );
       player.sendModel();
       //player.setGmInvis( true );
@@ -206,12 +206,26 @@ public:
       player.setSubType( 5 );
       player.setEnemyType( 4 );
       player.setbNPCBase( 882 );
-      player.setbNPCName( 1468 );
+      player.setbNPCName( 1471 );
       player.setModelMainWeapon( 0x0000000000000000 );
       player.sendModel();
       //player.setGmInvis( true );
     }
 
+    //! Setup Medium ADS
+    else if( player.getId() == 2097215 )
+    {
+      player.setRot( -3.12546 );
+      player.setPos( { -109.680817f, 690.421692f, 249.161118f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 882 );
+      player.setbNPCName( 2884 );
+      player.setModelMainWeapon( 0x0000000000000000 );
+      player.sendModel();
+      //player.setGmInvis( true );
+    }
   //! Setup eobjs
 
   instance.getEObjByName( "sgvf_w_lvd_b0294" )->setAnimationFlag( 0, 4 );
