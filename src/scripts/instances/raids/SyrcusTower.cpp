@@ -1,5 +1,7 @@
 #include <ScriptObject.h>
+#include "Actor/EventObject.h"
 #include <Territory/InstanceContent.h>
+#include <Actor/Player.h>
 
 using namespace Sapphire;
 
@@ -82,6 +84,15 @@ public:
     instance.registerEObj( "unknown_27", 2004170, 4710494, 4, { 0.449279f, 196.100006f, -262.072296f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "unknown_28", 2004179, 4742340, 4, { 28.708071f, 598.000183f, -156.658600f }, 1.000000f, 0.000000f ); 
 
+    //! RP Renamed eobjs
+
+    //! RP Altered eobjs
+
+    //! RP Added eobjs
+    instance.registerEObj( "portal", 2007181, 0, 4, { -14.400992f, -754.000000f, 182.641739f }, 1.000000f, 0.748016f ); 
+    instance.registerEObj( "oculargate", 2002927, 0, 4, { 0.074870f, -753.000000f, 180.761383f }, 1.000000f, -0.016232f ); 
+    instance.registerEObj( "notes", 2005180, 0, 4, { -16.690599f, -752.000000f, 184.967300f }, 1.000000f, 0.355421f ); 
+
   }
 
   void onUpdate( InstanceContent& instance, uint64_t tickCount ) override
@@ -93,6 +104,11 @@ public:
                          uint16_t param2 ) override
   {
 
+  }
+
+  void onPlayerSetup( InstanceContent& instance, Entity::Player& player )
+  {
+    instance.getEObjByName( "portal" )->setAnimationFlag( 0, 4 );
   }
 
 };

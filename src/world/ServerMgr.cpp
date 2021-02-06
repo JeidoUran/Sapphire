@@ -101,7 +101,7 @@ bool Sapphire::World::ServerMgr::loadSettings( int32_t argc, char* argv[] )
   m_config.network.disconnectTimeout = configMgr.getValue< uint16_t >( "Network", "DisconnectTimeout", 20 );
   m_config.network.listenIp = configMgr.getValue< std::string >( "Network", "ListenIp", "0.0.0.0" );
   m_config.network.listenPort = configMgr.getValue< uint16_t >( "Network", "ListenPort", 54992 );
-  m_config.network.inRangeDistance = configMgr.getValue< float >( "Network", "InRangeDistance", 80.f );
+  m_config.network.inRangeDistance = configMgr.getValue< float >( "Network", "InRangeDistance", 120.f );
 
   m_config.motd = configMgr.getValue< std::string >( "General", "MotD", "" );
 
@@ -169,9 +169,9 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   }
   Common::Service< Scripting::ScriptMgr >::set( pScript );
 
-  Logger::info( "Setting up InstanceObjectCache" );
-  auto pInstanceObjCache = std::make_shared< Sapphire::InstanceObjectCache >();
-  Common::Service< Sapphire::InstanceObjectCache >::set( pInstanceObjCache );
+  // Logger::info( "Setting up InstanceObjectCache" );
+  // auto pInstanceObjCache = std::make_shared< Sapphire::InstanceObjectCache >();
+  // Common::Service< Sapphire::InstanceObjectCache >::set( pInstanceObjCache );
 
   auto pActionMgr = std::make_shared< Manager::ActionMgr >();
   Common::Service< Manager::ActionMgr >::set( pActionMgr );

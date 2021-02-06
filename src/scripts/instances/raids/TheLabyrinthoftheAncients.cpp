@@ -3,6 +3,7 @@
 #include <Territory/InstanceContent.h>
 #include <Actor/Player.h>
 
+
 using namespace Sapphire;
 
 class TheLabyrinthoftheAncients :
@@ -87,20 +88,20 @@ public:
     //instance.registerEObj( "Exit", 2000139, 0, 4, { -110.009903f, 650.972229f, 157.832199f }, 0.793408f, 0.000048f ); 
 
     //! RP Renamed eobjs
-    instance.registerEObj( "platform1", 2002823, 4101871, 4, { -86.638451f, 650.731018f, 191.568298f }, 1.000000f, 0.000000f ); 
+    instance.registerEObj( "platform1", 2002823, 4101871, 4, { 71.280701, 650.308350, 191.918152 }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "platform2", 2002824, 4101872, 4, { -109.887199f, 650.970886f, 207.029099f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "platform3", 2002825, 4101873, 4, { -132.905304f, 650.731018f, 191.279907f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "circle1", 2002826, 0, 4, { -78.160004f, 649.940125f, 206.024597f }, 0.800000f, -0.634151f ); 
-    instance.registerEObj( "circle2", 2002832, 0, 4, { -85.569000f, 649.940125f, 213.420593f }, 0.800000f, -0.911137f ); 
-    instance.registerEObj( "circle3", 2002833, 0, 4, { -94.658401f, 649.940125f, 218.672806f }, 0.800000f, -1.177247f ); 
-    instance.registerEObj( "circle4", 2002834, 0, 4, { -125.350403f, 649.940125f, 218.672806f }, 0.800000f, -1.153363f ); 
-    instance.registerEObj( "circle5", 2002835, 0, 4, { -134.429901f, 649.940125f, 213.420593f }, 0.800000f, -0.918754f ); 
-    instance.registerEObj( "circle6", 2002836, 0, 4, { -141.827698f, 649.940125f, 206.024597f }, 0.800000f, -0.639576f ); 
-    instance.registerEObj( "bosswall", 2001042, 4491496, 4, { -110.122498f, 650.015808f, 227.968597f }, 1.000000f, 0.000000f ); 
+    instance.registerEObj( "circle1", 2002826, 0, 4, { -78.160004f, 649.950125f, 206.024597f }, 0.800000f, -0.634151f ); 
+    instance.registerEObj( "circle2", 2002832, 0, 4, { -85.569000f, 649.950125f, 213.420593f }, 0.800000f, -0.911137f ); 
+    instance.registerEObj( "circle3", 2002833, 0, 4, { -94.658401f, 649.950125f, 218.672806f }, 0.800000f, -1.177247f ); 
+    instance.registerEObj( "circle4", 2002834, 0, 4, { -125.350403f, 649.950125f, 218.672806f }, 0.800000f, -1.153363f ); 
+    instance.registerEObj( "circle5", 2002835, 0, 4, { -134.429901f, 649.950125f, 213.420593f }, 0.800000f, -0.918754f ); 
+    instance.registerEObj( "circle6", 2002836, 0, 4, { -141.827698f, 649.950125f, 206.024597f }, 0.800000f, -0.639576f ); 
+    instance.registerEObj( "bosswall", 2002793, 4491496, 4, { -110.122498f, 650.015808f, 227.968597f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "arenabarrier", 2001029, 4499125, 4, { -109.987602f, 650.731018f, 181.576202f }, 1.000000f, 0.000000f ); 
 
     //! RP Altered eobjs
-    instance.registerEObj( "Entrance", 2000182, 4317322, 5, { -110.032799f, 11.600000f, 850.444763f }, 0.991760f, 0.000048f ); 
+    instance.registerEObj( "Entrance", 2000182, 4317322, 5, { -145.124924f, 462.032715f, 0.094078f }, 0.991760f,  -1.57362f ); 
 
     //! RP Added eobjs
     //instance.registerEObj( "Shortcut", 2000700, 0, 4, { -101.470718f, 30.392542f, 416.210571f }, 0.991760f, 0.000144f ); 
@@ -110,6 +111,18 @@ public:
     instance.registerEObj( "switch1", 2008907, 0, 4, { -181.258392f, 690.415771f, 181.339722f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "switch2", 2008907, 0, 4, { -109.736443f, 690.556519f, 253.025848f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "switch3", 2008907, 0, 4, { -37.636600f, 690.598145f, 181.754272f }, 1.000000f, 0.000000f ); 
+    instance.registerEObj( "platformhint1", 2006281, 0, 4, { -71.280701f, 650.308350f, 191.918152f }, 1.000000f, 0.000000f ); 
+    instance.registerEObj( "platformhint2", 2006281, 0, 4, { -110.027336f, 650.308350f, 221.570938f }, 1.000000f, 0.000000f ); 
+    instance.registerEObj( "platformhint3", 2006281, 0, 4, { -148.634933f, 650.308350f, 191.927551f }, 1.000000f, 0.000000f ); 
+    instance.registerEObj( "circlehint1", 2006281, 0, 4, { -85.569000f, 649.940125f, 213.420593f }, 0.800000f, -0.911137f ); 
+    instance.registerEObj( "circlehint2", 2006281, 0, 4, { -134.429901f, 649.940125f, 213.420593f }, 0.800000f, -0.918754f ); 
+    instance.registerEObj( "puddle1", 2000680, 0, 4, { -71.280701f, 650.308350f, 191.918152f }, 1.000000f, 0.000000f ); 
+    instance.registerEObj( "puddle2", 2000680, 0, 4, { -110.027336f, 650.304504f, 221.570938f }, 1.000000f, 0.000000f ); 
+    instance.registerEObj( "puddle3", 2000680, 0, 4, { -148.634933f, 650.308350f, 191.927551f }, 1.000000f, 0.000000f ); 
+    //instance.registerEObj( "test", 2002793, 4493308, 4, { 0.0f, 0.0f, 0.0f }, 1.000000f, 0.000000f ); 
+    instance.registerEObj( "CTEntrance", 2011102, 0, 4, { -110.041481f, 700.410950f, -73.251411f }, 1.000000f, 0.000000f ); 
+    instance.registerEObj( "crystal", 2003145, 0, 4, { -37.422192f, 51.373531f, 418.407288f }, 4.000000f, -1.04615f ); 
+    instance.registerEObj( "crystal2", 2003145, 0, 4, { -182.863007f, 51.003531f, 418.407288f }, 4.000000f, 0.000000f ); 
 
   }
 
@@ -122,8 +135,12 @@ public:
                          uint16_t param2 ) override
   {
 
+  }
 
-    if( player.getId() == 2097209 )
+  void onPlayerSetup( InstanceContent& instance, Entity::Player& player )
+  {
+    //! Setup 1st ADS
+    if( player.getId() == 2097209 /* 2097155 */ )
     {
       player.setRot( -0.0466003 );
       player.setPos( { -110.027626f, 28.227448f, 502.090363f } );
@@ -131,12 +148,75 @@ public:
       player.setSubType( 5 );
       player.setEnemyType( 4 );
       player.setbNPCBase( 882 );
-      player.setbNPCName( 1459 );
+      player.setbNPCName( 2641 );
       player.setModelMainWeapon( 0x0000000000000000 );
       player.sendModel();
     }
-  }
 
+    //! Setup 2nd ADS
+    else if( player.getId() == 2097210 )
+    {
+      player.setRot( -0.00229883 );
+      player.setPos( { -109.986702f, 650.928223f, 181.590897f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 882 );
+      player.setbNPCName( 1468 );
+      player.setModelMainWeapon( 0x0000000000000000 );
+      player.sendModel();
+    }
+
+    //! Setup 1st Baby ADS
+    else if( player.getId() == 2097211 )
+    {
+      player.setRot( 1.59457 );
+      player.setPos( { -179.126953f, 690.415771f, 181.345612f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 882 );
+      player.setbNPCName( 1468 );
+      player.setModelMainWeapon( 0x0000000000000000 );
+      player.sendModel();
+      //player.setGmInvis( true );
+    }
+
+    //! Setup 2nd Baby ADS
+    else if( player.getId() == 2097212 )
+    {
+      player.setRot( -3.12546 );
+      player.setPos( { -109.680817f, 690.421692f, 249.161118f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 882 );
+      player.setbNPCName( 1468 );
+      player.setModelMainWeapon( 0x0000000000000000 );
+      player.sendModel();
+      //player.setGmInvis( true );
+    }
+
+    //! Setup 3rd Baby ADS
+    else if( player.getId() == 2097213 )
+    {
+      player.setRot( -1.5888 );
+      player.setPos( { -43.466114f, 690.216003f, 181.698944f } );
+      player.setModelType( 2 );
+      player.setSubType( 5 );
+      player.setEnemyType( 4 );
+      player.setbNPCBase( 882 );
+      player.setbNPCName( 1468 );
+      player.setModelMainWeapon( 0x0000000000000000 );
+      player.sendModel();
+      //player.setGmInvis( true );
+    }
+
+  //! Setup eobjs
+
+  instance.getEObjByName( "sgvf_w_lvd_b0294" )->setAnimationFlag( 0, 4 );
+  instance.getEObjByName( "sgvf_w_lvd_b0294_2" )->setAnimationFlag( 0, 4 );
+  }
 };
 
 EXPOSE_SCRIPT( TheLabyrinthoftheAncients );
