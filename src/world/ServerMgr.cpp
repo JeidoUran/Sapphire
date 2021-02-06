@@ -169,9 +169,9 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   }
   Common::Service< Scripting::ScriptMgr >::set( pScript );
 
-  // Logger::info( "Setting up InstanceObjectCache" );
-  // auto pInstanceObjCache = std::make_shared< Sapphire::InstanceObjectCache >();
-  // Common::Service< Sapphire::InstanceObjectCache >::set( pInstanceObjCache );
+  Logger::info( "Setting up InstanceObjectCache" );
+  auto pInstanceObjCache = std::make_shared< Sapphire::InstanceObjectCache >();
+  Common::Service< Sapphire::InstanceObjectCache >::set( pInstanceObjCache );
 
   auto pActionMgr = std::make_shared< Manager::ActionMgr >();
   Common::Service< Manager::ActionMgr >::set( pActionMgr );
