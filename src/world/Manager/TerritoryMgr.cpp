@@ -126,8 +126,7 @@ bool Sapphire::World::Manager::TerritoryMgr::isPrivateTerritory( uint32_t territ
     return false;
 
   return pTeri->territoryIntendedUse == TerritoryIntendedUse::OpeningArea ||
-         pTeri->territoryIntendedUse == TerritoryIntendedUse::Inn ||
-         pTeri->territoryIntendedUse == TerritoryIntendedUse::MSQPrivateArea;
+         pTeri->territoryIntendedUse == TerritoryIntendedUse::Inn;
 }
 
 bool Sapphire::World::Manager::TerritoryMgr::isInternalEstateTerritory( uint32_t territoryTypeId ) const

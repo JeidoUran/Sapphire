@@ -1219,10 +1219,32 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     obj->setAnimationFlag( state1, state2 );
   }
 
+  // else if( subCommand == "objspawn" )
+  // {
+    // uint32_t objectId;
+    // sscanf( params.c_str(), "%d", &objectId );
+
+    // Entity::EventObjectPtr object;
+    // auto eobjStatePacket = makeZonePacket< FFXIVIpcObjectSpawn >( object->getId(), player.getId() );
+    // auto spawnIndex = player.getNextObjSpawnIndexForActorId( object->getId() );
+    // eobjStatePacket->data().spawnIndex = spawnIndex;
+    // eobjStatePacket->data().objKind = object->getObjKind();
+    // eobjStatePacket->data().state = object->getState();
+    // eobjStatePacket->data().objId = objectId;
+    // eobjStatePacket->data().gimmickId = object->getGimmickId();
+    // eobjStatePacket->data().position = player.getPos();
+    // eobjStatePacket->data().scale = object->getScale();
+    // eobjStatePacket->data().actorId = object->getId();
+    // eobjStatePacket->data().housingLink = object->getHousingLink();
+    // eobjStatePacket->data().rotation = Common::Util::floatToUInt16Rot( player.getRot() );
+    // eobjStatePacket->data().flag = object->getFlag();
+    // player.queuePacket( eobjStatePacket );
+  // }
+
   else if( subCommand == "objdespawn" )
   {
     char objName[128];
-    sscanf( params.c_str(), "%s ", objName );
+    sscanf( params.c_str(), "%s", objName );
 
     auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
     if( !instance )
@@ -2103,9 +2125,9 @@ void Sapphire::World::Manager::DebugCommandMgr::action( char* data, Entity::Play
       castPacket->data().action_id = actionId;
       castPacket->data().skillType = Common::SkillType::Normal;
       castPacket->data().unknown_1 = actionId;
-      castPacket->data().cast_time = 2.5;
+      castPacket->data().cast_time = 5;
       castPacket->data().target_id = player.getTargetId();
-      castPacket->data().flag = 1;
+      castPacket->data().flag = 0;
       castPacket->data().posX = Common::Util::floatToUInt16( player.getPos().x );
       castPacket->data().posY = Common::Util::floatToUInt16( player.getPos().y );
       castPacket->data().posZ = Common::Util::floatToUInt16( player.getPos().z );
@@ -2858,6 +2880,7 @@ void Sapphire::World::Manager::DebugCommandMgr::player( char* data, Entity::Play
   {
     targetActor->getAsPlayer()->respawn();
     player.sendNotice( 0, "Player {0} respawned.", targetActor->getAsPlayer()->getName() );
+    player.setTargetId( 0 );
   }
   
   else if( subCommand == "reset" )
@@ -2874,6 +2897,7 @@ void Sapphire::World::Manager::DebugCommandMgr::player( char* data, Entity::Play
     targetActor->getAsPlayer()->queuePacket( makeActorControlSelf( player.getId(), Flee, 0 ) );
     targetActor->getAsPlayer()->respawn();
     player.sendNotice( 0, "Player {0} reseted.", targetActor->getAsPlayer()->getName() );
+    player.setTargetId( 0 );
   }
   else
   {
