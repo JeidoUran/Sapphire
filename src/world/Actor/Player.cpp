@@ -272,8 +272,7 @@ void Sapphire::Entity::Player::setGmInvis( bool invis )
 bool Sapphire::Entity::Player::isActingAsGm() const
 {
   auto status = getOnlineStatus();
-  return status == OnlineStatus::GameMaster || status == OnlineStatus::GameMaster1 ||
-         status == OnlineStatus::GameMaster2;
+  return status == OnlineStatus::GameMaster || status == OnlineStatus::GameMaster1;
 }
 
 bool Sapphire::Entity::Player::isActingAsEnemy() const
