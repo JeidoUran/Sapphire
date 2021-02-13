@@ -995,11 +995,11 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
   if( subCommand == "unload" )
   {
     if( subCommand == params )
-      player.sendDebug( "Command failed: requires name of script" );
+      player.sendUrgent( "Command failed: requires name of script" );
     else if( scriptMgr.getNativeScriptHandler().unloadScript( params ) )
       player.sendDebug( "Unloaded script successfully." );
     else
-      player.sendDebug( "Failed to unload script: {0}", params );
+      player.sendUrgent( "Failed to unload script: {0}", params );
   }
   else if( subCommand == "find" || subCommand == "f" )
   {
@@ -1027,20 +1027,20 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
   else if( subCommand == "load" || subCommand == "l" )
   {
     if( subCommand == params )
-      player.sendDebug( "Command failed: requires relative path to script" );
+      player.sendUrgent( "Command failed: requires relative path to script" );
     else
     {
       if( scriptMgr.getNativeScriptHandler().loadScript( params ) )
         player.sendDebug( "Loaded '{0}' successfully", params );
       else
-        player.sendDebug( "Failed to load '{0}'", params );
+        player.sendUrgent( "Failed to load '{0}'", params );
     }
 
   }
   else if( subCommand == "queuereload" || subCommand == "qrl" )
   {
     if( subCommand == params )
-      player.sendDebug( "Command failed: requires name of script to reload" );
+      player.sendUrgent( "Command failed: requires name of script to reload" );
     else
     {
       scriptMgr.getNativeScriptHandler().queueScriptReload( params );
@@ -1086,7 +1086,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     if( instance )
       player.sendDebug( "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
     else
-      player.sendDebug( "Failed to create instance with id#{0}", contentFinderConditionId );
+      player.sendUrgent( "Failed to create instance with id#{0}", contentFinderConditionId );
   }
   else if( subCommand == "bind" )
   {
@@ -1099,7 +1099,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
       auto pInstanceContent = terri->getAsInstanceContent();
       if( !pInstanceContent )
       {
-        player.sendDebug( "Instance id#{} is not an InstanceContent territory.", instanceId );
+        player.sendUrgent( "Instance id#{} is not an InstanceContent territory.", instanceId );
         return;
       }
 
@@ -1109,7 +1109,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
         " -> " + pInstanceContent->getName() );
     }
     else
-      player.sendDebug( "Unknown instance with id#{0}", instanceId );
+      player.sendUrgent( "Unknown instance with id#{0}", instanceId );
   }
   else if( subCommand == "unbind" )
   {
@@ -2233,7 +2233,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         player.sendUrgent( "Invalid target." );
         return;
       }
-       if( m_rpNPC.count( targetActor->getAsPlayer() ) == 1 )
+      if( m_rpNPC.count( targetActor->getAsPlayer() ) == 1 )
       {
         player.sendUrgent( "{0} is already registered to a RP session. Use \"!rp rm\" to remove them.", targetActor->getAsPlayer()->getName() );
         return;
@@ -2267,7 +2267,7 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         player.sendUrgent( "Invalid target." );
         return;
       }
-       if( m_rpSpectators.count( targetActor->getAsPlayer() ) == 1 )
+      if( m_rpSpectators.count( targetActor->getAsPlayer() ) == 1 )
       {
         player.sendUrgent( "{0} is already registered to a RP session. Use \"!rp rm\" to remove them.", targetActor->getAsPlayer()->getName() );
         return;
@@ -2293,11 +2293,22 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       player.sendUrgent( "You need to prepare a RP session before using this command. Use \"!rp prepare\".");
       return;
     }
-
-    sscanf( params.c_str(), "%d %d %d %d", &startzone, &startposx, &startposy, &startposz );
+    if( params == "current" )
+    {
+      startzone = player.getZoneId();
+      startposx = player.getPos().x;
+      startposy = player.getPos().y;
+      startposz = player.getPos().z;
+      auto pZone = terriMgr.getZoneByTerritoryTypeId( startzone );
+    }
+    else
+      sscanf( params.c_str(), "%d %d %d %d", &startzone, &startposx, &startposy, &startposz );
     auto pZone = terriMgr.getZoneByTerritoryTypeId( startzone );
-    player.sendNotice( 0, "The starting zone of the RP session has been set to {0} (ID: {1}), X: {2}, Y: {3}, Z: {4}.", pZone->getName(),
-                       startzone, startposx, startposy, startposz );
+    if( pZone )
+      player.sendNotice( 0, "The starting zone of the RP session has been set to {0} (ID: {1}), X: {2}, Y: {3}, Z: {4}.", pZone->getName(),
+                         startzone, startposx, startposy, startposz );
+    else
+      player.sendUrgent( "Invalid syntax. Check that the Zone ID entered is correct." );
   }
 
   else if( subCommand == "theme" )
@@ -2334,7 +2345,8 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
     auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
     auto pZone = terriMgr.getZoneByTerritoryTypeId( startzone );
     if ( !startzone == 0 )
-      player.sendNotice( 0, "Starting Zone: {0}", pZone->getName() );
+      player.sendNotice( 0, "Starting Zone: {0} (ID: {1}), X: {2}, Y: {3}, Z: {4}.", pZone->getName(),
+                         startzone, startposx, startposy, startposz );
     else
       player.sendNotice( 0, "Starting Zone: None" );
     if( strcmp (RpTheme,"") != 0)
@@ -2381,20 +2393,10 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
         Logger::info( "{0}", member->getAsPlayer()->getName() );
         player.addPartyMember( member->getAsPlayer() );
         member->getAsPlayer()->setRPMode( true );
-        //member->getAsPlayer()->setGmRank( 1 );
-        member->getAsPlayer()->setOnlineStatusMask( 0x0000000100400000 );
-
-        auto& serverMgr = Common::Service< World::ServerMgr >::ref();
-        auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( member->getAsPlayer()->getId() );
-        statusPacket->data().onlineStatusFlags = 0x0000000100400000;
-        serverMgr.getSession( member->getAsPlayer()->getId() )->getZoneConnection()->queueOutPacket( statusPacket );
-
-        auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( member->getAsPlayer()->getId() );
-        searchInfoPacket->data().onlineStatusFlags = 0x0000000100400000;
-        searchInfoPacket->data().selectRegion = member->getAsPlayer()->getSearchSelectRegion();
-        strcpy( searchInfoPacket->data().searchMessage, member->getAsPlayer()->getSearchMessage() );
-        member->getAsPlayer()->queuePacket( searchInfoPacket );
-
+        if( member->getAsPlayer() != player.getAsPlayer() )
+          member->getAsPlayer()->setOnlineStatusMask( 0x0000000100400000 );
+        else
+          member->getAsPlayer()->setOnlineStatusMask( 16 ); //TODO; Find correct hex value
         member->getAsPlayer()->sendToInRangeSet( makeActorControl( member->getAsPlayer()->getId(), SetStatusIcon, static_cast< uint8_t >( member->getAsPlayer()->getOnlineStatus() ) ), true );
         if( member->getAsPlayer() != player.getAsPlayer() )
         {
@@ -2465,12 +2467,12 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       if( member->getAsPlayer() != player.getAsPlayer() )
       {
         member->getAsPlayer()->prepareZoning( player.getZoneId(), true, 1, 0 );
-        if( member->getAsPlayer()->getCurrentInstance() )
-        {
-          member->getAsPlayer()->exitInstance();
-        }
         if( member->getAsPlayer()->getCurrentTerritory()->getGuId() != player.getCurrentTerritory()->getGuId() )
         {
+          if( member->getAsPlayer()->getCurrentInstance() )
+          {
+            member->getAsPlayer()->exitInstance();
+          }
           if( player.getCurrentInstance() )
           {
             auto pInstanceContent = player.getCurrentInstance()->getAsInstanceContent();
@@ -2494,31 +2496,58 @@ void Sapphire::World::Manager::DebugCommandMgr::rp( char* data, Entity::Player& 
       player.sendUrgent( "You need to start a RP session before using this command. Use \"!rp prepare\" and \"!rp start\"." );
       return;
     }
-      Logger::info( "===========================================================" );
-      Logger::info( "RP session stopped by {0}", player.getName() );
-      Logger::info( "Participants: {0}", m_rpMembers.size() );
-      for( auto member : m_rpMembers )
-      {
-          Logger::info( "{0}", member->getAsPlayer()->getName() );
-          member->getAsPlayer()->setRPMode( false );
-          if( member->getAsPlayer() != player.getAsPlayer() )
-            member->getAsPlayer()->sendNotice( 5, "RP session stopped by {0}.", player.getName() );
-      }
-      isRpPrepared = false;
-      isRpStarted = false;
+    Logger::info( "===========================================================" );
+    Logger::info( "RP session stopped by {0}", player.getName() );
+    Logger::info( "Participants: {0}", m_rpMembers.size() );
+    for( auto member : m_rpMembers )
+    {
+      Logger::info( "{0}", member->getAsPlayer()->getName() );
+      member->getAsPlayer()->setRPMode( false );
+      if( member->getAsPlayer() != player.getAsPlayer() )
+      member->getAsPlayer()->sendNotice( 5, "RP session stopped by {0}.", player.getName() );
+    }
+    isRpPrepared = false;
+    isRpStarted = false;
+    Logger::info( "===========================RP STOP=========================" );
+    if( params == "clean" )
+    {
       m_rpMembers.clear();
       m_rpNPC.clear();
       m_rpSpectators.clear();
-      Logger::info( "===========================RP STOP=========================" );
+      startzone = 0;
+      startposx = 0;
+      startposy = 0;
+      startposz = 0;
+      player.sendNotice( 5, "RP session stopped and cleaned." );
+    }
+    else
       player.sendNotice( 5, "RP session stopped." );
+      player.sendNotice( 0, "You may now use \"!rp clean\" to clear the Zone/Theme used, or keep them for later use." );
   }
   else if( subCommand == "clean" )
   {
+    m_rpMembers.clear();
+    m_rpNPC.clear();
+    m_rpSpectators.clear();
+    startzone = 0;
+    startposx = 0;
+    startposy = 0;
+    startposz = 0;
+    player.sendNotice( 0, "RP session cleaned." );
   }
   else if( subCommand == "mode" )
   {
   }
-  
+
+  else if( subCommand == "battle" )
+  {
+    if( params == "start" )
+    {
+      
+    }
+    
+  }
+
 /*   else if( subCommand == "spectate" )
   {
     uint16_t test;
