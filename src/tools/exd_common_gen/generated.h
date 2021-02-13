@@ -380,10 +380,10 @@ enum class ItemSearchCategory :
 enum class OnlineStatus :
   uint8_t
 {
-  Producer = 1,
+  GameQA = 1,
   GameMaster = 2,
   GameMaster1 = 3,
-  GameMaster2 = 4,
+  EventParticipant = 4,
   Disconnected = 5,
   WaitingforFriendListApproval = 6,
   WaitingforLinkshellApproval = 7,
