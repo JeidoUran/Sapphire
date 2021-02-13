@@ -91,7 +91,7 @@ public:
     //! RP Added eobjs
     instance.registerEObj( "portal", 2007181, 0, 4, { -14.400992f, -754.000000f, 182.641739f }, 1.000000f, 0.748016f ); 
     instance.registerEObj( "oculargate", 2002927, 0, 4, { 0.074870f, -753.000000f, 180.761383f }, 1.000000f, -0.016232f ); 
-    instance.registerEObj( "notes", 2005180, 0, 4, { -16.690599f, -752.000000f, 184.967300f }, 1.000000f, 0.355421f ); 
+    instance.registerEObj( "notes", 2005180, 0, 4, { -16.690599f, -754.000000f, 184.967300f }, 1.000000f, 0.355421f ); 
 
   }
 
@@ -108,6 +108,20 @@ public:
 
   void onPlayerSetup( InstanceContent& instance, Entity::Player& player )
   {
+    //! Setup Arme Jeido
+    if( player.getId() == 2097216 )
+    {
+      player.setRot( -1.87307 );
+      player.setPos( { -15.265095f, -754.000000f, 180.085052f } );
+      player.setModelType( 2 );
+      player.setSubType( 6 );
+      player.setEnemyType( 1 );
+      // player.setbNPCBase( 2161 );
+      // player.setbNPCName( 3540 );
+      //player.setModelMainWeapon( 0x0000000000000000 );
+      player.sendModel();
+      //player.setGmInvis( true );
+    }
     instance.getEObjByName( "portal" )->setAnimationFlag( 0, 4 );
   }
 
