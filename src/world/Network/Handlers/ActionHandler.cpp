@@ -26,7 +26,7 @@ void Sapphire::Network::GameConnection::actionHandler( const Packets::FFXIVARR_P
   const auto itemSourceSlot = packet.data().itemSourceSlot;
   const auto itemSourceContainer = packet.data().itemSourceContainer;
 
-  player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, targetId: {3}", type, sequence, actionId, targetId );
+  //player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, targetId: {3}", type, sequence, actionId, targetId );
 
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
@@ -97,8 +97,8 @@ void Sapphire::Network::GameConnection::placedActionHandler( const Packets::FFXI
     return;
   }
 
-  player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
-                    type, sequence, actionId, pos.x, pos.y, pos.z );
+  //player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
+  //                  type, sequence, actionId, pos.x, pos.y, pos.z );
 
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 

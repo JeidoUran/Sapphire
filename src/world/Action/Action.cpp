@@ -430,7 +430,7 @@ void Action::Action::execute()
   {
     auto player = m_pSource->getAsPlayer();
 
-    player->sendDebug( "action combo success from action#{0}", player->getLastComboActionId() );
+    //player->sendDebug( "action combo success from action#{0}", player->getLastComboActionId() );
   }
 
   if( !hasClientsideTarget()  )
@@ -502,11 +502,11 @@ void Action::Action::buildEffects()
   auto player = getSourceChara()->getAsPlayer();
   if( player )
   {
-    player->sendDebug( "type: {}, dpot: {} (dcpot: {}, ddpot: {}), hpot: {}, ss: {}, ts: {}, bonus: {}, breq: {}, bdata: {}",
-                       m_actionData->attackType,
-                       m_lutEntry.damagePotency, m_lutEntry.damageComboPotency, m_lutEntry.damageDirectionalPotency,
-                       m_lutEntry.healPotency, m_lutEntry.selfStatus, m_lutEntry.targetStatus,
-                       m_lutEntry.bonusEffect, m_lutEntry.bonusRequirement, m_lutEntry.bonusDataUInt32 );
+//    player->sendDebug( "type: {}, dpot: {} (dcpot: {}, ddpot: {}), hpot: {}, ss: {}, ts: {}, bonus: {}, breq: {}, bdata: {}",
+//                       m_actionData->attackType,
+//                       m_lutEntry.damagePotency, m_lutEntry.damageComboPotency, m_lutEntry.damageDirectionalPotency,
+//                       m_lutEntry.healPotency, m_lutEntry.selfStatus, m_lutEntry.targetStatus,
+//                       m_lutEntry.bonusEffect, m_lutEntry.bonusRequirement, m_lutEntry.bonusDataUInt32 );
   }
 
   uint8_t victimCounter = 0, validVictimCounter = 0;
@@ -1074,10 +1074,10 @@ bool Action::Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& ac
 
   if( auto player = m_pSource->getAsPlayer() )
   {
-    player->sendDebug( "Hit {} actors with {} filters", actors.size(), m_actorFilters.size() );
+    //player->sendDebug( "Hit {} actors with {} filters", actors.size(), m_actorFilters.size() );
     for( const auto& actor : actors )
     {
-      player->sendDebug( "hit actor#{}", actor->getId() );
+      //player->sendDebug( "hit actor#{}", actor->getId() );
     }
   }
 
