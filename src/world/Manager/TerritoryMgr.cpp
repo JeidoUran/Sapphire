@@ -115,7 +115,9 @@ bool Sapphire::World::Manager::TerritoryMgr::isInstanceContentTerritory( uint32_
          intendedUse == TerritoryIntendedUse::Eureka ||
          intendedUse == TerritoryIntendedUse::MaskedCarnival ||
          intendedUse == TerritoryIntendedUse::DiademV3 ||
-         intendedUse == TerritoryIntendedUse::Bozja;
+         intendedUse == TerritoryIntendedUse::Bozja ||
+         intendedUse == TerritoryIntendedUse::DelubrumReginae ||
+         intendedUse == TerritoryIntendedUse::DelubrumReginaeSavage;
 }
 
 bool Sapphire::World::Manager::TerritoryMgr::isPrivateTerritory( uint32_t territoryTypeId ) const

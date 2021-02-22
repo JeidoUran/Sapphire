@@ -70,6 +70,8 @@ namespace Sapphire::World::Manager
       OceanFishing = 46,
       DiademV3 = 47,
       Bozja = 48,
+      DelubrumReginae = 52,
+      DelubrumReginaeSavage = 53,
     };
 
     TerritoryMgr();
