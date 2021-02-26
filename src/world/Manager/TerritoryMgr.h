@@ -48,8 +48,10 @@ namespace Sapphire::World::Manager
       MSQPrivateArea = 15,
       Raids = 16,
       RaidFights = 17,
+      ChocoboSquare = 19,
       ChocoboTutorial = 21,
       Wedding = 22,
+      GoldSaucer = 23,
       DiademV1 = 26,
       BeginnerTutorial = 27,
       PvPTheFeast = 28,
@@ -68,6 +70,8 @@ namespace Sapphire::World::Manager
       OceanFishing = 46,
       DiademV3 = 47,
       Bozja = 48,
+      DelubrumReginae = 52,
+      DelubrumReginaeSavage = 53,
     };
 
     TerritoryMgr();

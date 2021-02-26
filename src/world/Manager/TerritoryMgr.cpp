@@ -115,7 +115,9 @@ bool Sapphire::World::Manager::TerritoryMgr::isInstanceContentTerritory( uint32_
          intendedUse == TerritoryIntendedUse::Eureka ||
          intendedUse == TerritoryIntendedUse::MaskedCarnival ||
          intendedUse == TerritoryIntendedUse::DiademV3 ||
-         intendedUse == TerritoryIntendedUse::Bozja;
+         intendedUse == TerritoryIntendedUse::Bozja ||
+         intendedUse == TerritoryIntendedUse::DelubrumReginae ||
+         intendedUse == TerritoryIntendedUse::DelubrumReginaeSavage;
 }
 
 bool Sapphire::World::Manager::TerritoryMgr::isPrivateTerritory( uint32_t territoryTypeId ) const
@@ -150,9 +152,9 @@ bool Sapphire::World::Manager::TerritoryMgr::isDefaultTerritory( uint32_t territ
          pTeri->territoryIntendedUse == TerritoryIntendedUse::Town ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::OpenWorld ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::JailArea ||
-         pTeri->territoryIntendedUse == TerritoryIntendedUse::OpeningArea;
-         pTeri->territoryIntendedUse == 23;
-
+         pTeri->territoryIntendedUse == TerritoryIntendedUse::OpeningArea ||
+         pTeri->territoryIntendedUse == TerritoryIntendedUse::GoldSaucer ||
+         pTeri->territoryIntendedUse == TerritoryIntendedUse::ChocoboSquare;
 }
 
 bool Sapphire::World::Manager::TerritoryMgr::isHousingTerritory( uint32_t territoryTypeId ) const
@@ -578,6 +580,7 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t 
 
       // remove zone from maps
       m_territorySet.erase( zone );
+      m_guIdToTerritoryPtrMap.erase( zone->getGuId() );
       it = m_landIdentToTerritoryPtrMap.erase( it );
     }
     else
