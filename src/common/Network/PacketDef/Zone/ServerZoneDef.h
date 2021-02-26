@@ -1856,7 +1856,7 @@ namespace Sapphire::Network::Packets::Server
 
   struct FFXIVIpcPerformNote : FFXIVIpcBasePacket< PerformNote >
   {
-    uint8_t data[32];
+    uint8_t data[16];
   };
 
   struct FFXIVIpcHousingUpdateLandFlagsSlot : FFXIVIpcBasePacket< HousingUpdateLandFlagsSlot >
